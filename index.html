@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BarberPro - Barbearia & Agendamento Admin</title>
+    <title>SaaS Agendador Multi-Nicho</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Cinzel & Inter -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <script>
         tailwind.config = {
@@ -19,21 +19,24 @@
             theme: {
                 extend: {
                     colors: {
-                        gold: {
-                            400: '#f1c40f',
-                            500: '#d4af37',
-                            600: '#aa8c2c',
-                            700: '#856d20'
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                            gold: '#d4af37',
+                            pink: '#ec4899',
+                            green: '#10b981'
                         },
                         dark: {
-                            900: '#0f0f11',
-                            800: '#17171a',
-                            700: '#222226',
-                            600: '#2d2d33'
+                            900: '#0f172a',
+                            800: '#1e293b',
+                            700: '#334155',
+                            600: '#475569'
                         }
                     },
                     fontFamily: {
-                        cinzel: ['Cinzel', 'serif'],
                         sans: ['Inter', 'sans-serif']
                     }
                 }
@@ -41,1159 +44,595 @@
         }
     </script>
     <style>
-        body {
-            background-color: #0f0f11;
-            color: #e5e7eb;
-            font-family: 'Inter', sans-serif;
-        }
-        .font-vintage { font-family: 'Cinzel', serif; }
-        .gold-gradient-text {
-            background: linear-gradient(135deg, #fce8ad 0%, #d4af37 50%, #aa8c2c 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .gold-border-glow { box-shadow: 0 0 15px rgba(212, 175, 55, 0.15); }
-        .gold-border-glow:hover { box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
+        .theme-barbearia { --accent-color: #d4af37; }
+        .theme-petshop { --accent-color: #10b981; }
+        .theme-salao { --accent-color: #ec4899; }
+        .theme-estetica { --accent-color: #8b5cf6; }
         ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f0f11; }
-        ::-webkit-scrollbar-thumb { background: #2d2d33; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #d4af37; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #0284c7; }
     </style>
 </head>
-<body class="antialiased selection:bg-gold-500 selection:text-black">
+<body class="antialiased selection:bg-sky-500 selection:text-white">
+
+    <!-- Top Bar Seletor de Nicho (Demonstração Vendedor/SaaS) -->
+    <div id="saasControlBar" class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 px-4 py-2 flex flex-wrap items-center justify-between text-xs text-slate-300 z-50 relative">
+        <div class="flex items-center space-x-2">
+            <span class="bg-sky-500/20 text-sky-400 font-bold px-2 py-0.5 rounded border border-sky-500/30"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> PAINEL DEMO SAAS</span>
+            <span class="hidden sm:inline text-slate-400">Troque o nicho do app em tempo real:</span>
+        </div>
+        <div class="flex items-center space-x-2">
+            <label for="nicheSelector" class="font-medium text-slate-300">Nicho Ativo:</label>
+            <select id="nicheSelector" onchange="switchNiche(this.value)" class="bg-slate-900 border border-slate-700 text-white rounded px-2.5 py-1 text-xs outline-none focus:border-sky-500">
+                <option value="barbearia">💈 Barbearia & Corte</option>
+                <option value="petshop">🐾 PetShop & Banho/Tosa</option>
+                <option value="salao">✂️ Salão de Beleza / Cabelo</option>
+                <option value="estetica">💅 Estética & Manicure</option>
+            </select>
+        </div>
+    </div>
 
     <!-- Header / Navbar -->
-    <header class="fixed w-full top-0 z-50 bg-dark-900/90 backdrop-blur-md border-b border-gold-500/20 transition-all duration-300">
+    <header class="sticky top-0 z-40 bg-dark-900/90 backdrop-blur-md border-b border-dark-700">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
+            <div class="flex items-center justify-between h-16">
                 <!-- Logo -->
                 <a href="#" onclick="showView('client')" class="flex items-center space-x-3 group">
-                    <div class="w-10 h-10 rounded-full border border-gold-500 flex items-center justify-center bg-dark-800 text-gold-500 group-hover:scale-105 transition-transform">
-                        <i class="fa-solid fa-scissors text-lg"></i>
+                    <div id="appLogoIcon" class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 flex items-center justify-center text-lg group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-scissors"></i>
                     </div>
-                    <span class="font-vintage text-xl sm:text-2xl font-bold tracking-wider gold-gradient-text">BARBER<span class="text-white">PRO</span></span>
+                    <div>
+                        <span id="appName" class="font-extrabold text-lg sm:text-xl text-white tracking-tight">BarberPro</span>
+                        <span id="appSubName" class="block text-[10px] text-slate-400 font-medium">Agendamento Online</span>
+                    </div>
                 </a>
 
-                <!-- Desktop Menu (Cliente) -->
-                <nav id="clientNav" class="hidden md:flex items-center space-x-8">
-                    <a href="#home" class="text-sm font-medium hover:text-gold-500 transition-colors">Início</a>
-                    <a href="#servicos" class="text-sm font-medium hover:text-gold-500 transition-colors">Serviços & Preços</a>
-                    <a href="#barbeiros" class="text-sm font-medium hover:text-gold-500 transition-colors">Barbeiros</a>
-                    <a href="#sobre" class="text-sm font-medium hover:text-gold-500 transition-colors">A Barbearia</a>
-                    <button onclick="openAgendamentosModal()" class="relative text-gold-500 hover:text-white text-sm font-medium transition-colors">
-                        <i class="fa-solid fa-calendar-check text-lg"></i>
-                        <span id="agendamentosBadge" class="hidden absolute -top-2 -right-3 bg-gold-500 text-black font-bold text-xs w-4 h-4 rounded-full flex items-center justify-center">0</span>
-                    </button>
-                    <a href="#agendar" class="bg-gradient-to-r from-gold-600 to-gold-500 hover:from-gold-500 hover:to-gold-400 text-black font-semibold px-5 py-2.5 rounded-lg shadow-lg text-sm">
-                        Agendar Horário
+                <!-- Desktop Menu -->
+                <nav id="clientNav" class="hidden md:flex items-center space-x-6 text-sm">
+                    <a href="#home" class="text-slate-300 hover:text-white transition-colors">Início</a>
+                    <a href="#servicos" class="text-slate-300 hover:text-white transition-colors">Serviços & Tabela</a>
+                    <a href="#profissionais" class="text-slate-300 hover:text-white transition-colors" id="navProfText">Profissionais</a>
+                    <a href="#agendar" class="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center">
+                        <i class="fa-solid fa-calendar-plus mr-2"></i> Agendar Agora
                     </a>
-                    <button onclick="openAdminAuthModal()" class="text-gray-400 hover:text-gold-400 text-xs flex items-center space-x-1 border border-dark-700 px-3 py-1.5 rounded-lg">
-                        <i class="fa-solid fa-user-gear"></i>
-                        <span>Painel Barbeiro</span>
+                    <button onclick="openAdminAuthModal()" class="text-slate-400 hover:text-sky-400 text-xs flex items-center space-x-1 border border-dark-700 px-3 py-1.5 rounded-lg">
+                        <i class="fa-solid fa-lock"></i>
+                        <span>Painel Admin</span>
                     </button>
                 </nav>
 
-                <!-- Admin Top Bar Indicator -->
-                <div id="adminNav" class="hidden flex items-center space-x-4">
-                    <span class="text-xs bg-gold-500/20 text-gold-400 border border-gold-500/40 px-3 py-1 rounded-full font-semibold">
-                        <i class="fa-solid fa-shield-halved mr-1"></i> Modo Administrador
+                <!-- Admin Nav Back -->
+                <div id="adminNav" class="hidden flex items-center space-x-3">
+                    <span class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-3 py-1 rounded-full font-semibold">
+                        <i class="fa-solid fa-user-shield mr-1"></i> Modo Administrador
                     </span>
-                    <button onclick="showView('client')" class="bg-dark-700 hover:bg-dark-600 text-gray-200 text-xs px-4 py-2 rounded-lg font-medium transition-all">
-                        <i class="fa-solid fa-arrow-left mr-1"></i> Voltar ao Site
-                    </button>
-                </div>
-
-                <!-- Mobile menu button -->
-                <div class="flex items-center space-x-3 md:hidden" id="mobileControls">
-                    <button onclick="openAdminAuthModal()" class="text-gold-500 text-sm font-medium border border-gold-500/30 px-2 py-1 rounded">
-                        <i class="fa-solid fa-lock text-xs"></i> Admin
-                    </button>
-                    <button id="mobileMenuBtn" class="text-gray-300 p-2">
-                        <i class="fa-solid fa-bars text-xl" id="menuIcon"></i>
+                    <button onclick="showView('client')" class="bg-dark-800 hover:bg-dark-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg border border-dark-700">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Ver Site Público
                     </button>
                 </div>
             </div>
-        </div>
-
-        <!-- Mobile Navigation Menu -->
-        <div id="mobileMenu" class="hidden md:hidden bg-dark-800 border-b border-gold-500/20 px-4 pt-2 pb-6 space-y-3">
-            <a href="#home" class="mobile-link block py-2 text-base font-medium text-gray-300">Início</a>
-            <a href="#servicos" class="mobile-link block py-2 text-base font-medium text-gray-300">Serviços & Preços</a>
-            <a href="#agendar" class="mobile-link block w-full text-center bg-gold-500 text-black font-semibold py-3 rounded-lg mt-4">
-                Agendar Horário
-            </a>
         </div>
     </header>
 
-    <!-- =================================================================== -->
-    <!-- VISÃO 1: SITE PÚBLICO DO CLIENTE -->
-    <!-- =================================================================== -->
-    <main id="clientView">
+    <!-- VISÃO 1: SITE CLIENTE -->
+    <main id="clientView" class="space-y-16 pb-16">
         <!-- Hero Section -->
-        <section id="home" class="relative min-h-screen flex items-center pt-20 overflow-hidden">
-            <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-dark-700 via-dark-900 to-black opacity-80"></div>
-            <div class="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-15 filter grayscale"></div>
-
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 text-center md:text-left flex flex-col md:flex-row items-center justify-between">
-                <div class="md:w-1/2 space-y-6">
-                    <div class="inline-flex items-center space-x-2 bg-dark-800 border border-gold-500/30 px-3 py-1.5 rounded-full text-gold-400 text-xs font-semibold uppercase tracking-wider">
-                        <i class="fa-solid fa-crown"></i>
-                        <span>Estilo & Tradição Vintage</span>
+        <section id="home" class="relative pt-12 pb-20 overflow-hidden bg-gradient-to-b from-dark-900 via-dark-800 to-dark-900 border-b border-dark-700">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
+                <div class="md:w-1/2 space-y-6 text-center md:text-left">
+                    <div id="heroBadge" class="inline-flex items-center space-x-2 bg-dark-800 border border-sky-500/30 px-3.5 py-1.5 rounded-full text-sky-400 text-xs font-semibold uppercase tracking-wider">
+                        <i class="fa-solid fa-star"></i>
+                        <span>Atendimento com Hora Marcada</span>
                     </div>
-                    <h1 class="font-vintage text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
-                        Mais que um corte, <br>uma <span class="gold-gradient-text">Experiência</span>.
+                    <h1 id="heroTitle" class="text-4xl sm:text-5xl font-extrabold text-white leading-tight tracking-tight">
+                        Sua Barbearia de Confiança com Agendamento Prático.
                     </h1>
-                    <p class="text-gray-400 text-base sm:text-lg max-w-xl">
-                        Agende seu horário em tempo real. Escolha o barbeiro de sua preferência, confira valores e garanta seu horário de forma instantânea.
+                    <p id="heroDesc" class="text-slate-400 text-base max-w-xl">
+                        Escolha os serviços, selecione o profissional de sua preferência e marque seu horário em poucos segundos.
                     </p>
-                    <div class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
-                        <a href="#agendar" class="w-full sm:w-auto text-center bg-gradient-to-r from-gold-600 to-gold-500 text-black font-bold px-8 py-4 rounded-xl shadow-lg hover:scale-105 transition-all text-base">
-                            <i class="fa-solid fa-calendar-plus mr-2"></i> Agendar Horário
+                    <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-2">
+                        <a href="#agendar" class="w-full sm:w-auto text-center bg-sky-600 hover:bg-sky-500 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition-all text-sm">
+                            <i class="fa-solid fa-calendar-check mr-2"></i> Agendar Atendimento
                         </a>
-                        <a href="#servicos" class="w-full sm:w-auto text-center border border-gold-500/40 text-gold-400 hover:bg-gold-500/10 font-medium px-8 py-4 rounded-xl transition-all text-base">
-                            Tabela de Preços
+                        <a href="#servicos" class="w-full sm:w-auto text-center border border-dark-600 text-slate-300 hover:bg-dark-800 px-6 py-3.5 rounded-xl transition-all text-sm">
+                            Ver Serviços e Valores
                         </a>
                     </div>
                 </div>
 
-                <div class="md:w-5/12 mt-12 md:mt-0 relative">
-                    <div class="relative mx-auto w-full max-w-md rounded-2xl overflow-hidden border-2 border-gold-500/30 gold-border-glow shadow-2xl">
-                        <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&q=80" alt="Barbearia Vintage" class="w-full h-[450px] object-cover">
-                        <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent"></div>
-                        <div class="absolute bottom-6 left-6 right-6 p-4 bg-dark-800/90 backdrop-blur-md rounded-xl border border-gold-500/20 flex items-center justify-between">
-                            <div>
-                                <p class="text-xs text-gold-400 font-semibold">HORÁRIO DE ATENDIMENTO</p>
-                                <p class="text-sm font-medium text-white">Seg à Sáb: 09:00 - 20:00</p>
+                <div class="md:w-5/12 w-full">
+                    <div class="relative mx-auto w-full max-w-md rounded-2xl overflow-hidden border border-dark-700 shadow-2xl bg-dark-800 p-2">
+                        <img id="heroImage" src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80" alt="Capa" class="w-full h-72 object-cover rounded-xl">
+                        <div class="p-4 space-y-2">
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> Funcionamento:</span>
+                                <span class="text-emerald-400 font-semibold">Seg à Sáb: 08:00 - 19:00</span>
                             </div>
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-500/10 text-green-400 border border-green-500/30">
-                                ● Agenda Aberta
-                            </span>
+                            <div class="flex items-center justify-between text-xs">
+                                <span class="text-slate-400"><i class="fa-solid fa-location-dot mr-1"></i> Endereço:</span>
+                                <span class="text-slate-200">Atendimento Presencial</span>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Tabela de Serviços e Preços -->
-        <section id="servicos" class="py-20 bg-dark-800 relative">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <h2 class="text-gold-400 text-sm font-semibold uppercase tracking-wider mb-2">Tabela de Valores</h2>
-                    <p class="font-vintage text-3xl sm:text-4xl font-bold text-white mb-4">Nossos Serviços & Combos</p>
-                    <p class="text-gray-400">Preços transparentes com a qualidade e atendimento que você merece.</p>
-                </div>
-
-                <div class="flex justify-center flex-wrap gap-2 mb-10" id="servicesFilter">
-                    <button onclick="filterServices('all')" class="filter-btn active bg-gold-500 text-black px-5 py-2 rounded-full font-medium text-sm transition-all">Todos</button>
-                    <button onclick="filterServices('cabelo')" class="filter-btn bg-dark-700 text-gray-300 hover:bg-dark-600 px-5 py-2 rounded-full font-medium text-sm transition-all">Cabelo</button>
-                    <button onclick="filterServices('barba')" class="filter-btn bg-dark-700 text-gray-300 hover:bg-dark-600 px-5 py-2 rounded-full font-medium text-sm transition-all">Barba</button>
-                    <button onclick="filterServices('combos')" class="filter-btn bg-dark-700 text-gray-300 hover:bg-dark-600 px-5 py-2 rounded-full font-medium text-sm transition-all">Combos</button>
-                </div>
-
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="servicesGrid">
-                    <!-- Preenchido via JS -->
-                </div>
+        <!-- Serviços e Preços -->
+        <section id="servicos" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <h2 class="text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">Valores Transparentes</h2>
+                <p class="text-2xl sm:text-3xl font-extrabold text-white">Nossos Serviços & Preços</p>
             </div>
+            <div id="servicesGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- Barbeiros -->
-        <section id="barbeiros" class="py-20 bg-dark-900 border-t border-dark-700">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <h2 class="text-gold-400 text-sm font-semibold uppercase tracking-wider mb-2">Especialistas</h2>
-                    <p class="font-vintage text-3xl sm:text-4xl font-bold text-white mb-4">Nossos Barbeiros</p>
-                </div>
-                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8" id="barbersGrid">
-                    <!-- Preenchido via JS -->
-                </div>
+        <!-- Profissionais -->
+        <section id="profissionais" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-dark-700 pt-16">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <h2 class="text-sky-400 text-xs font-bold uppercase tracking-wider mb-1" id="profSubtitle">Equipe Especializada</h2>
+                <p class="text-2xl sm:text-3xl font-extrabold text-white" id="profTitle">Escolha o Profissional</p>
             </div>
+            <div id="teamGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
         </section>
 
-        <!-- Seção do Formulário de Agendamento Cliente -->
-        <section id="agendar" class="py-20 bg-dark-800 relative border-t border-gold-500/10">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div class="bg-dark-900 border border-gold-500/30 rounded-2xl p-6 sm:p-10 shadow-2xl gold-border-glow">
-                    <div class="text-center mb-8">
-                        <span class="inline-block p-3 rounded-full bg-gold-500/10 text-gold-400 mb-3">
-                            <i class="fa-regular fa-calendar-check text-2xl"></i>
-                        </span>
-                        <h2 class="font-vintage text-3xl font-bold text-white">Agendamento Online</h2>
-                        <p class="text-gray-400 text-sm mt-1">Selecione o serviço e confira a disponibilidade real de horários.</p>
+        <!-- Formulário de Agendamento -->
+        <section id="agendar" class="max-w-3xl mx-auto px-4">
+            <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
+                <div class="text-center">
+                    <h3 class="text-2xl font-bold text-white">Agendamento em 3 Passos</h3>
+                    <p class="text-slate-400 text-xs mt-1">Selecione o serviço e confirme seu horário com disponibilidade em tempo real.</p>
+                </div>
+
+                <form id="bookingForm" onsubmit="handleClientBooking(event)" class="space-y-4">
+                    <!-- 1. Serviço -->
+                    <div>
+                        <label class="block text-xs font-bold text-sky-400 uppercase tracking-wider mb-2">1. Selecione o Serviço</label>
+                        <select id="bookServiceSelect" required onchange="updateBookingState()" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-3 text-sm outline-none focus:border-sky-500"></select>
                     </div>
 
-                    <!-- Passos do Wizard -->
-                    <div class="flex items-center justify-between mb-8 max-w-md mx-auto">
-                        <div class="flex flex-col items-center">
-                            <div id="step1-indicator" class="w-8 h-8 rounded-full bg-gold-500 text-black font-bold flex items-center justify-center text-sm">1</div>
-                            <span class="text-xs text-gray-400 mt-1">Serviço</span>
+                    <!-- 2. Profissional -->
+                    <div>
+                        <label class="block text-xs font-bold text-sky-400 uppercase tracking-wider mb-2">2. Profissional</label>
+                        <select id="bookProfSelect" required onchange="renderTimeSlots()" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-3 text-sm outline-none focus:border-sky-500"></select>
+                    </div>
+
+                    <!-- 3. Data e Horário -->
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-sky-400 uppercase tracking-wider mb-2">3. Data desejada</label>
+                            <input type="date" id="bookDate" required onchange="renderTimeSlots()" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-3 text-sm outline-none focus:border-sky-500">
                         </div>
-                        <div class="flex-1 h-0.5 bg-dark-700 mx-2"></div>
-                        <div class="flex flex-col items-center">
-                            <div id="step2-indicator" class="w-8 h-8 rounded-full bg-dark-700 text-gray-400 font-bold flex items-center justify-center text-sm">2</div>
-                            <span class="text-xs text-gray-400 mt-1">Data & Horário</span>
-                        </div>
-                        <div class="flex-1 h-0.5 bg-dark-700 mx-2"></div>
-                        <div class="flex flex-col items-center">
-                            <div id="step3-indicator" class="w-8 h-8 rounded-full bg-dark-700 text-gray-400 font-bold flex items-center justify-center text-sm">3</div>
-                            <span class="text-xs text-gray-400 mt-1">Confirmação</span>
+                        <div>
+                            <label class="block text-xs font-bold text-sky-400 uppercase tracking-wider mb-2">Horários Disponíveis</label>
+                            <div id="slotsGrid" class="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto p-1 bg-dark-900 rounded-lg border border-dark-600">
+                                <p class="col-span-3 text-xs text-slate-500 text-center py-4">Selecione a data primeiro</p>
+                            </div>
                         </div>
                     </div>
 
-                    <form id="bookingForm" onsubmit="handleClientFormSubmit(event)">
-                        <!-- Passo 1: Serviço -->
-                        <div id="step1" class="space-y-4">
-                            <label class="block text-sm font-medium text-gold-400 mb-2">1. Escolha o Serviço:</label>
-                            <div class="grid gap-3" id="bookingServicesList"></div>
-                            <div class="flex justify-end pt-4">
-                                <button type="button" onclick="nextStep(2)" id="btnNext1" disabled class="bg-gold-500 text-black font-semibold px-6 py-3 rounded-lg opacity-50 cursor-not-allowed">
-                                    Próximo Passo <i class="fa-solid fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
+                    <!-- Dados Pessoais -->
+                    <div class="grid sm:grid-cols-2 gap-4 border-t border-dark-700 pt-4">
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">Seu Nome Completo *</label>
+                            <input type="text" id="bookClientName" required placeholder="Ex: João da Silva" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
                         </div>
-
-                        <!-- Passo 2: Barbeiro, Data e Horários em Tempo Real -->
-                        <div id="step2" class="space-y-6 hidden">
-                            <div>
-                                <label class="block text-sm font-medium text-gold-400 mb-2">2. Barbeiro de Preferência:</label>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="bookingBarberList"></div>
-                            </div>
-
-                            <div class="grid sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="bookingDate" class="block text-sm font-medium text-gold-400 mb-2">3. Selecione a Data:</label>
-                                    <input type="date" id="bookingDate" required onchange="renderTimeSlots()" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-3 outline-none focus:border-gold-500">
-                                </div>
-                                <div>
-                                    <div class="flex justify-between items-center mb-2">
-                                        <label class="block text-sm font-medium text-gold-400">4. Horários:</label>
-                                        <span class="text-xs text-gray-400"><span class="inline-block w-2 h-2 rounded-full bg-red-500 mr-1"></span> Vermelho = Ocupado</span>
-                                    </div>
-                                    <div id="timeSlotsGrid" class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1 bg-dark-800 rounded-lg border border-dark-600">
-                                        <p class="col-span-3 text-xs text-gray-500 text-center py-4">Selecione uma data acima</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="flex justify-between pt-4">
-                                <button type="button" onclick="prevStep(1)" class="border border-dark-600 text-gray-300 font-medium px-6 py-3 rounded-lg">
-                                    <i class="fa-solid fa-arrow-left mr-2"></i> Voltar
-                                </button>
-                                <button type="button" onclick="nextStep(3)" id="btnNext2" disabled class="bg-gold-500 text-black font-semibold px-6 py-3 rounded-lg opacity-50 cursor-not-allowed">
-                                    Próximo Passo <i class="fa-solid fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
+                        <div>
+                            <label class="block text-xs font-medium text-slate-300 mb-1">WhatsApp / Celular *</label>
+                            <input type="tel" id="bookClientPhone" required placeholder="(11) 99999-9999" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
                         </div>
+                    </div>
 
-                        <!-- Passo 3: Dados Pessoais -->
-                        <div id="step3" class="space-y-4 hidden">
-                            <div class="grid sm:grid-cols-2 gap-4">
-                                <div>
-                                    <label for="clientName" class="block text-sm font-medium text-gold-400 mb-1">Seu Nome Completo *</label>
-                                    <input type="text" id="clientName" required placeholder="Ex: João Silva" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-3 outline-none">
-                                </div>
-                                <div>
-                                    <label for="clientPhone" class="block text-sm font-medium text-gold-400 mb-1">WhatsApp / Celular *</label>
-                                    <input type="tel" id="clientPhone" required placeholder="(11) 99999-9999" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-3 outline-none">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label for="clientNotes" class="block text-sm font-medium text-gold-400 mb-1">Observações (Opcional)</label>
-                                <textarea id="clientNotes" rows="2" placeholder="Ex: Preferência por fade alto, barba bem alinhada..." class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-3 outline-none"></textarea>
-                            </div>
-
-                            <div class="bg-dark-800 p-4 rounded-xl border border-gold-500/20 space-y-2 mt-4 text-sm">
-                                <h4 class="font-vintage text-gold-400 font-bold border-b border-dark-700 pb-2">Resumo da Reserva</h4>
-                                <div class="flex justify-between text-gray-300"><span>Serviço:</span><span id="summaryService" class="font-semibold text-white">-</span></div>
-                                <div class="flex justify-between text-gray-300"><span>Barbeiro:</span><span id="summaryBarber" class="font-semibold text-white">-</span></div>
-                                <div class="flex justify-between text-gray-300"><span>Data & Horário:</span><span id="summaryDateTime" class="font-semibold text-white">-</span></div>
-                                <div class="flex justify-between text-gray-300 border-t border-dark-700 pt-2 font-bold">
-                                    <span class="text-gold-400">Total a Pagar no local:</span>
-                                    <span id="summaryPrice" class="text-gold-400 text-base">R$ 0,00</span>
-                                </div>
-                            </div>
-
-                            <div class="flex justify-between pt-4">
-                                <button type="button" onclick="prevStep(2)" class="border border-dark-600 text-gray-300 font-medium px-6 py-3 rounded-lg">
-                                    <i class="fa-solid fa-arrow-left mr-2"></i> Voltar
-                                </button>
-                                <button type="submit" class="bg-gradient-to-r from-gold-600 to-gold-500 text-black font-bold px-8 py-3 rounded-lg shadow-lg flex items-center">
-                                    <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Confirmar & Enviar WhatsApp
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </section>
-
-        <!-- Sobre -->
-        <section id="sobre" class="py-16 bg-dark-900 border-t border-dark-700 text-center">
-            <div class="max-w-4xl mx-auto px-4">
-                <h3 class="font-vintage text-2xl font-bold text-white mb-2">BarberPro Lounge</h3>
-                <p class="text-gray-400 text-sm">Ambiente climatizado, atendimento exclusivo, café especial e chopp gelado de cortesia.</p>
+                    <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all text-sm flex items-center justify-center">
+                        <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Confirmar Agendamento no WhatsApp
+                    </button>
+                </form>
             </div>
         </section>
     </main>
 
-    <!-- =================================================================== -->
-    <!-- VISÃO 2: PAINEL DO ADMINISTRADOR / BARBEIRO -->
-    <!-- =================================================================== -->
-    <main id="adminView" class="hidden pt-24 pb-16 min-h-screen bg-dark-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            
-            <!-- Header do Admin -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-dark-700 mb-8 gap-4">
-                <div>
-                    <h1 class="font-vintage text-3xl font-bold text-white">Painel do Barbeiro</h1>
-                    <p class="text-gray-400 text-sm">Gerencie sua agenda do dia, bloqueie horários e atualize preços.</p>
-                </div>
-                <div class="flex items-center space-x-3">
-                    <button onclick="openManualBookingModal()" class="bg-gold-500 hover:bg-gold-400 text-black font-bold px-4 py-2.5 rounded-lg text-sm transition-all flex items-center">
-                        <i class="fa-solid fa-plus-circle mr-2"></i> Encaixe / Bloquear Horário
-                    </button>
-                    <button onclick="openManageServicesModal()" class="bg-dark-800 border border-gold-500/30 text-gold-400 hover:bg-dark-700 px-4 py-2.5 rounded-lg text-sm font-semibold transition-all">
-                        <i class="fa-solid fa-tags mr-1"></i> Preços & Serviços
-                    </button>
-                </div>
+    <!-- VISÃO 2: PAINEL ADMINISTRATIVO -->
+    <main id="adminView" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-dark-700 pb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-white">Painel de Gestão da Agenda</h1>
+                <p class="text-slate-400 text-xs">Visualize os horários agendados e bloqueie novos horários manuais.</p>
             </div>
-
-            <!-- Dashboard Métricas Rápidas -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-                <div class="bg-dark-800 p-4 rounded-xl border border-dark-700">
-                    <p class="text-xs text-gray-400">Agendamentos Hoje</p>
-                    <p class="font-vintage text-2xl font-bold text-white" id="statTodayCount">0</p>
-                </div>
-                <div class="bg-dark-800 p-4 rounded-xl border border-dark-700">
-                    <p class="text-xs text-gray-400">Total Confirmados</p>
-                    <p class="font-vintage text-2xl font-bold text-green-400" id="statConfirmedCount">0</p>
-                </div>
-                <div class="bg-dark-800 p-4 rounded-xl border border-dark-700">
-                    <p class="text-xs text-gray-400">Faturamento Estimado</p>
-                    <p class="font-vintage text-2xl font-bold text-gold-400" id="statRevenue">R$ 0</p>
-                </div>
-                <div class="bg-dark-800 p-4 rounded-xl border border-dark-700">
-                    <p class="text-xs text-gray-400">Concluídos</p>
-                    <p class="font-vintage text-2xl font-bold text-blue-400" id="statCompletedCount">0</p>
-                </div>
-            </div>
-
-            <!-- Filtro por Data e Barbeiro na Agenda -->
-            <div class="bg-dark-800 p-4 rounded-xl border border-dark-700 mb-6 flex flex-col md:flex-row items-center justify-between gap-4">
-                <div class="flex items-center space-x-3 w-full md:w-auto">
-                    <label for="adminDateFilter" class="text-sm font-medium text-gold-400 whitespace-nowrap">Filtrar Agenda:</label>
-                    <input type="date" id="adminDateFilter" onchange="renderAdminBookings()" class="bg-dark-900 border border-dark-600 text-white text-sm rounded-lg p-2 outline-none">
-                </div>
-                <div class="flex space-x-2">
-                    <button onclick="setAdminFilterToday()" class="bg-dark-700 hover:bg-dark-600 text-xs px-3 py-2 rounded-lg text-gray-300">Hoje</button>
-                    <button onclick="setAdminFilterAll()" class="bg-dark-700 hover:bg-dark-600 text-xs px-3 py-2 rounded-lg text-gray-300">Ver Todos</button>
-                </div>
-            </div>
-
-            <!-- Lista de Agendamentos (Tabela/Cards Admin) -->
-            <div class="bg-dark-800 rounded-xl border border-dark-700 overflow-hidden shadow-xl">
-                <div class="p-4 border-b border-dark-700 flex justify-between items-center">
-                    <h3 class="font-vintage font-bold text-lg text-white">Horários Marcados & Bloqueios</h3>
-                    <span class="text-xs text-gray-400" id="adminListTitle">Mostrando agendamentos</span>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-gray-300">
-                        <thead class="bg-dark-900 text-gold-400 uppercase text-xs font-semibold border-b border-dark-700">
-                            <tr>
-                                <th class="p-4">Horário / Data</th>
-                                <th class="p-4">Cliente / Origem</th>
-                                <th class="p-4">Barbeiro</th>
-                                <th class="p-4">Serviço</th>
-                                <th class="p-4">Valor</th>
-                                <th class="p-4">Status</th>
-                                <th class="p-4 text-center">Ações</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminBookingsTable" class="divide-y divide-dark-700">
-                            <!-- Preenchido via JS -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-        </div>
-    </main>
-
-    <!-- FOOTER -->
-    <footer class="bg-black py-8 border-t border-dark-800 text-center text-gray-500 text-sm">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <p>© 2026 BarberPro. Sistema Integrado de Agendamento.</p>
-            <button onclick="openAdminAuthModal()" class="text-gray-400 hover:text-gold-400 text-xs">
-                <i class="fa-solid fa-lock mr-1"></i> Acesso Restrito Barbeiro
+            <button onclick="openManualBlockModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-lg text-xs flex items-center">
+                <i class="fa-solid fa-plus mr-2"></i> Novo Encaixe / Bloquear Horário
             </button>
         </div>
-    </footer>
 
-    <!-- =================================================================== -->
-    <!-- MODAIS E POPUPS DA APLICAÇÃO -->
-    <!-- =================================================================== -->
+        <!-- Filtros e Agenda -->
+        <div class="bg-dark-800 p-4 rounded-xl border border-dark-700 flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center space-x-3">
+                <label for="adminDate" class="text-xs font-medium text-slate-300">Data da Agenda:</label>
+                <input type="date" id="adminDate" onchange="renderAdminTable()" class="bg-dark-900 border border-dark-600 text-white text-xs rounded-lg p-2 outline-none">
+            </div>
+            <span id="adminTotalInfo" class="text-xs text-sky-400 font-semibold">Total de agendamentos: 0</span>
+        </div>
 
-    <!-- MODAL: Senha do Admin -->
-    <div id="adminAuthModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-dark-900 border border-gold-500/40 w-full max-w-sm rounded-2xl p-6 text-center space-y-4">
-            <div class="w-12 h-12 rounded-full bg-gold-500/10 text-gold-400 flex items-center justify-center mx-auto text-xl border border-gold-500/30">
-                <i class="fa-solid fa-shield-halved"></i>
+        <div class="bg-dark-800 rounded-xl border border-dark-700 overflow-hidden shadow-xl">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="bg-dark-900 text-slate-400 uppercase font-semibold border-b border-dark-700">
+                        <tr>
+                            <th class="p-3">Horário</th>
+                            <th class="p-3">Cliente / Origem</th>
+                            <th class="p-3">Profissional</th>
+                            <th class="p-3">Serviço</th>
+                            <th class="p-3">Valor</th>
+                            <th class="p-3">Status</th>
+                            <th class="p-3 text-center">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody" class="divide-y divide-dark-700"></tbody>
+                </table>
             </div>
-            <h3 class="font-vintage text-xl font-bold text-white">Acesso do Barbeiro</h3>
-            <p class="text-xs text-gray-400">Digite a senha administrativa para acessar a gestão da agenda.</p>
-            <div>
-                <input type="password" id="adminPasswordInput" placeholder="Senha (Padrão: 1234)" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-3 text-center outline-none focus:border-gold-500">
-                <p id="adminAuthError" class="text-red-400 text-xs mt-2 hidden">Senha incorreta!</p>
-            </div>
+        </div>
+    </main>
+
+    <!-- MODAL AUTH ADMIN -->
+    <div id="authModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-dark-800 border border-dark-700 w-full max-w-xs rounded-xl p-6 text-center space-y-4">
+            <h3 class="text-lg font-bold text-white">Acesso Restrito</h3>
+            <p class="text-xs text-slate-400">Digite a senha administrativa (Padrão: 1234):</p>
+            <input type="password" id="authPass" placeholder="Senha" class="w-full bg-dark-900 border border-dark-600 text-white text-center rounded-lg p-2.5 text-sm outline-none">
             <div class="flex gap-2">
-                <button onclick="closeAdminAuthModal()" class="w-1/2 bg-dark-800 text-gray-300 py-2.5 rounded-lg text-sm">Cancelar</button>
-                <button onclick="verifyAdminPassword()" class="w-1/2 bg-gold-500 hover:bg-gold-400 text-black font-bold py-2.5 rounded-lg text-sm">Entrar</button>
+                <button onclick="closeAuthModal()" class="w-1/2 bg-dark-700 text-slate-300 py-2 rounded-lg text-xs">Cancelar</button>
+                <button onclick="checkAuth()" class="w-1/2 bg-sky-600 text-white font-bold py-2 rounded-lg text-xs">Entrar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: Encaixe / Agendamento Manual do Barbeiro -->
-    <div id="manualBookingModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-dark-900 border border-gold-500/40 w-full max-w-md rounded-2xl p-6 space-y-4">
-            <div class="flex justify-between items-center border-b border-dark-700 pb-3">
-                <h3 class="font-vintage text-lg font-bold text-gold-400">Novo Encaixe / Bloqueio</h3>
-                <button onclick="closeManualBookingModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            <form onsubmit="handleManualBookingSubmit(event)" class="space-y-3">
+    <!-- MODAL MANUAL BLOCK -->
+    <div id="manualModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-dark-800 border border-dark-700 w-full max-w-md rounded-xl p-6 space-y-4">
+            <h3 class="text-lg font-bold text-white">Bloquear Horário / Encaixe</h3>
+            <form onsubmit="handleManualSubmit(event)" class="space-y-3">
                 <div>
-                    <label class="block text-xs font-medium text-gray-400 mb-1">Tipo de Registro:</label>
-                    <select id="manualType" onchange="toggleManualTypeFields()" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
-                        <option value="manual">Agendamento Manual (Insta / Whats / Presencial)</option>
-                        <option value="block">Bloquear Horário (Almoço / Folga / Manutenção)</option>
-                    </select>
-                </div>
-                <div id="manualClientFields">
-                    <label class="block text-xs font-medium text-gray-400 mb-1">Nome do Cliente:</label>
-                    <input type="text" id="manualClientName" placeholder="Ex: Lucas (Instagram)" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
+                    <label class="block text-xs text-slate-400 mb-1">Nome / Motivo:</label>
+                    <input type="text" id="manualName" required placeholder="Ex: Cliente Instagram ou Almoço" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-2.5 text-xs outline-none">
                 </div>
                 <div>
-                    <label class="block text-xs font-medium text-gray-400 mb-1">Barbeiro:</label>
-                    <select id="manualBarber" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none"></select>
-                </div>
-                <div>
-                    <label class="block text-xs font-medium text-gray-400 mb-1">Serviço / Motivo:</label>
-                    <select id="manualService" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none"></select>
+                    <label class="block text-xs text-slate-400 mb-1">Profissional:</label>
+                    <select id="manualProf" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-2.5 text-xs outline-none"></select>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-medium text-gray-400 mb-1">Data:</label>
-                        <input type="date" id="manualDate" required class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
+                        <label class="block text-xs text-slate-400 mb-1">Data:</label>
+                        <input type="date" id="manualDate" required class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-2.5 text-xs outline-none">
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-gray-400 mb-1">Horário:</label>
-                        <select id="manualTime" required class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none"></select>
+                        <label class="block text-xs text-slate-400 mb-1">Horário:</label>
+                        <select id="manualTime" required class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-2.5 text-xs outline-none"></select>
                     </div>
                 </div>
-                <div class="pt-3 flex justify-end gap-2">
-                    <button type="button" onclick="closeManualBookingModal()" class="bg-dark-800 text-gray-300 px-4 py-2 rounded-lg text-sm">Cancelar</button>
-                    <button type="submit" class="bg-gold-500 hover:bg-gold-400 text-black font-bold px-5 py-2 rounded-lg text-sm">Salvar e Bloquear Slot</button>
+                <div class="flex justify-end gap-2 pt-2">
+                    <button type="button" onclick="closeManualModal()" class="bg-dark-700 text-slate-300 px-3 py-2 rounded-lg text-xs">Cancelar</button>
+                    <button type="submit" class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-lg text-xs">Salvar Bloqueio</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: Gerenciar Preços e Serviços -->
-    <div id="manageServicesModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-dark-900 border border-gold-500/40 w-full max-w-2xl rounded-2xl p-6 space-y-4 max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center border-b border-dark-700 pb-3">
-                <h3 class="font-vintage text-lg font-bold text-gold-400">Editar Tabela de Serviços & Preços</h3>
-                <button onclick="closeManageServicesModal()" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-            
-            <div class="overflow-y-auto space-y-3 pr-1 flex-1" id="adminServicesList">
-                <!-- Preenchido via JS -->
-            </div>
-
-            <!-- Adicionar Novo Serviço -->
-            <form onsubmit="handleAddNewService(event)" class="border-t border-dark-700 pt-3 grid grid-cols-1 sm:grid-cols-4 gap-2">
-                <input type="text" id="newServiceName" placeholder="Nome do Serviço" required class="bg-dark-800 border border-dark-600 text-white text-xs rounded-lg p-2.5 outline-none">
-                <input type="number" step="0.5" id="newServicePrice" placeholder="Preço (R$)" required class="bg-dark-800 border border-dark-600 text-white text-xs rounded-lg p-2.5 outline-none">
-                <input type="text" id="newServiceTime" placeholder="Duração (ex: 30 min)" required class="bg-dark-800 border border-dark-600 text-white text-xs rounded-lg p-2.5 outline-none">
-                <button type="submit" class="bg-gold-500 hover:bg-gold-400 text-black font-bold text-xs rounded-lg p-2.5">
-                    + Adicionar Novo
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- MODAL: Meus Agendamentos (Cliente) -->
-    <div id="agendamentosModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-dark-900 border border-gold-500/30 w-full max-w-lg rounded-2xl p-6 relative">
-            <div class="flex justify-between items-center border-b border-dark-700 pb-4 mb-4">
-                <h3 class="font-vintage text-xl font-bold text-gold-400">Meus Agendamentos</h3>
-                <button onclick="closeAgendamentosModal()" class="text-gray-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            <div id="agendamentosListModal" class="space-y-3 max-h-80 overflow-y-auto"></div>
-            <div class="mt-6 pt-4 border-t border-dark-700 flex justify-end">
-                <button onclick="closeAgendamentosModal()" class="bg-dark-700 text-white px-4 py-2 rounded-lg text-sm">Fechar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: Confirmação e WhatsApp -->
-    <div id="confirmModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-dark-900 border border-gold-500/50 w-full max-w-md rounded-2xl p-6 text-center space-y-4 shadow-2xl">
-            <div class="w-16 h-16 rounded-full bg-green-500/10 text-green-400 flex items-center justify-center mx-auto text-3xl border border-green-500/30">
-                <i class="fa-solid fa-check"></i>
-            </div>
-            <h3 class="font-vintage text-2xl font-bold text-white">Agendamento Solicitado!</h3>
-            <p class="text-gray-300 text-sm">Horário reservado no sistema! Clique no botão abaixo para confirmar com a barbearia pelo WhatsApp.</p>
-            <div id="modalDetails" class="bg-dark-800 p-3 rounded-lg text-left text-xs space-y-1 text-gray-300"></div>
-            <div class="flex flex-col gap-2 pt-2">
-                <a id="btnSendWhatsapp" href="#" target="_blank" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg flex items-center justify-center">
-                    <i class="fa-brands fa-whatsapp text-xl mr-2"></i> Confirmar via WhatsApp
-                </a>
-                <button onclick="closeConfirmModal()" class="w-full bg-dark-700 text-gray-300 py-2 rounded-lg text-sm">Fechar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- SCRIPT PRINCIPAL & LÓGICA INTEGRAÇÃO -->
     <script>
-        const BARBER_PHONE = "5511999998888";
-        const ADMIN_PASS = "1234";
+        // CONFIGURAÇÕES DOS NICHOS (WHITE-LABEL ENGINE)
+        const niches = {
+            barbearia: {
+                appName: "BarberPro",
+                subName: "Barbearia & Estilo",
+                icon: "fa-scissors",
+                heroBadge: "Atendimento Vintage & Moderno",
+                heroTitle: "Sua Barbearia de Confiança com Agendamento Prático.",
+                heroDesc: "Escolha os serviços de corte e barba, selecione seu barbeiro e garanta seu horário sem filas.",
+                heroImg: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80",
+                profTitle: "Nossos Barbeiros",
+                profSubtitle: "Especialistas em Estilo Masculino",
+                whatsapp: "5511999998888",
+                services: [
+                    { id: 1, name: "Corte Social / Fade", price: 45, time: "35 min", icon: "fa-scissors" },
+                    { id: 2, name: "Barba Tradicional", price: 35, time: "30 min", icon: "fa-user-ninja" },
+                    { id: 3, name: "Combo Corte + Barba", price: 75, time: "60 min", icon: "fa-crown" }
+                ],
+                profs: [
+                    { id: "p1", name: "Carlos Barbeiro", role: "Fade Master" },
+                    { id: "p2", name: "Lucas Barber", role: "Barboterapia" }
+                ]
+            },
+            petshop: {
+                appName: "PetCare Agendador",
+                subName: "Banho, Tosa & Estética Pet",
+                icon: "fa-paw",
+                heroBadge: "Cuidado e Carinho para seu Pet",
+                heroTitle: "Agende Banho e Tosa sem Complicação.",
+                heroDesc: "Escolha os pacotes para seu pet, o profissional de tosa e acompanhe os horários em tempo real.",
+                heroImg: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80",
+                profTitle: "Nossos Groomers & Tosadores",
+                profSubtitle: "Especialistas no Cuidado Pet",
+                whatsapp: "5511988887777",
+                services: [
+                    { id: 1, name: "Banho & Higienização", price: 50, time: "40 min", icon: "fa-shower" },
+                    { id: 2, name: "Tosa Higiênica + Banho", price: 80, time: "60 min", icon: "fa-cut" },
+                    { id: 3, name: "Tosa Completa de Raça", price: 110, time: "90 min", icon: "fa-dog" }
+                ],
+                profs: [
+                    { id: "p1", name: "Mariana Tosadora", role: "Especialista Cães Pequenos" },
+                    { id: "p2", name: "Roberto Groomer", role: "Tosa Tesoura & Raças Grandes" }
+                ]
+            },
+            salao: {
+                appName: "Studio Bella",
+                subName: "Salão de Beleza & Cabeleireiros",
+                icon: "fa-wand-magic-sparkles",
+                heroBadge: "Beleza & Autoestima",
+                heroTitle: "Realce sua Beleza com Atendimento Exclusivo.",
+                heroDesc: "Agende cortes, escovas e tratamentos capilares com nossas profissionais.",
+                heroImg: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80",
+                profTitle: "Nossas Hair Stylists",
+                profSubtitle: "Equipe de Cabeleireiras",
+                whatsapp: "5511977776666",
+                services: [
+                    { id: 1, name: "Corte Feminino + Escova", price: 90, time: "50 min", icon: "fa-scissors" },
+                    { id: 2, name: "Hidratação Profunda", price: 120, time: "60 min", icon: "fa-spa" },
+                    { id: 3, name: "Coloração & Mechas", price: 250, time: "120 min", icon: "fa-paint-brush" }
+                ],
+                profs: [
+                    { id: "p1", name: "Ana Paula Stylist", role: "Colorista" },
+                    { id: "p2", name: "Juliana Lima", role: "Cortes & Penteados" }
+                ]
+            },
+            estetica: {
+                appName: "Glamour Estética & Nails",
+                subName: "Manicure & Cuidados",
+                icon: "fa-gem",
+                heroBadge: "Unhas & Estética Corporal",
+                heroTitle: "Manicure, Pedicure e Estética com Hora Marcada.",
+                heroDesc: "Agende seu horário para unhas em gel, esmaltação e procedimentos corporais.",
+                heroImg: "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&q=80",
+                profTitle: "Nossas Designer & Manicures",
+                profSubtitle: "Profissionais Certificadas",
+                whatsapp: "5511966665555",
+                services: [
+                    { id: 1, name: "Manicure + Pedicure Tradicional", price: 55, time: "45 min", icon: "fa-hand-sparkles" },
+                    { id: 2, name: "Alongamento Unha em Gel", price: 130, time: "90 min", icon: "fa-gem" },
+                    { id: 3, name: "Design de Sobrancelha", price: 40, time: "30 min", icon: "fa-eye" }
+                ],
+                profs: [
+                    { id: "p1", name: "Camila Nail Designer", role: "Alongamentos" },
+                    { id: "p2", name: "Fernanda Manicure", role: "Esmaltação & Spas" }
+                ]
+            }
+        };
 
-        // Dados padrão de serviços
-        const defaultServices = [
-            { id: 1, category: 'cabelo', name: 'Corte Social / Fade', price: 45, time: '35 min', desc: 'Corte moderno ou clássico com acabamento perfeito.', icon: 'fa-scissors' },
-            { id: 2, category: 'cabelo', name: 'Corte Navalhado', price: 55, time: '45 min', desc: 'Fade degradê zero com acabamento ultra preciso na lâmina.', icon: 'fa-razor' },
-            { id: 3, category: 'barba', name: 'Barba Tradicional', price: 35, time: '30 min', desc: 'Modelagem da barba com alinhamento na lâmina.', icon: 'fa-user-ninja' },
-            { id: 4, category: 'barba', name: 'Barboterapia Premium', price: 50, time: '40 min', desc: 'Toalha quente, massagem facial e hidratação.', icon: 'fa-hot-tub-person' },
-            { id: 5, category: 'combos', name: 'Combo: Corte + Barba', price: 75, time: '60 min', desc: 'Nosso combo mais pedido para estilo completo.', icon: 'fa-crown' },
-            { id: 6, category: 'combos', name: 'Combo VIP BarberPro', price: 110, time: '80 min', desc: 'Corte + Barboterapia + Sobrancelha + Drink especial.', icon: 'fa-gem' }
-        ];
+        const hoursList = ['08:00', '09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
+        let currentNicheKey = 'barbearia';
+        let selectedTimeSlot = '';
 
-        const barbersData = [
-            { id: 'qualquer', name: 'Sem preferência', role: 'Qualquer Barbeiro', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80' },
-            { id: 'carlos', name: 'Carlos "Mãos de Tesoura"', role: 'Especialista Fade', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80' },
-            { id: 'rodrigo', name: 'Rodrigo Barbeiro', role: 'Mestre Barboterapia', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80' },
-            { id: 'lucas', name: 'Lucas Style', role: 'Visagismo Masculino', img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80' }
-        ];
-
-        const availableHours = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
-
-        let bookingState = { service: null, barber: barbersData[0], date: '', time: '', name: '', phone: '', notes: '' };
-
-        // --- LOCAL STORAGE HELPERS ---
-        function getServices() {
-            const saved = localStorage.getItem('barberpro_services');
-            return saved ? JSON.parse(saved) : defaultServices;
-        }
-
-        function saveServices(services) {
-            localStorage.setItem('barberpro_services', JSON.stringify(services));
-        }
-
-        function getAllBookings() {
-            return JSON.parse(localStorage.getItem('barberpro_all_bookings') || '[]');
-        }
-
-        function saveAllBookings(list) {
-            localStorage.setItem('barberpro_all_bookings', JSON.stringify(list));
-        }
-
-        // --- INICIALIZAÇÃO DA PÁGINA ---
+        // INICIALIZAÇÃO
         document.addEventListener('DOMContentLoaded', () => {
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('bookingDate').min = today;
+            document.getElementById('bookDate').min = today;
             document.getElementById('manualDate').min = today;
-            document.getElementById('adminDateFilter').value = today;
-
-            renderServices(getServices());
-            renderBarbers();
-            renderBookingServices();
-            renderBookingBarbers();
-            updateBadgeCount();
-
-            // Setup menu mobile
-            const mobileBtn = document.getElementById('mobileMenuBtn');
-            const mobileMenu = document.getElementById('mobileMenu');
-            if (mobileBtn) {
-                mobileBtn.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
-            }
+            document.getElementById('adminDate').value = today;
+            switchNiche('barbearia');
         });
 
-        // --- ALTERNÂNCIA DE TELAS (CLIENTE / ADMIN) ---
-        function showView(view) {
-            const clientView = document.getElementById('clientView');
-            const adminView = document.getElementById('adminView');
-            const clientNav = document.getElementById('clientNav');
-            const adminNav = document.getElementById('adminNav');
+        // TROCA DINÂMICA DE NICHO (WHITE-LABEL ENGINE)
+        function switchNiche(key) {
+            currentNicheKey = key;
+            const data = niches[key];
 
-            if (view === 'admin') {
-                clientView.classList.add('hidden');
-                adminView.classList.remove('hidden');
-                clientNav.classList.add('hidden');
-                adminNav.classList.remove('hidden');
-                renderAdminBookings();
-            } else {
-                adminView.classList.add('hidden');
-                clientView.classList.remove('hidden');
-                adminNav.classList.add('hidden');
-                clientNav.classList.remove('hidden');
-                renderServices(getServices());
-                renderBookingServices();
-            }
-        }
+            document.getElementById('appName').innerText = data.appName;
+            document.getElementById('appSubName').innerText = data.subName;
+            document.getElementById('appLogoIcon').innerHTML = `<i class="fa-solid ${data.icon}"></i>`;
+            document.getElementById('heroBadge').innerHTML = `<i class="fa-solid fa-star"></i> <span>${data.heroBadge}</span>`;
+            document.getElementById('heroTitle').innerText = data.heroTitle;
+            document.getElementById('heroDesc').innerText = data.heroDesc;
+            document.getElementById('heroImage').src = data.heroImg;
+            document.getElementById('profTitle').innerText = data.profTitle;
+            document.getElementById('profSubtitle').innerText = data.profSubtitle;
 
-        function openAdminAuthModal() {
-            document.getElementById('adminPasswordInput').value = '';
-            document.getElementById('adminAuthError').classList.add('hidden');
-            document.getElementById('adminAuthModal').classList.remove('hidden');
-        }
-
-        function closeAdminAuthModal() {
-            document.getElementById('adminAuthModal').classList.add('hidden');
-        }
-
-        function verifyAdminPassword() {
-            const pass = document.getElementById('adminPasswordInput').value;
-            if (pass === ADMIN_PASS) {
-                closeAdminAuthModal();
-                showView('admin');
-            } else {
-                document.getElementById('adminAuthError').classList.remove('hidden');
-            }
-        }
-
-        // --- RENDERIZAÇÃO PÚBLICA (CLIENTE) ---
-        function renderServices(services) {
-            const grid = document.getElementById('servicesGrid');
-            grid.innerHTML = services.map(s => `
-                <div class="bg-dark-900 border border-dark-700 hover:border-gold-500/40 rounded-xl p-6 transition-all flex flex-col justify-between">
+            // Renderiza Serviços
+            document.getElementById('servicesGrid').innerHTML = data.services.map(s => `
+                <div class="bg-dark-800 border border-dark-700 rounded-xl p-5 hover:border-sky-500/50 transition-all flex justify-between items-center">
                     <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-10 h-10 rounded-lg bg-gold-500/10 border border-gold-500/20 text-gold-400 flex items-center justify-center text-lg">
-                                <i class="fa-solid ${s.icon || 'fa-scissors'}"></i>
-                            </div>
-                            <span class="text-xs bg-dark-800 text-gray-400 px-3 py-1 rounded-full border border-dark-700">${s.time}</span>
-                        </div>
-                        <h3 class="font-vintage text-xl font-bold text-white mb-2">${s.name}</h3>
-                        <p class="text-gray-400 text-sm mb-4">${s.desc || 'Serviço profissional de altíssima qualidade.'}</p>
+                        <p class="font-bold text-white text-sm">${s.name}</p>
+                        <p class="text-xs text-slate-400 mt-1"><i class="fa-regular fa-clock mr-1"></i> ${s.time}</p>
                     </div>
-                    <div class="pt-4 border-t border-dark-800 flex items-center justify-between">
-                        <span class="font-vintage text-2xl font-extrabold text-gold-400">R$ ${parseFloat(s.price).toFixed(2).replace('.', ',')}</span>
-                        <button onclick="selectServiceAndScroll(${s.id})" class="text-xs font-semibold text-white hover:text-gold-400 flex items-center">
-                            Agendar <i class="fa-solid fa-chevron-right ml-1 text-gold-400"></i>
-                        </button>
-                    </div>
+                    <span class="font-bold text-sky-400 text-sm">R$ ${s.price.toFixed(2)}</span>
                 </div>
             `).join('');
-        }
 
-        function filterServices(category) {
-            document.querySelectorAll('#servicesFilter button').forEach(b => b.classList.replace('bg-gold-500', 'bg-dark-700'));
-            event.target.classList.replace('bg-dark-700', 'bg-gold-500');
-
-            const services = getServices();
-            if (category === 'all') renderServices(services);
-            else renderServices(services.filter(s => s.category === category));
-        }
-
-        function renderBarbers() {
-            const grid = document.getElementById('barbersGrid');
-            const list = barbersData.filter(b => b.id !== 'qualquer');
-            grid.innerHTML = list.map(b => `
-                <div class="bg-dark-800 rounded-xl overflow-hidden border border-dark-700">
-                    <img src="${b.img}" class="w-full h-56 object-cover">
-                    <div class="p-4 text-center">
-                        <h4 class="font-vintage font-bold text-white">${b.name}</h4>
-                        <p class="text-gold-400 text-xs">${b.role}</p>
+            // Renderiza Time/Profissionais
+            document.getElementById('teamGrid').innerHTML = data.profs.map(p => `
+                <div class="bg-dark-800 border border-dark-700 rounded-xl p-4 text-center">
+                    <div class="w-12 h-12 bg-sky-500/10 text-sky-400 rounded-full flex items-center justify-center mx-auto mb-2 text-lg font-bold">
+                        ${p.name.charAt(0)}
                     </div>
+                    <h4 class="font-bold text-white text-sm">${p.name}</h4>
+                    <p class="text-xs text-slate-400">${p.role}</p>
                 </div>
             `).join('');
-        }
 
-        function renderBookingServices() {
-            const list = document.getElementById('bookingServicesList');
-            const services = getServices();
-            list.innerHTML = services.map(s => `
-                <label class="flex items-center justify-between p-3.5 rounded-xl bg-dark-800 border border-dark-700 cursor-pointer hover:border-gold-500/40">
-                    <div class="flex items-center space-x-3">
-                        <input type="radio" name="serviceOption" value="${s.id}" onchange="onSelectService(${s.id})" class="accent-gold-500">
-                        <div>
-                            <p class="font-bold text-white text-sm">${s.name}</p>
-                            <p class="text-xs text-gray-400">${s.time}</p>
-                        </div>
-                    </div>
-                    <span class="font-vintage text-gold-400 font-bold">R$ ${parseFloat(s.price).toFixed(2).replace('.', ',')}</span>
-                </label>
-            `).join('');
-        }
+            // Preenche selects do form
+            document.getElementById('bookServiceSelect').innerHTML = data.services.map(s => `<option value="${s.name}" data-price="${s.price}">${s.name} (R$ ${s.price.toFixed(2)})</option>`).join('');
+            document.getElementById('bookProfSelect').innerHTML = data.profs.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+            document.getElementById('manualProf').innerHTML = data.profs.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
+            document.getElementById('manualTime').innerHTML = hoursList.map(h => `<option value="${h}">${h}</option>`).join('');
 
-        function renderBookingBarbers() {
-            const list = document.getElementById('bookingBarberList');
-            list.innerHTML = barbersData.map((b, index) => `
-                <label class="block cursor-pointer">
-                    <input type="radio" name="barberOption" value="${b.id}" ${index === 0 ? 'checked' : ''} onchange="onSelectBarber('${b.id}')" class="peer hidden">
-                    <div class="p-3 bg-dark-800 border border-dark-700 rounded-xl text-center peer-checked:border-gold-500 peer-checked:bg-gold-500/10">
-                        <img src="${b.img}" class="w-10 h-10 rounded-full mx-auto mb-1 object-cover">
-                        <p class="text-xs font-bold text-white truncate">${b.name}</p>
-                    </div>
-                </label>
-            `).join('');
-        }
-
-        function selectServiceAndScroll(serviceId) {
-            onSelectService(serviceId);
-            const radio = document.querySelector(`input[name="serviceOption"][value="${serviceId}"]`);
-            if (radio) radio.checked = true;
-            document.getElementById('agendar').scrollIntoView({ behavior: 'smooth' });
-            nextStep(2);
-        }
-
-        function onSelectService(serviceId) {
-            bookingState.service = getServices().find(s => s.id === serviceId);
-            const btn = document.getElementById('btnNext1');
-            btn.disabled = false;
-            btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            updateSummary();
-        }
-
-        function onSelectBarber(barberId) {
-            bookingState.barber = barbersData.find(b => b.id === barberId);
             renderTimeSlots();
-            updateSummary();
         }
 
-        // --- VERIFICAÇÃO DE HORÁRIOS EM TEMPO REAL ---
-        function renderTimeSlots() {
-            const dateInput = document.getElementById('bookingDate').value;
-            bookingState.date = dateInput;
-            const container = document.getElementById('timeSlotsGrid');
+        // AGENDAMENTOS LOCALSTORAGE
+        function getBookings() {
+            return JSON.parse(localStorage.getItem(`saas_bookings_${currentNicheKey}`) || '[]');
+        }
 
-            if (!dateInput) {
-                container.innerHTML = `<p class="col-span-3 text-xs text-gray-500 text-center py-4">Selecione uma data acima</p>`;
+        function saveBookings(list) {
+            localStorage.setItem(`saas_bookings_${currentNicheKey}`, JSON.stringify(list));
+        }
+
+        function renderTimeSlots() {
+            const date = document.getElementById('bookDate').value;
+            const profId = document.getElementById('bookProfSelect').value;
+            const container = document.getElementById('slotsGrid');
+
+            if (!date) {
+                container.innerHTML = `<p class="col-span-3 text-xs text-slate-500 text-center py-4">Selecione uma data</p>`;
                 return;
             }
 
-            const allBookings = getAllBookings();
-            const selectedBarberId = bookingState.barber ? bookingState.barber.id : 'qualquer';
+            const taken = getBookings().filter(b => b.date === date && b.profId === profId && b.status !== 'cancelado').map(b => b.time);
 
-            // Buscar agendamentos na mesma data
-            const takenSlots = allBookings.filter(b => {
-                if (b.status === 'cancelado') return false;
-                if (b.date !== dateInput) return false;
-                // Se escolheu barbeiro específico ou "qualquer"
-                if (selectedBarberId !== 'qualquer' && b.barberId !== 'qualquer' && b.barberId !== selectedBarberId) {
-                    return false;
-                }
-                return true;
-            }).map(b => b.time);
-
-            container.innerHTML = availableHours.map(time => {
-                const isTaken = takenSlots.includes(time);
+            container.innerHTML = hoursList.map(h => {
+                const isTaken = taken.includes(h);
                 if (isTaken) {
-                    return `
-                        <button type="button" disabled class="py-2 text-xs font-semibold bg-red-950/40 border border-red-500/30 text-red-400 rounded-lg opacity-60 cursor-not-allowed flex items-center justify-center">
-                            <i class="fa-solid fa-lock mr-1 text-[10px]"></i> ${time}
-                        </button>
-                    `;
+                    return `<button type="button" disabled class="py-1.5 text-xs bg-red-950/40 text-red-400 border border-red-500/30 rounded font-semibold opacity-60 cursor-not-allowed">Ocupado</button>`;
                 }
-                const isSelected = bookingState.time === time;
-                return `
-                    <button type="button" onclick="selectTime('${time}', this)" class="time-btn py-2 text-xs font-semibold ${isSelected ? 'bg-gold-500 text-black font-bold' : 'bg-dark-900 border border-dark-700 text-gray-300 hover:border-gold-500'} rounded-lg transition-all">
-                        ${time}
-                    </button>
-                `;
+                const isSelected = selectedTimeSlot === h;
+                return `<button type="button" onclick="selectSlot('${h}', this)" class="slot-btn py-1.5 text-xs ${isSelected ? 'bg-sky-600 text-white font-bold' : 'bg-dark-800 text-slate-300 border border-dark-600 hover:border-sky-500'} rounded transition-all">${h}</button>`;
             }).join('');
-
-            validateStep2();
         }
 
-        function selectTime(time, btn) {
-            bookingState.time = time;
-            document.querySelectorAll('.time-btn').forEach(b => {
-                b.classList.remove('bg-gold-500', 'text-black');
-                b.classList.add('bg-dark-900', 'text-gray-300');
-            });
-            btn.classList.add('bg-gold-500', 'text-black');
-            btn.classList.remove('bg-dark-900', 'text-gray-300');
-
-            validateStep2();
-            updateSummary();
+        function selectSlot(time, btn) {
+            selectedTimeSlot = time;
+            document.querySelectorAll('.slot-btn').forEach(b => b.className = 'slot-btn py-1.5 text-xs bg-dark-800 text-slate-300 border border-dark-600 rounded transition-all');
+            btn.className = 'slot-btn py-1.5 text-xs bg-sky-600 text-white font-bold rounded transition-all';
         }
 
-        function validateStep2() {
-            const btn = document.getElementById('btnNext2');
-            if (bookingState.date && bookingState.time) {
-                btn.disabled = false;
-                btn.classList.remove('opacity-50', 'cursor-not-allowed');
-            } else {
-                btn.disabled = true;
-                btn.classList.add('opacity-50', 'cursor-not-allowed');
-            }
-        }
-
-        function nextStep(step) {
-            if (step === 2 && !bookingState.service) return;
-            if (step === 3 && (!bookingState.date || !bookingState.time)) return;
-
-            document.getElementById('step1').classList.add('hidden');
-            document.getElementById('step2').classList.add('hidden');
-            document.getElementById('step3').classList.add('hidden');
-            document.getElementById(`step${step}`).classList.remove('hidden');
-        }
-
-        function prevStep(step) { nextStep(step); }
-
-        function updateSummary() {
-            if (bookingState.service) {
-                document.getElementById('summaryService').innerText = bookingState.service.name;
-                document.getElementById('summaryPrice').innerText = `R$ ${parseFloat(bookingState.service.price).toFixed(2).replace('.', ',')}`;
-            }
-            if (bookingState.barber) {
-                document.getElementById('summaryBarber').innerText = bookingState.barber.name;
-            }
-            if (bookingState.date && bookingState.time) {
-                const formattedDate = bookingState.date.split('-').reverse().join('/');
-                document.getElementById('summaryDateTime').innerText = `${formattedDate} às ${bookingState.time}`;
-            }
-        }
-
-        // Submissão pelo Cliente
-        function handleClientFormSubmit(e) {
+        function handleClientBooking(e) {
             e.preventDefault();
-            bookingState.name = document.getElementById('clientName').value.trim();
-            bookingState.phone = document.getElementById('clientPhone').value.trim();
-            bookingState.notes = document.getElementById('clientNotes').value.trim();
+            if (!selectedTimeSlot) { alert('Selecione um horário disponível!'); return; }
 
-            const all = getAllBookings();
+            const serviceSelect = document.getElementById('bookServiceSelect');
+            const selectedOpt = serviceSelect.options[serviceSelect.selectedIndex];
+            const date = document.getElementById('bookDate').value;
+            const clientName = document.getElementById('bookClientName').value;
+            const clientPhone = document.getElementById('bookClientPhone').value;
+            const profId = document.getElementById('bookProfSelect').value;
+            const profObj = niches[currentNicheKey].profs.find(p => p.id === profId);
 
-            // Salva agendamento global
             const newBooking = {
                 id: Date.now(),
-                clientName: bookingState.name,
-                phone: bookingState.phone,
-                serviceName: bookingState.service.name,
-                price: parseFloat(bookingState.service.price),
-                barberId: bookingState.barber.id,
-                barberName: bookingState.barber.name,
-                date: bookingState.date, // Formato YYYY-MM-DD
-                time: bookingState.time,
-                notes: bookingState.notes,
-                type: 'online',
+                clientName,
+                phone: clientPhone,
+                serviceName: selectedOpt.value,
+                price: parseFloat(selectedOpt.getAttribute('data-price') || 0),
+                profId,
+                profName: profObj ? profObj.name : 'Profissional',
+                date,
+                time: selectedTimeSlot,
                 status: 'confirmado'
             };
 
-            all.push(newBooking);
-            saveAllBookings(all);
+            const list = getBookings();
+            list.push(newBooking);
+            saveBookings(list);
 
-            // Abre modal WhatsApp
-            const dateFormatted = bookingState.date.split('-').reverse().join('/');
-            const msg = `💈 *NOVO AGENDAMENTO - BARBERPRO* 💈\n\n` +
-                `👤 *Cliente:* ${bookingState.name}\n` +
-                `📞 *WhatsApp:* ${bookingState.phone}\n` +
-                `✂️ *Serviço:* ${bookingState.service.name} (R$ ${bookingState.service.price})\n` +
-                `💈 *Barbeiro:* ${bookingState.barber.name}\n` +
-                `📅 *Data:* ${dateFormatted}\n` +
-                `⏰ *Horário:* ${bookingState.time}\n` +
-                (bookingState.notes ? `📝 *Obs:* ${bookingState.notes}\n` : '');
+            // WhatsApp link
+            const msg = `Olá! Gostaria de confirmar meu agendamento no ${niches[currentNicheKey].appName}:\n` +
+                        `👤 Nome: ${clientName}\n` +
+                        `📋 Serviço: ${selectedOpt.value}\n` +
+                        `🗓️ Data: ${date.split('-').reverse().join('/')} às ${selectedTimeSlot}\n` +
+                        `⭐ Profissional: ${profObj ? profObj.name : ''}`;
 
-            document.getElementById('modalDetails').innerHTML = `
-                <p><strong class="text-gold-400">Cliente:</strong> ${bookingState.name}</p>
-                <p><strong class="text-gold-400">Serviço:</strong> ${bookingState.service.name}</p>
-                <p><strong class="text-gold-400">Horário:</strong> ${dateFormatted} às ${bookingState.time}</p>
-            `;
-            document.getElementById('btnSendWhatsapp').href = `https://wa.me/${BARBER_PHONE}?text=${encodeURIComponent(msg)}`;
-            document.getElementById('confirmModal').classList.remove('hidden');
+            window.open(`https://wa.me/${niches[currentNicheKey].whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
 
-            updateBadgeCount();
-        }
-
-        function closeConfirmModal() {
-            document.getElementById('confirmModal').classList.add('hidden');
             document.getElementById('bookingForm').reset();
-            bookingState = { service: null, barber: barbersData[0], date: '', time: '', name: '', phone: '', notes: '' };
-            nextStep(1);
+            selectedTimeSlot = '';
+            renderTimeSlots();
         }
 
-        function updateBadgeCount() {
-            const count = getAllBookings().filter(b => b.type === 'online').length;
-            const badge = document.getElementById('agendamentosBadge');
-            if (count > 0) {
-                badge.innerText = count;
-                badge.classList.remove('hidden');
+        // ADMIN VIEWS & ACTIONS
+        function showView(v) {
+            if (v === 'admin') {
+                document.getElementById('clientView').classList.add('hidden');
+                document.getElementById('adminView').classList.remove('hidden');
+                document.getElementById('clientNav').classList.add('hidden');
+                document.getElementById('adminNav').classList.remove('hidden');
+                renderAdminTable();
+            } else {
+                document.getElementById('adminView').classList.add('hidden');
+                document.getElementById('clientView').classList.remove('hidden');
+                document.getElementById('adminNav').classList.add('hidden');
+                document.getElementById('clientNav').classList.remove('hidden');
             }
         }
 
-        function openAgendamentosModal() {
-            const list = getAllBookings().filter(b => b.type === 'online');
-            const container = document.getElementById('agendamentosListModal');
-            if (list.length === 0) {
-                container.innerHTML = `<p class="text-gray-400 text-center py-6 text-sm">Nenhum agendamento realizado.</p>`;
+        function openAdminAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
+        function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
+        function checkAuth() {
+            if (document.getElementById('authPass').value === '1234') {
+                closeAuthModal();
+                showView('admin');
+            } else { alert('Senha incorreta!'); }
+        }
+
+        function renderAdminTable() {
+            const date = document.getElementById('adminDate').value;
+            const all = getBookings().filter(b => b.date === date);
+            document.getElementById('adminTotalInfo').innerText = `Agendamentos para ${date.split('-').reverse().join('/')}: ${all.length}`;
+
+            const tbody = document.getElementById('adminTableBody');
+            if (all.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">Nenhum registro para este dia.</td></tr>`;
             } else {
-                container.innerHTML = list.map(item => `
-                    <div class="bg-dark-800 p-3 rounded-xl border border-dark-700 flex justify-between items-center">
-                        <div>
-                            <p class="font-bold text-white text-sm">${item.serviceName}</p>
-                            <p class="text-xs text-gold-400">${item.date.split('-').reverse().join('/')} às ${item.time} (${item.barberName})</p>
-                            <p class="text-xs text-gray-400">Status: <span class="capitalize text-green-400">${item.status}</span></p>
-                        </div>
-                        <button onclick="cancelBookingFromClient(${item.id})" class="text-red-400 hover:text-red-300 p-2 text-xs">Cancelar</button>
-                    </div>
+                tbody.innerHTML = all.map(b => `
+                    <tr>
+                        <td class="p-3 font-bold text-white">${b.time}</td>
+                        <td class="p-3">${b.clientName} <span class="block text-[10px] text-slate-400">${b.phone}</span></td>
+                        <td class="p-3 text-sky-400">${b.profName}</td>
+                        <td class="p-3">${b.serviceName}</td>
+                        <td class="p-3 font-bold">R$ ${b.price.toFixed(2)}</td>
+                        <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px] capitalize">${b.status}</span></td>
+                        <td class="p-3 text-center">
+                            <button onclick="deleteBooking(${b.id})" class="text-red-400 hover:text-red-300 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
                 `).join('');
             }
-            document.getElementById('agendamentosModal').classList.remove('hidden');
         }
 
-        function closeAgendamentosModal() { document.getElementById('agendamentosModal').classList.add('hidden'); }
-
-        function cancelBookingFromClient(id) {
-            let list = getAllBookings();
-            list = list.map(b => b.id === id ? { ...b, status: 'cancelado' } : b);
-            saveAllBookings(list);
-            openAgendamentosModal();
+        function deleteBooking(id) {
+            let list = getBookings().filter(b => b.id !== id);
+            saveBookings(list);
+            renderAdminTable();
             renderTimeSlots();
         }
 
-        // ===================================================================
-        // LÓGICA DO PAINEL DO ADMINISTRADOR / BARBEIRO
-        // ===================================================================
-
-        function renderAdminBookings() {
-            const filterDate = document.getElementById('adminDateFilter').value;
-            const all = getAllBookings();
-
-            // Filtragem
-            let filtered = all;
-            if (filterDate) {
-                filtered = all.filter(b => b.date === filterDate);
-                document.getElementById('adminListTitle').innerText = `Agendamentos para ${filterDate.split('-').reverse().join('/')}`;
-            } else {
-                document.getElementById('adminListTitle').innerText = `Todos os agendamentos registrados`;
-            }
-
-            // Ordena por horário
-            filtered.sort((a, b) => a.time.localeCompare(b.time));
-
-            const tbody = document.getElementById('adminBookingsTable');
-            if (filtered.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-gray-500">Nenhum agendamento registrado para esta data.</td></tr>`;
-            } else {
-                tbody.innerHTML = filtered.map(b => {
-                    let statusBadge = `<span class="bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 px-2 py-0.5 rounded text-xs">Confirmado</span>`;
-                    if (b.status === 'concluido') statusBadge = `<span class="bg-blue-500/10 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded text-xs">Concluído</span>`;
-                    if (b.status === 'cancelado') statusBadge = `<span class="bg-red-500/10 text-red-400 border border-red-500/30 px-2 py-0.5 rounded text-xs">Cancelar</span>`;
-                    if (b.type === 'block') statusBadge = `<span class="bg-gray-500/20 text-gray-400 border border-gray-500/30 px-2 py-0.5 rounded text-xs">Bloqueado</span>`;
-
-                    return `
-                        <tr class="hover:bg-dark-700/50 transition-colors">
-                            <td class="p-4 font-bold text-white">${b.time} <span class="block text-xs font-normal text-gray-400">${b.date.split('-').reverse().join('/')}</span></td>
-                            <td class="p-4">
-                                <span class="font-semibold text-white">${b.clientName}</span>
-                                ${b.phone ? `<span class="block text-xs text-gray-400">${b.phone}</span>` : ''}
-                            </td>
-                            <td class="p-4 text-xs text-gold-400">${b.barberName}</td>
-                            <td class="p-4 text-xs">${b.serviceName}</td>
-                            <td class="p-4 font-bold text-white">R$ ${parseFloat(b.price || 0).toFixed(2)}</td>
-                            <td class="p-4">${statusBadge}</td>
-                            <td class="p-4 text-center">
-                                <div class="flex items-center justify-center space-x-2">
-                                    ${b.status !== 'concluido' && b.type !== 'block' ? `
-                                        <button onclick="changeBookingStatus(${b.id}, 'concluido')" class="bg-green-600/20 text-green-400 hover:bg-green-600 hover:text-white px-2 py-1 rounded text-xs" title="Concluir Atendimento">
-                                            <i class="fa-solid fa-check"></i>
-                                        </button>
-                                    ` : ''}
-                                    ${b.status !== 'cancelado' ? `
-                                        <button onclick="changeBookingStatus(${b.id}, 'cancelado')" class="bg-yellow-600/20 text-yellow-400 hover:bg-yellow-600 hover:text-white px-2 py-1 rounded text-xs" title="Cancelar">
-                                            <i class="fa-solid fa-ban"></i>
-                                        </button>
-                                    ` : ''}
-                                    <button onclick="deleteBookingPermanent(${b.id})" class="bg-red-600/20 text-red-400 hover:bg-red-600 hover:text-white px-2 py-1 rounded text-xs" title="Excluir Registro">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `;
-                }).join('');
-            }
-
-            // Atualiza métricas
-            updateAdminStats(all, filterDate);
+        function openManualBlockModal() {
+            document.getElementById('manualDate').value = document.getElementById('adminDate').value;
+            document.getElementById('manualModal').classList.remove('hidden');
         }
+        function closeManualModal() { document.getElementById('manualModal').classList.add('hidden'); }
 
-        function updateAdminStats(allBookings, filterDate) {
-            const todayStr = new Date().toISOString().split('T')[0];
-            const todayBookings = allBookings.filter(b => b.date === (filterDate || todayStr) && b.status !== 'cancelado');
-
-            document.getElementById('statTodayCount').innerText = todayBookings.length;
-            document.getElementById('statConfirmedCount').innerText = todayBookings.filter(b => b.status === 'confirmado').length;
-            document.getElementById('statCompletedCount').innerText = todayBookings.filter(b => b.status === 'concluido').length;
-
-            const totalRev = todayBookings.reduce((acc, b) => acc + (b.price || 0), 0);
-            document.getElementById('statRevenue').innerText = `R$ ${totalRev.toFixed(2)}`;
-        }
-
-        function setAdminFilterToday() {
-            document.getElementById('adminDateFilter').value = new Date().toISOString().split('T')[0];
-            renderAdminBookings();
-        }
-
-        function setAdminFilterAll() {
-            document.getElementById('adminDateFilter').value = '';
-            renderAdminBookings();
-        }
-
-        function changeBookingStatus(id, newStatus) {
-            let list = getAllBookings();
-            list = list.map(b => b.id === id ? { ...b, status: newStatus } : b);
-            saveAllBookings(list);
-            renderAdminBookings();
-            renderTimeSlots();
-        }
-
-        function deleteBookingPermanent(id) {
-            let list = getAllBookings();
-            list = list.filter(b => b.id !== id);
-            saveAllBookings(list);
-            renderAdminBookings();
-            renderTimeSlots();
-        }
-
-        // --- ENCAIXE / BLOQUEIO MANUAL PELO BARBEIRO ---
-        function openManualBookingModal() {
-            // Preenche barbeiros e serviços
-            const barberSelect = document.getElementById('manualBarber');
-            barberSelect.innerHTML = barbersData.map(b => `<option value="${b.id}">${b.name}</option>`).join('');
-
-            const serviceSelect = document.getElementById('manualService');
-            serviceSelect.innerHTML = getServices().map(s => `<option value="${s.name}" data-price="${s.price}">${s.name} (R$ ${s.price})</option>`).join('');
-            serviceSelect.innerHTML += `<option value="Bloqueio de Agenda" data-price="0">Bloqueio / Folga</option>`;
-
-            const timeSelect = document.getElementById('manualTime');
-            timeSelect.innerHTML = availableHours.map(h => `<option value="${h}">${h}</option>`).join('');
-
-            document.getElementById('manualDate').value = document.getElementById('adminDateFilter').value || new Date().toISOString().split('T')[0];
-            document.getElementById('manualBookingModal').classList.remove('hidden');
-        }
-
-        function closeManualBookingModal() {
-            document.getElementById('manualBookingModal').classList.add('hidden');
-        }
-
-        function toggleManualTypeFields() {
-            const type = document.getElementById('manualType').value;
-            const clientFields = document.getElementById('manualClientFields');
-            if (type === 'block') {
-                clientFields.classList.add('hidden');
-            } else {
-                clientFields.classList.remove('hidden');
-            }
-        }
-
-        function handleManualBookingSubmit(e) {
+        function handleManualSubmit(e) {
             e.preventDefault();
-            const type = document.getElementById('manualType').value;
-            const barberId = document.getElementById('manualBarber').value;
-            const barberObj = barbersData.find(b => b.id === barberId);
-            const serviceSelect = document.getElementById('manualService');
-            const selectedOption = serviceSelect.options[serviceSelect.selectedIndex];
-
-            const date = document.getElementById('manualDate').value;
-            const time = document.getElementById('manualTime').value;
-
-            const all = getAllBookings();
+            const profId = document.getElementById('manualProf').value;
+            const profObj = niches[currentNicheKey].profs.find(p => p.id === profId);
 
             const newBooking = {
                 id: Date.now(),
-                clientName: type === 'block' ? '🚫 HORÁRIO BLOQUEADO' : (document.getElementById('manualClientName').value || 'Cliente Presencial/Insta'),
-                phone: type === 'block' ? '' : 'Encaixe Manual',
-                serviceName: selectedOption.value,
-                price: parseFloat(selectedOption.getAttribute('data-price') || 0),
-                barberId: barberId,
-                barberName: barberObj ? barberObj.name : 'Barbeiro',
-                date: date,
-                time: time,
-                type: type,
-                status: type === 'block' ? 'bloqueado' : 'confirmado'
+                clientName: document.getElementById('manualName').value,
+                phone: 'Bloqueio Manual',
+                serviceName: 'Bloqueio / Encaixe',
+                price: 0,
+                profId,
+                profName: profObj ? profObj.name : 'Profissional',
+                date: document.getElementById('manualDate').value,
+                time: document.getElementById('manualTime').value,
+                status: 'bloqueado'
             };
 
-            all.push(newBooking);
-            saveAllBookings(all);
-            closeManualBookingModal();
-            renderAdminBookings();
+            const list = getBookings();
+            list.push(newBooking);
+            saveBookings(list);
+            closeManualModal();
+            renderAdminTable();
             renderTimeSlots();
-        }
-
-        // --- GERENCIAMENTO DE SERVIÇOS & PREÇOS ---
-        function openManageServicesModal() {
-            renderAdminServicesList();
-            document.getElementById('manageServicesModal').classList.remove('hidden');
-        }
-
-        function closeManageServicesModal() {
-            document.getElementById('manageServicesModal').classList.add('hidden');
-            renderServices(getServices());
-            renderBookingServices();
-        }
-
-        function renderAdminServicesList() {
-            const list = getServices();
-            const container = document.getElementById('adminServicesList');
-            container.innerHTML = list.map(s => `
-                <div class="bg-dark-800 p-3 rounded-xl border border-dark-700 flex flex-col sm:flex-row justify-between items-center gap-3">
-                    <div class="flex items-center space-x-3 w-full sm:w-auto">
-                        <i class="fa-solid ${s.icon || 'fa-scissors'} text-gold-400 text-lg"></i>
-                        <div>
-                            <p class="font-bold text-white text-sm">${s.name}</p>
-                            <p class="text-xs text-gray-400">${s.time}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-3 w-full sm:w-auto justify-end">
-                        <span class="text-xs text-gray-400">R$</span>
-                        <input type="number" step="0.5" value="${s.price}" onchange="updateServicePrice(${s.id}, this.value)" class="w-20 bg-dark-900 border border-dark-600 text-white font-bold rounded p-1 text-center text-sm">
-                        <button onclick="deleteService(${s.id})" class="text-red-400 hover:text-red-300 p-1 text-xs" title="Excluir Serviço">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function updateServicePrice(id, newPrice) {
-            let list = getServices();
-            list = list.map(s => s.id === id ? { ...s, price: parseFloat(newPrice) || 0 } : s);
-            saveServices(list);
-        }
-
-        function deleteService(id) {
-            let list = getServices();
-            list = list.filter(s => s.id !== id);
-            saveServices(list);
-            renderAdminServicesList();
-        }
-
-        function handleAddNewService(e) {
-            e.preventDefault();
-            const name = document.getElementById('newServiceName').value.trim();
-            const price = parseFloat(document.getElementById('newServicePrice').value) || 0;
-            const time = document.getElementById('newServiceTime').value.trim();
-
-            if (!name) return;
-
-            const list = getServices();
-            list.push({
-                id: Date.now(),
-                category: 'cabelo',
-                name: name,
-                price: price,
-                time: time || '30 min',
-                desc: 'Serviço personalizado da barbearia.',
-                icon: 'fa-scissors'
-            });
-
-            saveServices(list);
-            document.getElementById('newServiceName').value = '';
-            document.getElementById('newServicePrice').value = '';
-            document.getElementById('newServiceTime').value = '';
-            renderAdminServicesList();
         }
     </script>
 </body>
