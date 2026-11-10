@@ -1,639 +1,96 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark scroll-smooth">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SaaS Agendador Multi-Nicho</title>
-    <!-- Tailwind CSS -->
+    <title>Agendify - Sistema de Agendamento Inteligente</title>
+    <!-- Tailwind CSS para Estilização Moderna -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        brand: {
-                            50: '#f0f9ff',
-                            100: '#e0f2fe',
-                            500: '#0284c7',
-                            600: '#0369a1',
-                            700: '#075985',
-                            gold: '#d4af37',
-                            pink: '#ec4899',
-                            green: '#10b981'
-                        },
-                        dark: {
-                            900: '#0f172a',
-                            800: '#1e293b',
-                            700: '#334155',
-                            600: '#475569'
-                        }
-                    },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif']
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        body { background-color: #0f172a; color: #f8fafc; font-family: 'Inter', sans-serif; }
-        .theme-barbearia { --accent-color: #d4af37; }
-        .theme-petshop { --accent-color: #10b981; }
-        .theme-salao { --accent-color: #ec4899; }
-        .theme-estetica { --accent-color: #8b5cf6; }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #0284c7; }
-    </style>
+    <!-- Supabase JS Client SDK -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body class="antialiased selection:bg-sky-500 selection:text-white">
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between">
 
-    <!-- Top Bar Seletor de Nicho (Demonstração Vendedor/SaaS) -->
-    <div id="saasControlBar" class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-b border-slate-700 px-4 py-2 flex flex-wrap items-center justify-between text-xs text-slate-300 z-50 relative">
-        <div class="flex items-center space-x-2">
-            <span class="bg-sky-500/20 text-sky-400 font-bold px-2 py-0.5 rounded border border-sky-500/30"><i class="fa-solid fa-wand-magic-sparkles mr-1"></i> PAINEL DEMO SAAS</span>
-            <span class="hidden sm:inline text-slate-400">Troque o nicho do app em tempo real:</span>
-        </div>
-        <div class="flex items-center space-x-2">
-            <label for="nicheSelector" class="font-medium text-slate-300">Nicho Ativo:</label>
-            <select id="nicheSelector" onchange="switchNiche(this.value)" class="bg-slate-900 border border-slate-700 text-white rounded px-2.5 py-1 text-xs outline-none focus:border-sky-500">
-                <option value="barbearia">💈 Barbearia & Corte</option>
-                <option value="petshop">🐾 PetShop & Banho/Tosa</option>
-                <option value="salao">✂️ Salão de Beleza / Cabelo</option>
-                <option value="estetica">💅 Estética & Manicure</option>
-            </select>
-        </div>
-    </div>
-
-    <!-- Header / Navbar -->
-    <header class="sticky top-0 z-40 bg-dark-900/90 backdrop-blur-md border-b border-dark-700">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <!-- Logo -->
-                <a href="#" onclick="showView('client')" class="flex items-center space-x-3 group">
-                    <div id="appLogoIcon" class="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/30 text-sky-400 flex items-center justify-center text-lg group-hover:scale-105 transition-transform">
-                        <i class="fa-solid fa-scissors"></i>
-                    </div>
-                    <div>
-                        <span id="appName" class="font-extrabold text-lg sm:text-xl text-white tracking-tight">BarberPro</span>
-                        <span id="appSubName" class="block text-[10px] text-slate-400 font-medium">Agendamento Online</span>
-                    </div>
-                </a>
-
-                <!-- Desktop Menu -->
-                <nav id="clientNav" class="hidden md:flex items-center space-x-6 text-sm">
-                    <a href="#home" class="text-slate-300 hover:text-white transition-colors">Início</a>
-                    <a href="#servicos" class="text-slate-300 hover:text-white transition-colors">Serviços & Tabela</a>
-                    <a href="#profissionais" class="text-slate-300 hover:text-white transition-colors" id="navProfText">Profissionais</a>
-                    <a href="#agendar" class="bg-sky-600 hover:bg-sky-500 text-white font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center">
-                        <i class="fa-solid fa-calendar-plus mr-2"></i> Agendar Agora
-                    </a>
-                    <button onclick="openAdminAuthModal()" class="text-slate-400 hover:text-sky-400 text-xs flex items-center space-x-1 border border-dark-700 px-3 py-1.5 rounded-lg">
-                        <i class="fa-solid fa-lock"></i>
-                        <span>Painel Admin</span>
-                    </button>
-                </nav>
-
-                <!-- Admin Nav Back -->
-                <div id="adminNav" class="hidden flex items-center space-x-3">
-                    <span class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-3 py-1 rounded-full font-semibold">
-                        <i class="fa-solid fa-user-shield mr-1"></i> Modo Administrador
-                    </span>
-                    <button onclick="showView('client')" class="bg-dark-800 hover:bg-dark-700 text-slate-200 text-xs px-3 py-1.5 rounded-lg border border-dark-700">
-                        <i class="fa-solid fa-arrow-left mr-1"></i> Ver Site Público
-                    </button>
-                </div>
+    <!-- CABEÇALHO -->
+    <header class="bg-slate-900 border-b border-slate-800 p-4 shadow-md">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-2xl font-black tracking-wider text-emerald-400">AGENDIFY <span class="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full uppercase">Cloud SaaS</span></h1>
+            <div id="statusNuvem" class="text-xs text-emerald-400 flex items-center gap-1.5 bg-emerald-950/50 px-3 py-1 rounded-full border border-emerald-800/50">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Nuvem Conectada
             </div>
         </div>
     </header>
 
-    <!-- VISÃO 1: SITE CLIENTE -->
-    <main id="clientView" class="space-y-16 pb-16">
-        <!-- Hero Section -->
-        <section id="home" class="relative pt-12 pb-20 overflow-hidden bg-gradient-to-b from-dark-900 via-dark-800 to-dark-900 border-b border-dark-700">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 flex flex-col md:flex-row items-center justify-between gap-12">
-                <div class="md:w-1/2 space-y-6 text-center md:text-left">
-                    <div id="heroBadge" class="inline-flex items-center space-x-2 bg-dark-800 border border-sky-500/30 px-3.5 py-1.5 rounded-full text-sky-400 text-xs font-semibold uppercase tracking-wider">
-                        <i class="fa-solid fa-star"></i>
-                        <span>Atendimento com Hora Marcada</span>
-                    </div>
-                    <h1 id="heroTitle" class="text-4xl sm:text-5xl font-extrabold text-white leading-tight tracking-tight">
-                        Sua Barbearia de Confiança com Agendamento Prático.
-                    </h1>
-                    <p id="heroDesc" class="text-slate-400 text-base max-w-xl">
-                        Escolha os serviços, selecione o profissional de sua preferência e marque seu horário em poucos segundos.
-                    </p>
-                    <div class="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 pt-2">
-                        <a href="#agendar" class="w-full sm:w-auto text-center bg-sky-600 hover:bg-sky-500 text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition-all text-sm">
-                            <i class="fa-solid fa-calendar-check mr-2"></i> Agendar Atendimento
-                        </a>
-                        <a href="#servicos" class="w-full sm:w-auto text-center border border-dark-600 text-slate-300 hover:bg-dark-800 px-6 py-3.5 rounded-xl transition-all text-sm">
-                            Ver Serviços e Valores
-                        </a>
-                    </div>
-                </div>
-
-                <div class="md:w-5/12 w-full">
-                    <div class="relative mx-auto w-full max-w-md rounded-2xl overflow-hidden border border-dark-700 shadow-2xl bg-dark-800 p-2">
-                        <img id="heroImage" src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80" alt="Capa" class="w-full h-72 object-cover rounded-xl">
-                        <div class="p-4 space-y-2">
-                            <div class="flex items-center justify-between text-xs">
-                                <span class="text-slate-400"><i class="fa-regular fa-clock mr-1"></i> Funcionamento:</span>
-                                <span class="text-emerald-400 font-semibold">Seg à Sáb: 08:00 - 19:00</span>
-                            </div>
-                            <div class="flex items-center justify-between text-xs">
-                                <span class="text-slate-400"><i class="fa-solid fa-location-dot mr-1"></i> Endereço:</span>
-                                <span class="text-slate-200">Atendimento Presencial</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Serviços e Preços -->
-        <section id="servicos" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="text-center max-w-2xl mx-auto mb-10">
-                <h2 class="text-sky-400 text-xs font-bold uppercase tracking-wider mb-1">Valores Transparentes</h2>
-                <p class="text-2xl sm:text-3xl font-extrabold text-white">Nossos Serviços & Preços</p>
-            </div>
-            <div id="servicesGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        </section>
-
-        <!-- Profissionais -->
-        <section id="profissionais" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 border-t border-dark-700 pt-16">
-            <div class="text-center max-w-2xl mx-auto mb-10">
-                <h2 class="text-sky-400 text-xs font-bold uppercase tracking-wider mb-1" id="profSubtitle">Equipe Especializada</h2>
-                <p class="text-2xl sm:text-3xl font-extrabold text-white" id="profTitle">Escolha o Profissional</p>
-            </div>
-            <div id="teamGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-        </section>
-
-        <!-- Formulário de Agendamento -->
-        <section id="agendar" class="max-w-3xl mx-auto px-4">
-            <div class="bg-dark-800 border border-dark-700 rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6">
-                <div class="text-center">
-                    <h3 class="text-2xl font-bold text-white">Agendamento em 3 Passos</h3>
-                    <p class="text-slate-400 text-xs mt-1">Selecione o serviço e confirme seu horário com disponibilidade em tempo real.</p>
-                </div>
-
-                <form id="bookingForm" onsubmit="handleClientBooking(event)" class="space-y-4">
-                    <!-- 1. Serviço -->
-                    <div>
-                        <label class="block text-xs font-bold text-sky-400 uppercase tracking-wider mb-2">1. Selecione o Serviço</label>
-                        <select id="bookServiceSelect" required onchange="updateBookingState()" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-3 text-sm outline-none focus:border-sky-500"></select>
-                    </div>
-
-                    <!-- 2. Profissional -->
-                    <div>
-                        <label class="block text-xs font-bold text-sky-400 uppercase tracking-wider mb-2">2. Profissional</label>
-                        <select id="bookProfSelect" required onchange="renderTimeSlots()" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-3 text-sm outline-none focus:border-sky-500"></select>
-                    </div>
-
-                    <!-- 3. Data e Horário -->
-                    <div class="grid sm:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-sky-400 uppercase tracking-wider mb-2">3. Data desejada</label>
-                            <input type="date" id="bookDate" required onchange="renderTimeSlots()" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-3 text-sm outline-none focus:border-sky-500">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-sky-400 uppercase tracking-wider mb-2">Horários Disponíveis</label>
-                            <div id="slotsGrid" class="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto p-1 bg-dark-900 rounded-lg border border-dark-600">
-                                <p class="col-span-3 text-xs text-slate-500 text-center py-4">Selecione a data primeiro</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Dados Pessoais -->
-                    <div class="grid sm:grid-cols-2 gap-4 border-t border-dark-700 pt-4">
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">Seu Nome Completo *</label>
-                            <input type="text" id="bookClientName" required placeholder="Ex: João da Silva" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-slate-300 mb-1">WhatsApp / Celular *</label>
-                            <input type="tel" id="bookClientPhone" required placeholder="(11) 99999-9999" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
-                        </div>
-                    </div>
-
-                    <button type="submit" class="w-full bg-sky-600 hover:bg-sky-500 text-white font-bold py-3.5 rounded-xl shadow-lg transition-all text-sm flex items-center justify-center">
-                        <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Confirmar Agendamento no WhatsApp
-                    </button>
-                </form>
-            </div>
-        </section>
-    </main>
-
-    <!-- VISÃO 2: PAINEL ADMINISTRATIVO -->
-    <main id="adminView" class="hidden max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-dark-700 pb-6">
-            <div>
-                <h1 class="text-2xl font-bold text-white">Painel de Gestão da Agenda</h1>
-                <p class="text-slate-400 text-xs">Visualize os horários agendados e bloqueie novos horários manuais.</p>
-            </div>
-            <button onclick="openManualBlockModal()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-4 py-2.5 rounded-lg text-xs flex items-center">
-                <i class="fa-solid fa-plus mr-2"></i> Novo Encaixe / Bloquear Horário
-            </button>
-        </div>
-
-        <!-- Filtros e Agenda -->
-        <div class="bg-dark-800 p-4 rounded-xl border border-dark-700 flex flex-wrap items-center justify-between gap-4">
-            <div class="flex items-center space-x-3">
-                <label for="adminDate" class="text-xs font-medium text-slate-300">Data da Agenda:</label>
-                <input type="date" id="adminDate" onchange="renderAdminTable()" class="bg-dark-900 border border-dark-600 text-white text-xs rounded-lg p-2 outline-none">
-            </div>
-            <span id="adminTotalInfo" class="text-xs text-sky-400 font-semibold">Total de agendamentos: 0</span>
-        </div>
-
-        <div class="bg-dark-800 rounded-xl border border-dark-700 overflow-hidden shadow-xl">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs text-slate-300">
-                    <thead class="bg-dark-900 text-slate-400 uppercase font-semibold border-b border-dark-700">
-                        <tr>
-                            <th class="p-3">Horário</th>
-                            <th class="p-3">Cliente / Origem</th>
-                            <th class="p-3">Profissional</th>
-                            <th class="p-3">Serviço</th>
-                            <th class="p-3">Valor</th>
-                            <th class="p-3">Status</th>
-                            <th class="p-3 text-center">Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminTableBody" class="divide-y divide-dark-700"></tbody>
-                </table>
+    <!-- CONTEÚDO PRINCIPAL -->
+    <main class="max-w-4xl w-full mx-auto p-4 md:p-6 my-auto">
+        
+        <!-- SELETOR DE NICHO / DEMONSTRAÇÃO -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6 shadow-xl">
+            <h2 class="text-lg font-semibold mb-3 text-slate-200">Selecione o Nicho de Demonstração:</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <button onclick="mudarNicho('barbearia')" class="nicho-btn p-3 rounded-xl border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-medium text-center transition">💈 Barbearia</button>
+                <button onclick="mudarNicho('petshop')" class="nicho-btn p-3 rounded-xl border border-slate-800 bg-slate-800/50 text-slate-400 hover:border-slate-700 text-center transition">🐾 PetShop</button>
+                <button onclick="mudarNicho('salao')" class="nicho-btn p-3 rounded-xl border border-slate-800 bg-slate-800/50 text-slate-400 hover:border-slate-700 text-center transition">💇 Salão de Beleza</button>
+                <button onclick="mudarNicho('estetica')" class="nicho-btn p-3 rounded-xl border border-slate-800 bg-slate-800/50 text-slate-400 hover:border-slate-700 text-center transition">✨ Estética</button>
             </div>
         </div>
-    </main>
 
-    <!-- MODAL AUTH ADMIN -->
-    <div id="authModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-dark-800 border border-dark-700 w-full max-w-xs rounded-xl p-6 text-center space-y-4">
-            <h3 class="text-lg font-bold text-white">Acesso Restrito</h3>
-            <p class="text-xs text-slate-400">Digite a senha administrativa (Padrão: 1234):</p>
-            <input type="password" id="authPass" placeholder="Senha" class="w-full bg-dark-900 border border-dark-600 text-white text-center rounded-lg p-2.5 text-sm outline-none">
-            <div class="flex gap-2">
-                <button onclick="closeAuthModal()" class="w-1/2 bg-dark-700 text-slate-300 py-2 rounded-lg text-xs">Cancelar</button>
-                <button onclick="checkAuth()" class="w-1/2 bg-sky-600 text-white font-bold py-2 rounded-lg text-xs">Entrar</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL MANUAL BLOCK -->
-    <div id="manualModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-dark-800 border border-dark-700 w-full max-w-md rounded-xl p-6 space-y-4">
-            <h3 class="text-lg font-bold text-white">Bloquear Horário / Encaixe</h3>
-            <form onsubmit="handleManualSubmit(event)" class="space-y-3">
+        <!-- FORMULÁRIO DE AGENDAMENTO -->
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+            <h2 id="tituloEstabelecimento" class="text-xl font-bold text-white mb-6">Agende seu horário na Barbearia</h2>
+            
+            <form id="formAgendamento" class="space-y-4">
                 <div>
-                    <label class="block text-xs text-slate-400 mb-1">Nome / Motivo:</label>
-                    <input type="text" id="manualName" required placeholder="Ex: Cliente Instagram ou Almoço" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-2.5 text-xs outline-none">
+                    <label class="block text-sm font-medium text-slate-400 mb-1">Seu Nome Completo</label>
+                    <input type="text" id="clienteNome" required placeholder="Ex: João da Silva" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
                 </div>
-                <div>
-                    <label class="block text-xs text-slate-400 mb-1">Profissional:</label>
-                    <select id="manualProf" class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-2.5 text-xs outline-none"></select>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Data:</label>
-                        <input type="date" id="manualDate" required class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-2.5 text-xs outline-none">
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Seu WhatsApp / Telefone</label>
+                        <input type="tel" id="clienteTelefone" required placeholder="(11) 99999-9999" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
                     </div>
                     <div>
-                        <label class="block text-xs text-slate-400 mb-1">Horário:</label>
-                        <select id="manualTime" required class="w-full bg-dark-900 border border-dark-600 text-white rounded-lg p-2.5 text-xs outline-none"></select>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Serviço Desejado</label>
+                        <select id="selectServico" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                            <option value="corte">Corte Profissional - R$ 45,00</option>
+                            <option value="barba">Barba Completa - R$ 35,00</option>
+                            <option value="combo">Combo Corte + Barba - R$ 70,00</option>
+                        </select>
                     </div>
                 </div>
-                <div class="flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="closeManualModal()" class="bg-dark-700 text-slate-300 px-3 py-2 rounded-lg text-xs">Cancelar</button>
-                    <button type="submit" class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-lg text-xs">Salvar Bloqueio</button>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Data do Agendamento</label>
+                        <input type="date" id="dataAgendamento" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-400 mb-1">Horário</label>
+                        <select id="selectHorario" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500">
+                            <option value="09:00">09:00</option>
+                            <option value="10:00">10:00</option>
+                            <option value="11:00">11:00</option>
+                            <option value="14:00">14:00</option>
+                            <option value="15:00">15:00</option>
+                            <option value="16:00">16:00</option>
+                            <option value="17:00">17:00</option>
+                            <option value="18:00">18:00</option>
+                        </select>
+                    </div>
                 </div>
+
+                <button type="submit" class="w-full mt-4 bg-emerald-500 hover:bg-emerald-600 font-bold text-slate-950 py-3.5 rounded-xl transition shadow-lg shadow-emerald-500/20">
+                    Confirmar Agendamento na Nuvem
+                </button>
             </form>
         </div>
-    </div>
 
-    <script>
-        // CONFIGURAÇÕES DOS NICHOS (WHITE-LABEL ENGINE)
-        const niches = {
-            barbearia: {
-                appName: "BarberPro",
-                subName: "Barbearia & Estilo",
-                icon: "fa-scissors",
-                heroBadge: "Atendimento Vintage & Moderno",
-                heroTitle: "Sua Barbearia de Confiança com Agendamento Prático.",
-                heroDesc: "Escolha os serviços de corte e barba, selecione seu barbeiro e garanta seu horário sem filas.",
-                heroImg: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80",
-                profTitle: "Nossos Barbeiros",
-                profSubtitle: "Especialistas em Estilo Masculino",
-                whatsapp: "5511999998888",
-                services: [
-                    { id: 1, name: "Corte Social / Fade", price: 45, time: "35 min", icon: "fa-scissors" },
-                    { id: 2, name: "Barba Tradicional", price: 35, time: "30 min", icon: "fa-user-ninja" },
-                    { id: 3, name: "Combo Corte + Barba", price: 75, time: "60 min", icon: "fa-crown" }
-                ],
-                profs: [
-                    { id: "p1", name: "Carlos Barbeiro", role: "Fade Master" },
-                    { id: "p2", name: "Lucas Barber", role: "Barboterapia" }
-                ]
-            },
-            petshop: {
-                appName: "PetCare Agendador",
-                subName: "Banho, Tosa & Estética Pet",
-                icon: "fa-paw",
-                heroBadge: "Cuidado e Carinho para seu Pet",
-                heroTitle: "Agende Banho e Tosa sem Complicação.",
-                heroDesc: "Escolha os pacotes para seu pet, o profissional de tosa e acompanhe os horários em tempo real.",
-                heroImg: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80",
-                profTitle: "Nossos Groomers & Tosadores",
-                profSubtitle: "Especialistas no Cuidado Pet",
-                whatsapp: "5511988887777",
-                services: [
-                    { id: 1, name: "Banho & Higienização", price: 50, time: "40 min", icon: "fa-shower" },
-                    { id: 2, name: "Tosa Higiênica + Banho", price: 80, time: "60 min", icon: "fa-cut" },
-                    { id: 3, name: "Tosa Completa de Raça", price: 110, time: "90 min", icon: "fa-dog" }
-                ],
-                profs: [
-                    { id: "p1", name: "Mariana Tosadora", role: "Especialista Cães Pequenos" },
-                    { id: "p2", name: "Roberto Groomer", role: "Tosa Tesoura & Raças Grandes" }
-                ]
-            },
-            salao: {
-                appName: "Studio Bella",
-                subName: "Salão de Beleza & Cabeleireiros",
-                icon: "fa-wand-magic-sparkles",
-                heroBadge: "Beleza & Autoestima",
-                heroTitle: "Realce sua Beleza com Atendimento Exclusivo.",
-                heroDesc: "Agende cortes, escovas e tratamentos capilares com nossas profissionais.",
-                heroImg: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80",
-                profTitle: "Nossas Hair Stylists",
-                profSubtitle: "Equipe de Cabeleireiras",
-                whatsapp: "5511977776666",
-                services: [
-                    { id: 1, name: "Corte Feminino + Escova", price: 90, time: "50 min", icon: "fa-scissors" },
-                    { id: 2, name: "Hidratação Profunda", price: 120, time: "60 min", icon: "fa-spa" },
-                    { id: 3, name: "Coloração & Mechas", price: 250, time: "120 min", icon: "fa-paint-brush" }
-                ],
-                profs: [
-                    { id: "p1", name: "Ana Paula Stylist", role: "Colorista" },
-                    { id: "p2", name: "Juliana Lima", role: "Cortes & Penteados" }
-                ]
-            },
-            estetica: {
-                appName: "Glamour Estética & Nails",
-                subName: "Manicure & Cuidados",
-                icon: "fa-gem",
-                heroBadge: "Unhas & Estética Corporal",
-                heroTitle: "Manicure, Pedicure e Estética com Hora Marcada.",
-                heroDesc: "Agende seu horário para unhas em gel, esmaltação e procedimentos corporais.",
-                heroImg: "https://images.unsplash.com/photo-1604654894610-df63bc536371?auto=format&fit=crop&q=80",
-                profTitle: "Nossas Designer & Manicures",
-                profSubtitle: "Profissionais Certificadas",
-                whatsapp: "5511966665555",
-                services: [
-                    { id: 1, name: "Manicure + Pedicure Tradicional", price: 55, time: "45 min", icon: "fa-hand-sparkles" },
-                    { id: 2, name: "Alongamento Unha em Gel", price: 130, time: "90 min", icon: "fa-gem" },
-                    { id: 3, name: "Design de Sobrancelha", price: 40, time: "30 min", icon: "fa-eye" }
-                ],
-                profs: [
-                    { id: "p1", name: "Camila Nail Designer", role: "Alongamentos" },
-                    { id: "p2", name: "Fernanda Manicure", role: "Esmaltação & Spas" }
-                ]
-            }
-        };
+    </main>
 
-        const hoursList = ['08:00', '09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
-        let currentNicheKey = 'barbearia';
-        let selectedTimeSlot = '';
+    <!-- RODAPÉ -->
+    <footer class="text-center py-6 text-xs text-slate-500 border-t border-slate-900">
+        Agendify Cloud SaaS &copy; 2026 - Todos os direitos reservados.
+    </footer>
 
-        // INICIALIZAÇÃO
-        document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('bookDate').min = today;
-            document.getElementById('manualDate').min = today;
-            document.getElementById('adminDate').value = today;
-            switchNiche('barbearia');
-        });
-
-        // TROCA DINÂMICA DE NICHO (WHITE-LABEL ENGINE)
-        function switchNiche(key) {
-            currentNicheKey = key;
-            const data = niches[key];
-
-            document.getElementById('appName').innerText = data.appName;
-            document.getElementById('appSubName').innerText = data.subName;
-            document.getElementById('appLogoIcon').innerHTML = `<i class="fa-solid ${data.icon}"></i>`;
-            document.getElementById('heroBadge').innerHTML = `<i class="fa-solid fa-star"></i> <span>${data.heroBadge}</span>`;
-            document.getElementById('heroTitle').innerText = data.heroTitle;
-            document.getElementById('heroDesc').innerText = data.heroDesc;
-            document.getElementById('heroImage').src = data.heroImg;
-            document.getElementById('profTitle').innerText = data.profTitle;
-            document.getElementById('profSubtitle').innerText = data.profSubtitle;
-
-            // Renderiza Serviços
-            document.getElementById('servicesGrid').innerHTML = data.services.map(s => `
-                <div class="bg-dark-800 border border-dark-700 rounded-xl p-5 hover:border-sky-500/50 transition-all flex justify-between items-center">
-                    <div>
-                        <p class="font-bold text-white text-sm">${s.name}</p>
-                        <p class="text-xs text-slate-400 mt-1"><i class="fa-regular fa-clock mr-1"></i> ${s.time}</p>
-                    </div>
-                    <span class="font-bold text-sky-400 text-sm">R$ ${s.price.toFixed(2)}</span>
-                </div>
-            `).join('');
-
-            // Renderiza Time/Profissionais
-            document.getElementById('teamGrid').innerHTML = data.profs.map(p => `
-                <div class="bg-dark-800 border border-dark-700 rounded-xl p-4 text-center">
-                    <div class="w-12 h-12 bg-sky-500/10 text-sky-400 rounded-full flex items-center justify-center mx-auto mb-2 text-lg font-bold">
-                        ${p.name.charAt(0)}
-                    </div>
-                    <h4 class="font-bold text-white text-sm">${p.name}</h4>
-                    <p class="text-xs text-slate-400">${p.role}</p>
-                </div>
-            `).join('');
-
-            // Preenche selects do form
-            document.getElementById('bookServiceSelect').innerHTML = data.services.map(s => `<option value="${s.name}" data-price="${s.price}">${s.name} (R$ ${s.price.toFixed(2)})</option>`).join('');
-            document.getElementById('bookProfSelect').innerHTML = data.profs.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-            document.getElementById('manualProf').innerHTML = data.profs.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
-            document.getElementById('manualTime').innerHTML = hoursList.map(h => `<option value="${h}">${h}</option>`).join('');
-
-            renderTimeSlots();
-        }
-
-        // AGENDAMENTOS LOCALSTORAGE
-        function getBookings() {
-            return JSON.parse(localStorage.getItem(`saas_bookings_${currentNicheKey}`) || '[]');
-        }
-
-        function saveBookings(list) {
-            localStorage.setItem(`saas_bookings_${currentNicheKey}`, JSON.stringify(list));
-        }
-
-        function renderTimeSlots() {
-            const date = document.getElementById('bookDate').value;
-            const profId = document.getElementById('bookProfSelect').value;
-            const container = document.getElementById('slotsGrid');
-
-            if (!date) {
-                container.innerHTML = `<p class="col-span-3 text-xs text-slate-500 text-center py-4">Selecione uma data</p>`;
-                return;
-            }
-
-            const taken = getBookings().filter(b => b.date === date && b.profId === profId && b.status !== 'cancelado').map(b => b.time);
-
-            container.innerHTML = hoursList.map(h => {
-                const isTaken = taken.includes(h);
-                if (isTaken) {
-                    return `<button type="button" disabled class="py-1.5 text-xs bg-red-950/40 text-red-400 border border-red-500/30 rounded font-semibold opacity-60 cursor-not-allowed">Ocupado</button>`;
-                }
-                const isSelected = selectedTimeSlot === h;
-                return `<button type="button" onclick="selectSlot('${h}', this)" class="slot-btn py-1.5 text-xs ${isSelected ? 'bg-sky-600 text-white font-bold' : 'bg-dark-800 text-slate-300 border border-dark-600 hover:border-sky-500'} rounded transition-all">${h}</button>`;
-            }).join('');
-        }
-
-        function selectSlot(time, btn) {
-            selectedTimeSlot = time;
-            document.querySelectorAll('.slot-btn').forEach(b => b.className = 'slot-btn py-1.5 text-xs bg-dark-800 text-slate-300 border border-dark-600 rounded transition-all');
-            btn.className = 'slot-btn py-1.5 text-xs bg-sky-600 text-white font-bold rounded transition-all';
-        }
-
-        function handleClientBooking(e) {
-            e.preventDefault();
-            if (!selectedTimeSlot) { alert('Selecione um horário disponível!'); return; }
-
-            const serviceSelect = document.getElementById('bookServiceSelect');
-            const selectedOpt = serviceSelect.options[serviceSelect.selectedIndex];
-            const date = document.getElementById('bookDate').value;
-            const clientName = document.getElementById('bookClientName').value;
-            const clientPhone = document.getElementById('bookClientPhone').value;
-            const profId = document.getElementById('bookProfSelect').value;
-            const profObj = niches[currentNicheKey].profs.find(p => p.id === profId);
-
-            const newBooking = {
-                id: Date.now(),
-                clientName,
-                phone: clientPhone,
-                serviceName: selectedOpt.value,
-                price: parseFloat(selectedOpt.getAttribute('data-price') || 0),
-                profId,
-                profName: profObj ? profObj.name : 'Profissional',
-                date,
-                time: selectedTimeSlot,
-                status: 'confirmado'
-            };
-
-            const list = getBookings();
-            list.push(newBooking);
-            saveBookings(list);
-
-            // WhatsApp link
-            const msg = `Olá! Gostaria de confirmar meu agendamento no ${niches[currentNicheKey].appName}:\n` +
-                        `👤 Nome: ${clientName}\n` +
-                        `📋 Serviço: ${selectedOpt.value}\n` +
-                        `🗓️ Data: ${date.split('-').reverse().join('/')} às ${selectedTimeSlot}\n` +
-                        `⭐ Profissional: ${profObj ? profObj.name : ''}`;
-
-            window.open(`https://wa.me/${niches[currentNicheKey].whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
-
-            document.getElementById('bookingForm').reset();
-            selectedTimeSlot = '';
-            renderTimeSlots();
-        }
-
-        // ADMIN VIEWS & ACTIONS
-        function showView(v) {
-            if (v === 'admin') {
-                document.getElementById('clientView').classList.add('hidden');
-                document.getElementById('adminView').classList.remove('hidden');
-                document.getElementById('clientNav').classList.add('hidden');
-                document.getElementById('adminNav').classList.remove('hidden');
-                renderAdminTable();
-            } else {
-                document.getElementById('adminView').classList.add('hidden');
-                document.getElementById('clientView').classList.remove('hidden');
-                document.getElementById('adminNav').classList.add('hidden');
-                document.getElementById('clientNav').classList.remove('hidden');
-            }
-        }
-
-        function openAdminAuthModal() { document.getElementById('authModal').classList.remove('hidden'); }
-        function closeAuthModal() { document.getElementById('authModal').classList.add('hidden'); }
-        function checkAuth() {
-            if (document.getElementById('authPass').value === '1234') {
-                closeAuthModal();
-                showView('admin');
-            } else { alert('Senha incorreta!'); }
-        }
-
-        function renderAdminTable() {
-            const date = document.getElementById('adminDate').value;
-            const all = getBookings().filter(b => b.date === date);
-            document.getElementById('adminTotalInfo').innerText = `Agendamentos para ${date.split('-').reverse().join('/')}: ${all.length}`;
-
-            const tbody = document.getElementById('adminTableBody');
-            if (all.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">Nenhum registro para este dia.</td></tr>`;
-            } else {
-                tbody.innerHTML = all.map(b => `
-                    <tr>
-                        <td class="p-3 font-bold text-white">${b.time}</td>
-                        <td class="p-3">${b.clientName} <span class="block text-[10px] text-slate-400">${b.phone}</span></td>
-                        <td class="p-3 text-sky-400">${b.profName}</td>
-                        <td class="p-3">${b.serviceName}</td>
-                        <td class="p-3 font-bold">R$ ${b.price.toFixed(2)}</td>
-                        <td class="p-3"><span class="bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded text-[10px] capitalize">${b.status}</span></td>
-                        <td class="p-3 text-center">
-                            <button onclick="deleteBooking(${b.id})" class="text-red-400 hover:text-red-300 p-1 text-xs"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `).join('');
-            }
-        }
-
-        function deleteBooking(id) {
-            let list = getBookings().filter(b => b.id !== id);
-            saveBookings(list);
-            renderAdminTable();
-            renderTimeSlots();
-        }
-
-        function openManualBlockModal() {
-            document.getElementById('manualDate').value = document.getElementById('adminDate').value;
-            document.getElementById('manualModal').classList.remove('hidden');
-        }
-        function closeManualModal() { document.getElementById('manualModal').classList.add('hidden'); }
-
-        function handleManualSubmit(e) {
-            e.preventDefault();
-            const profId = document.getElementById('manualProf').value;
-            const profObj = niches[currentNicheKey].profs.find(p => p.id === profId);
-
-            const newBooking = {
-                id: Date.now(),
-                clientName: document.getElementById('manualName').value,
-                phone: 'Bloqueio Manual',
-                serviceName: 'Bloqueio / Encaixe',
-                price: 0,
-                profId,
-                profName: profObj ? profObj.name : 'Profissional',
-                date: document.getElementById('manualDate').value,
-                time: document.getElementById('manualTime').value,
-                status: 'bloqueado'
-            };
-
-            const list = getBookings();
-            list.push(newBooking);
-            saveBookings(list);
-            closeManualModal();
-            renderAdminTable();
-            renderTimeSlots();
-        }
-    </script>
-</body>
-</html>
+    <!-- S
