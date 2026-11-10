@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BarberPro - Barbearia & Agendamento</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Cinzel & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gold: {
+                            400: '#f1c40f',
+                            500: '#d4af37',
+                            600: '#aa8c2c',
+                            700: '#856d20'
+                        },
+                        dark: {
+                            900: '#0f0f11',
+                            800: '#17171a',
+                            700: '#222226',
+                            600: '#2d2d33'
+                        }
+                    },
+                    fontFamily: {
+                        cinzel: ['Cinzel', 'serif'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom Styles & Vintage Visual Elements */
+        body {
+            background-color: #0f0f11;
+            color: #e5e7eb;
+            font-family: 'Inter', sans-serif;
+        }
+        .font-vintage {
+            font-family: 'Cinzel', serif;
+        }
+        .gold-gradient-text {
+            background: linear-gradient(135deg, #fce8ad 0%, #d4af37 50%, #aa8c2c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .gold-border-glow {
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+        }
+        .gold-border-glow:hover {
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f0f11;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2d2d33;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #d4af37;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-gold-500 selection:text-black">
+
+    <!-- Header / Navbar -->
+    <header class="fixed w-full top-0 z-50 bg-dark-900/90 backdrop-blur-md border-b border-gold-500/20 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logo -->
+                <a href="#" class="flex items-center space-x-3 group">
+                    <div class="w-10 h-10 rounded-full border border-gold-500 flex items-center justify-center bg-dark-800 text-gold-500 group-hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-scissors text-lg"></i>
+                    </div>
+                    <span class="font-vintage text-xl sm:text-2xl font-bold tracking-wider gold-gradient-text">BARBER<span class="text-white">PRO</span></span>
+                </a>
+
+                <!-- Desktop Menu -->
+                <nav class="hidden md:flex items-center space-x-8">
+                    <a href="#home" class="text-sm font-medium hover:text-gold-500 transition-colors">Início</a>
+                    <a href="#servicos" class="text-sm font-medium hover:text-gold-500 transition-colors">Serviços & Preços</a>
+                    <a href="#barbeiros" class="text-sm font-medium hover:text-gold-500 transition-colors">Barbeiros</a>
+                    <a href="#sobre" class="text-sm font-medium hover:text-gold-500 transition-colors">A Barbearia</a>
+                    <a href="#contato" class="text-sm font-medium hover:text-gold-500 transition-colors">Contato</a>
+                    <button onclick="openAgendamentosModal()" class="relative text-gold-500 hover:text-white text-sm font-medium transition-colors" title="Meus Agendamentos">
+                        <i class="fa-solid fa-calendar-check text-lg"></i>
+                        <span id="agendamentosBadge" class="hidden absolute -top-2 -right-3 bg-gold-500 text-black font-bold text-xs w-4 h-4 rounded-full flex items-center justify-center">0</span>
+                    </button>
+                    <a href="#agendar" class="bg-gradient-to-r from-gold-600 to-gold-500 hover:from-gold-500 hover:to-gold-400 text-black font-semibold px-5 py-2.5 rounded-lg shadow-lg shadow-gold-500/10 hover:shadow-gold-500/20 transition-all duration-200 text-sm">
+                        Agendar Horário
+                    </a>
+                </nav>
+
+                <!-- Mobile menu button -->
+                <div class="flex items-center space-x-4 md:hidden">
+                    <button onclick="openAgendamentosModal()" class="relative text-gold-500 p-2" title="Meus Agendamentos">
+                        <i class="fa-solid fa-calendar-check text-xl"></i>
+                        <span id="agendamentosBadgeMobile" class="hidden absolute top-0 right-0 bg-gold-500 text-black font-bold text-xs w-4 h-4 rounded-full flex items-center justify-center">0</span>
+                    </button>
+                    <button id="mobileMenuBtn" class="text-gray-300 hover:text-gold-500 focus:outline-none p-2">
+                        <i class="fa-solid fa-bars text-2xl" id="menuIcon"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Navigation Menu -->
+        <div id="mobileMenu" class="hidden md:hidden bg-dark-800 border-b border-gold-500/20 px-4 pt-2 pb-6 space-y-3">
+            <a href="#home" class="mobile-link block py-2 text-base font-medium text-gray-300 hover:text-gold-500">Início</a>
+            <a href="#servicos" class="mobile-link block py-2 text-base font-medium text-gray-300 hover:text-gold-500">Serviços & Preços</a>
+            <a href="#barbeiros" class="mobile-link block py-2 text-base font-medium text-gray-300 hover:text-gold-500">Barbeiros</a>
+            <a href="#sobre" class="mobile-link block py-2 text-base font-medium text-gray-300 hover:text-gold-500">A Barbearia</a>
+            <a href="#contato" class="mobile-link block py-2 text-base font-medium text-gray-300 hover:text-gold-500">Contato</a>
+            <a href="#agendar" class="mobile-link block w-full text-center bg-gold-500 text-black font-semibold py-3 rounded-lg mt-4">
+                Agendar Horário
+            </a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative min-h-screen flex items-center pt-20 overflow-hidden">
+        <!-- Background Pattern / Overlay -->
+        <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-dark-700 via-dark-900 to-black opacity-80"></div>
+        <div class="absolute inset-0 z-0 bg-[url('https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80')] bg-cover bg-center opacity-15 filter grayscale"></div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 py-16 text-center md:text-left flex flex-col md:flex-row items-center justify-between">
+            <div class="md:w-1/2 space-y-6">
+                <div class="inline-flex items-center space-x-2 bg-dark-800 border border-gold-500/30 px-3 py-1.5 rounded-full text-gold-400 text-xs font-semibold uppercase tracking-wider">
+                    <i class="fa-solid fa-crown"></i>
+                    <span>Estilo & Tradição Vintage</span>
+                </div>
+                <h1 class="font-vintage text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
+                    Mais que um corte, <br>uma <span class="gold-gradient-text">Experiência</span>.
+                </h1>
+                <p class="text-gray-400 text-base sm:text-lg max-w-xl">
+                    Agende seu horário com os melhores profissionais da cidade. Cortes clássicos, barboterapia relaxante e ambiente exclusivo com toalha quente e cerveja gelada.
+                </p>
+                <div class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
+                    <a href="#agendar" class="w-full sm:w-auto text-center bg-gradient-to-r from-gold-600 to-gold-500 hover:from-gold-500 hover:to-gold-400 text-black font-bold px-8 py-4 rounded-xl shadow-lg shadow-gold-500/20 hover:scale-105 transition-all text-base">
+                        <i class="fa-solid fa-calendar-plus mr-2"></i> Agendar Agora
+                    </a>
+                    <a href="#servicos" class="w-full sm:w-auto text-center border border-gold-500/40 text-gold-400 hover:bg-gold-500/10 font-medium px-8 py-4 rounded-xl transition-all text-base">
+                        Ver Preços
+                    </a>
+                </div>
+
+                <!-- Info Highlights -->
+                <div class="grid grid-cols-3 gap-4 pt-8 border-t border-dark-700">
+                    <div>
+                        <p class="font-vintage text-2xl font-bold text-gold-400">4.9/5</p>
+                        <p class="text-xs text-gray-400">Avaliações</p>
+                    </div>
+                    <div>
+                        <p class="font-vintage text-2xl font-bold text-gold-400">+5.000</p>
+                        <p class="text-xs text-gray-400">Clientes Atendidos</p>
+                    </div>
+                    <div>
+                        <p class="font-vintage text-2xl font-bold text-gold-400">100%</p>
+                        <p class="text-xs text-gray-400">Satisfação</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hero Image Showcase -->
+            <div class="md:w-5/12 mt-12 md:mt-0 relative">
+                <div class="relative mx-auto w-full max-w-md rounded-2xl overflow-hidden border-2 border-gold-500/30 gold-border-glow shadow-2xl">
+                    <img src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?auto=format&fit=crop&q=80" alt="Barbearia Vintage" class="w-full h-[450px] object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent"></div>
+                    <div class="absolute bottom-6 left-6 right-6 p-4 bg-dark-800/90 backdrop-blur-md rounded-xl border border-gold-500/20 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs text-gold-400 font-semibold">HORÁRIO HOJE</p>
+                            <p class="text-sm font-medium text-white">09:00 - 20:00</p>
+                        </div>
+                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-500/10 text-green-400 border border-green-500/30">
+                            ● Aberto Agora
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tabela de Serviços e Preços -->
+    <section id="servicos" class="py-20 bg-dark-800 relative">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-gold-400 text-sm font-semibold uppercase tracking-wider mb-2">Tabela de Preços</h2>
+                <p class="font-vintage text-3xl sm:text-4xl font-bold text-white mb-4">Nossos Serviços Exclusivos</p>
+                <p class="text-gray-400">Trabalhamos com produtos de alta qualidade e técnicas modernas para garantir o melhor resultado para seu estilo.</p>
+            </div>
+
+            <!-- Categories Filter -->
+            <div class="flex justify-center flex-wrap gap-2 mb-10" id="servicesFilter">
+                <button onclick="filterServices('all')" class="filter-btn active bg-gold-500 text-black px-5 py-2 rounded-full font-medium text-sm transition-all">Todos</button>
+                <button onclick="filterServices('cabelo')" class="filter-btn bg-dark-700 text-gray-300 hover:bg-dark-600 px-5 py-2 rounded-full font-medium text-sm transition-all">Cabelo</button>
+                <button onclick="filterServices('barba')" class="filter-btn bg-dark-700 text-gray-300 hover:bg-dark-600 px-5 py-2 rounded-full font-medium text-sm transition-all">Barba</button>
+                <button onclick="filterServices('combos')" class="filter-btn bg-dark-700 text-gray-300 hover:bg-dark-600 px-5 py-2 rounded-full font-medium text-sm transition-all">Combos Especialidades</button>
+                <button onclick="filterServices('tratamentos')" class="filter-btn bg-dark-700 text-gray-300 hover:bg-dark-600 px-5 py-2 rounded-full font-medium text-sm transition-all">Tratamentos</button>
+            </div>
+
+            <!-- Grid de Serviços -->
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="servicesGrid">
+                <!-- Inserido dinamicamente via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Nossos Barbeiros -->
+    <section id="barbeiros" class="py-20 bg-dark-900 border-t border-dark-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <h2 class="text-gold-400 text-sm font-semibold uppercase tracking-wider mb-2">Especialistas</h2>
+                <p class="font-vintage text-3xl sm:text-4xl font-bold text-white mb-4">Conheça Nossa Equipe</p>
+                <p class="text-gray-400">Profissionais qualificados com anos de experiência no mercado de estética masculina.</p>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8" id="barbersGrid">
+                <!-- Inserido via JS -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Seção do Formulário de Agendamento -->
+    <section id="agendar" class="py-20 bg-dark-800 relative overflow-hidden border-t border-gold-500/10">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="bg-dark-900 border border-gold-500/30 rounded-2xl p-6 sm:p-10 shadow-2xl gold-border-glow">
+                <div class="text-center mb-8">
+                    <span class="inline-block p-3 rounded-full bg-gold-500/10 text-gold-400 mb-3">
+                        <i class="fa-regular fa-calendar-check text-2xl"></i>
+                    </span>
+                    <h2 class="font-vintage text-3xl font-bold text-white">Agende Seu Horário</h2>
+                    <p class="text-gray-400 text-sm mt-1">Preencha os dados abaixo e confirme seu agendamento em instantes.</p>
+                </div>
+
+                <!-- Form Wizard Step Indicator -->
+                <div class="flex items-center justify-between mb-8 max-w-md mx-auto">
+                    <div class="flex flex-col items-center">
+                        <div id="step1-indicator" class="w-8 h-8 rounded-full bg-gold-500 text-black font-bold flex items-center justify-center text-sm">1</div>
+                        <span class="text-xs text-gray-400 mt-1">Serviço</span>
+                    </div>
+                    <div class="flex-1 h-0.5 bg-dark-700 mx-2" id="line1"></div>
+                    <div class="flex flex-col items-center">
+                        <div id="step2-indicator" class="w-8 h-8 rounded-full bg-dark-700 text-gray-400 font-bold flex items-center justify-center text-sm">2</div>
+                        <span class="text-xs text-gray-400 mt-1">Data & Barbeiro</span>
+                    </div>
+                    <div class="flex-1 h-0.5 bg-dark-700 mx-2" id="line2"></div>
+                    <div class="flex flex-col items-center">
+                        <div id="step3-indicator" class="w-8 h-8 rounded-full bg-dark-700 text-gray-400 font-bold flex items-center justify-center text-sm">3</div>
+                        <span class="text-xs text-gray-400 mt-1">Seus Dados</span>
+                    </div>
+                </div>
+
+                <form id="bookingForm" onsubmit="handleFormSubmit(event)">
+                    <!-- Passos do Formulário -->
+                    
+                    <!-- Passo 1: Seleção de Serviço -->
+                    <div id="step1" class="space-y-4">
+                        <label class="block text-sm font-medium text-gold-400 mb-2">Selecione o Serviço Desejado:</label>
+                        <div class="grid gap-3" id="bookingServicesList">
+                            <!-- Inserido dinamicamente via JS -->
+                        </div>
+                        <div class="flex justify-end pt-4">
+                            <button type="button" onclick="nextStep(2)" id="btnNext1" disabled class="bg-gold-500 hover:bg-gold-400 text-black font-semibold px-6 py-3 rounded-lg transition-all opacity-50 cursor-not-allowed">
+                                Próximo Passo <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Passo 2: Seleção de Barbeiro, Data e Horário -->
+                    <div id="step2" class="space-y-6 hidden">
+                        <div>
+                            <label class="block text-sm font-medium text-gold-400 mb-2">Escolha o Profissional:</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" id="bookingBarberList">
+                                <!-- Inserido via JS -->
+                            </div>
+                        </div>
+
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="bookingDate" class="block text-sm font-medium text-gold-400 mb-2">Selecione a Data:</label>
+                                <input type="date" id="bookingDate" required onchange="updateTimeSlots()" class="w-full bg-dark-800 border border-dark-600 focus:border-gold-500 text-white rounded-lg p-3 outline-none transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gold-400 mb-2">Horários Disponíveis:</label>
+                                <div id="timeSlotsGrid" class="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto p-1 bg-dark-800 rounded-lg border border-dark-600">
+                                    <p class="col-span-3 text-xs text-gray-500 text-center py-4">Selecione uma data primeiro</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between pt-4">
+                            <button type="button" onclick="prevStep(1)" class="border border-dark-600 hover:border-gold-500/50 text-gray-300 font-medium px-6 py-3 rounded-lg transition-all">
+                                <i class="fa-solid fa-arrow-left mr-2"></i> Voltar
+                            </button>
+                            <button type="button" onclick="nextStep(3)" id="btnNext2" disabled class="bg-gold-500 hover:bg-gold-400 text-black font-semibold px-6 py-3 rounded-lg transition-all opacity-50 cursor-not-allowed">
+                                Próximo Passo <i class="fa-solid fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Passo 3: Dados Pessoais & Confirmação -->
+                    <div id="step3" class="space-y-4 hidden">
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div>
+                                <label for="clientName" class="block text-sm font-medium text-gold-400 mb-1">Seu Nome Completo *</label>
+                                <input type="text" id="clientName" required placeholder="Ex: João Silva" class="w-full bg-dark-800 border border-dark-600 focus:border-gold-500 text-white rounded-lg p-3 outline-none">
+                            </div>
+                            <div>
+                                <label for="clientPhone" class="block text-sm font-medium text-gold-400 mb-1">WhatsApp / Telefone *</label>
+                                <input type="tel" id="clientPhone" required placeholder="(11) 99999-9999" class="w-full bg-dark-800 border border-dark-600 focus:border-gold-500 text-white rounded-lg p-3 outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="clientNotes" class="block text-sm font-medium text-gold-400 mb-1">Observações (Opcional)</label>
+                            <textarea id="clientNotes" rows="2" placeholder="Ex: Preferência por barba desenhada, corte na tesoura..." class="w-full bg-dark-800 border border-dark-600 focus:border-gold-500 text-white rounded-lg p-3 outline-none"></textarea>
+                        </div>
+
+                        <!-- Resumo do Agendamento -->
+                        <div class="bg-dark-800 p-4 rounded-xl border border-gold-500/20 space-y-2 mt-4 text-sm">
+                            <h4 class="font-vintage text-gold-400 font-bold border-b border-dark-700 pb-2">Resumo da Reserva</h4>
+                            <div class="flex justify-between text-gray-300">
+                                <span>Serviço:</span>
+                                <span id="summaryService" class="font-semibold text-white">-</span>
+                            </div>
+                            <div class="flex justify-between text-gray-300">
+                                <span>Barbeiro:</span>
+                                <span id="summaryBarber" class="font-semibold text-white">-</span>
+                            </div>
+                            <div class="flex justify-between text-gray-300">
+                                <span>Data & Horário:</span>
+                                <span id="summaryDateTime" class="font-semibold text-white">-</span>
+                            </div>
+                            <div class="flex justify-between text-gray-300 border-t border-dark-700 pt-2 font-bold">
+                                <span class="text-gold-400">Total Estimado:</span>
+                                <span id="summaryPrice" class="text-gold-400 text-base">R$ 0,00</span>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between pt-4">
+                            <button type="button" onclick="prevStep(2)" class="border border-dark-600 hover:border-gold-500/50 text-gray-300 font-medium px-6 py-3 rounded-lg transition-all">
+                                <i class="fa-solid fa-arrow-left mr-2"></i> Voltar
+                            </button>
+                            <button type="submit" class="bg-gradient-to-r from-gold-600 to-gold-500 hover:from-gold-500 hover:to-gold-400 text-black font-bold px-8 py-3 rounded-lg shadow-lg shadow-gold-500/20 transition-all flex items-center">
+                                <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Confirmar & Enviar WhatsApp
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sobre a Barbearia -->
+    <section id="sobre" class="py-20 bg-dark-900 border-t border-dark-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6">
+                    <h2 class="text-gold-400 text-sm font-semibold uppercase tracking-wider">Tradição & Modernidade</h2>
+                    <h3 class="font-vintage text-3xl sm:text-4xl font-bold text-white">O Espaço Feito para o Homem Moderno</h3>
+                    <p class="text-gray-400 leading-relaxed">
+                        Fundada em 2018, a BarberPro foi concebida para resgatar a essência das antigas barbearias, unindo o charme do estilo clássico com a sofisticação e conforto da atualidade.
+                    </p>
+                    <p class="text-gray-400 leading-relaxed">
+                        Aqui cada detalhe foi pensado para o seu bem-estar. Enquanto aguarda ou realiza seu atendimento, você pode desfrutar de uma bebida gelada, jogar uma partida de sinuca ou simplesmente relaxar ao som de boa música.
+                    </p>
+                    <div class="grid grid-cols-2 gap-4 pt-2">
+                        <div class="flex items-start space-x-3">
+                            <i class="fa-solid fa-beer-mug-empty text-gold-400 text-xl mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">Drink de Cortesia</h4>
+                                <p class="text-xs text-gray-400">Chopp ou café especial</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-3">
+                            <i class="fa-solid fa-wifi text-gold-400 text-xl mt-1"></i>
+                            <div>
+                                <h4 class="font-bold text-white text-sm">Wi-Fi & Lounges</h4>
+                                <p class="text-xs text-gray-400">Ambiente climatizado</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <img src="https://images.unsplash.com/photo-1585747860715-2ba37e788b70?auto=format&fit=crop&q=80" alt="Interior da Barbearia" class="rounded-xl border border-gold-500/20 object-cover h-64 w-full">
+                    <img src="https://images.unsplash.com/photo-1605497788044-5a32c7078486?auto=format&fit=crop&q=80" alt="Corte de Cabelo" class="rounded-xl border border-gold-500/20 object-cover h-64 w-full mt-8">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Depoimentos de Clientes -->
+    <section class="py-16 bg-dark-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-gold-400 text-sm font-semibold uppercase tracking-wider mb-2">Avaliações</h2>
+                <p class="font-vintage text-3xl font-bold text-white">O que Nossos Clientes Dizem</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-dark-900 p-6 rounded-xl border border-dark-700">
+                    <div class="flex text-gold-400 text-sm mb-3">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-gray-300 text-sm italic mb-4">"Melhor barbearia da cidade! O agendamento online facilitou muito minha rotina. Cheguei no horário e fui atendido imediatamente."</p>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-gold-500/20 flex items-center justify-center text-gold-400 font-bold">RC</div>
+                        <div>
+                            <p class="text-sm font-semibold text-white">Ricardo Costa</p>
+                            <p class="text-xs text-gray-500">Cliente desde 2021</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-dark-900 p-6 rounded-xl border border-dark-700">
+                    <div class="flex text-gold-400 text-sm mb-3">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-gray-300 text-sm italic mb-4">"A barboterapia é fantástica. Ambiente nota 10, atendimento atencioso e a cerveja é sempre estupidamente gelada!"</p>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-gold-500/20 flex items-center justify-center text-gold-400 font-bold">MS</div>
+                        <div>
+                            <p class="text-sm font-semibold text-white">Matheus Silva</p>
+                            <p class="text-xs text-gray-500">Cliente frequente</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-dark-900 p-6 rounded-xl border border-dark-700">
+                    <div class="flex text-gold-400 text-sm mb-3">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+                    </div>
+                    <p class="text-gray-300 text-sm italic mb-4">"O barbeiro Carlos mandou muito bem no degradê navalhado. Recomendo de olhos fechados o combo VIP."</p>
+                    <div class="flex items-center space-x-3">
+                        <div class="w-10 h-10 rounded-full bg-gold-500/20 flex items-center justify-center text-gold-400 font-bold">AL</div>
+                        <div>
+                            <p class="text-sm font-semibold text-white">André Lima</p>
+                            <p class="text-xs text-gray-500">Novo Cliente</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contato e Localização -->
+    <section id="contato" class="py-20 bg-dark-900 border-t border-dark-700">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-12">
+                <!-- Informações -->
+                <div class="space-y-8">
+                    <div>
+                        <h2 class="text-gold-400 text-sm font-semibold uppercase tracking-wider mb-2">Localização</h2>
+                        <h3 class="font-vintage text-3xl font-bold text-white">Onde Estamos</h3>
+                        <p class="text-gray-400 mt-2">Venha nos fazer uma visita ou entre em contato diretamente pelo WhatsApp.</p>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4 p-4 bg-dark-800 rounded-xl border border-dark-700">
+                            <i class="fa-solid fa-location-dot text-gold-400 text-xl mt-1"></i>
+                            <div>
+                                <h4 class="text-white font-bold text-sm">Endereço</h4>
+                                <p class="text-gray-400 text-sm">Av. Paulista, 1000 - Bela Vista, São Paulo - SP</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4 p-4 bg-dark-800 rounded-xl border border-dark-700">
+                            <i class="fa-solid fa-clock text-gold-400 text-xl mt-1"></i>
+                            <div>
+                                <h4 class="text-white font-bold text-sm">Horário de Funcionamento</h4>
+                                <p class="text-gray-400 text-sm">Segunda à Sexta: 09:00 - 20:00</p>
+                                <p class="text-gray-400 text-sm">Sábado: 08:00 - 19:00</p>
+                                <p class="text-gray-400 text-sm">Domingo: Fechado</p>
+                            </div>
+                        </div>
+
+                        <div class="flex items-start space-x-4 p-4 bg-dark-800 rounded-xl border border-dark-700">
+                            <i class="fa-solid fa-phone text-gold-400 text-xl mt-1"></i>
+                            <div>
+                                <h4 class="text-white font-bold text-sm">Telefone / WhatsApp</h4>
+                                <p class="text-gray-400 text-sm">(11) 99999-8888</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Redes Sociais -->
+                    <div class="flex space-x-4 pt-2">
+                        <a href="#" class="w-10 h-10 rounded-lg bg-dark-800 border border-dark-700 text-gold-400 flex items-center justify-center hover:bg-gold-500 hover:text-black transition-colors">
+                            <i class="fa-brands fa-instagram text-lg"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-lg bg-dark-800 border border-dark-700 text-gold-400 flex items-center justify-center hover:bg-gold-500 hover:text-black transition-colors">
+                            <i class="fa-brands fa-facebook-f text-lg"></i>
+                        </a>
+                        <a href="https://wa.me/5511999998888" target="_blank" class="w-10 h-10 rounded-lg bg-dark-800 border border-dark-700 text-gold-400 flex items-center justify-center hover:bg-gold-500 hover:text-black transition-colors">
+                            <i class="fa-brands fa-whatsapp text-lg"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Mapa / Imagem Interativa -->
+                <div class="h-96 rounded-2xl overflow-hidden border border-gold-500/20 bg-dark-800 relative">
+                    <iframe 
+                        title="Localização da Barbearia"
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3657.197573031238!2d-46.65867!3d-23.561414!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x94ce59c8da0aa315%3A0xd59f9431f2c9776a!2sAv.%20Paulista%2C%20S%C3%A3o%20Paulo%20-%20SP!5e0!3m2!1spt-BR!2sbr!4v1620000000000!5m2!1spt-BR!2sbr" 
+                        class="w-full h-full border-0 grayscale contrast-125 opacity-80 hover:opacity-100 transition-opacity" 
+                        allowfullscreen="" 
+                        loading="lazy">
+                    </iframe>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black py-8 border-t border-dark-800 text-center text-gray-500 text-sm">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>© 2026 BarberPro. Todos os direitos reservados. Desenvolvido para agendamento online rápido.</p>
+        </div>
+    </footer>
+
+    <!-- MODAL: Meus Agendamentos Guardados -->
+    <div id="agendamentosModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-dark-900 border border-gold-500/30 w-full max-w-lg rounded-2xl p-6 relative">
+            <div class="flex justify-between items-center border-b border-dark-700 pb-4 mb-4">
+                <h3 class="font-vintage text-xl font-bold text-gold-400">Meus Agendamentos</h3>
+                <button onclick="closeAgendamentosModal()" class="text-gray-400 hover:text-white text-xl">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <div id="agendamentosListModal" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+                <!-- Conteúdo via JS -->
+            </div>
+
+            <div class="mt-6 pt-4 border-t border-dark-700 flex justify-end">
+                <button onclick="closeAgendamentosModal()" class="bg-dark-700 hover:bg-dark-600 text-white font-semibold px-4 py-2 rounded-lg text-sm">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Notificação de Agendamento Concluído -->
+    <div id="confirmModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-dark-900 border border-gold-500/50 w-full max-w-md rounded-2xl p-6 text-center space-y-4 shadow-2xl">
+            <div class="w-16 h-16 rounded-full bg-green-500/10 text-green-400 flex items-center justify-center mx-auto text-3xl border border-green-500/30">
+                <i class="fa-solid fa-check"></i>
+            </div>
+            <h3 class="font-vintage text-2xl font-bold text-white">Agendamento Solicitado!</h3>
+            <p class="text-gray-300 text-sm">
+                Sua reserva foi gerada com sucesso! Para confirmar seu horário instantaneamente, clique no botão abaixo para enviar o comprovante via WhatsApp.
+            </p>
+
+            <div id="modalDetails" class="bg-dark-800 p-3 rounded-lg text-left text-xs space-y-1 text-gray-300">
+                <!-- Preenchido via JS -->
+            </div>
+
+            <div class="flex flex-col gap-2 pt-2">
+                <a id="btnSendWhatsapp" href="#" target="_blank" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded-lg flex items-center justify-center transition-all">
+                    <i class="fa-brands fa-whatsapp text-xl mr-2"></i> Abrir WhatsApp para Confirmar
+                </a>
+                <button onclick="closeConfirmModal()" class="w-full bg-dark-700 hover:bg-dark-600 text-gray-300 font-medium py-2 rounded-lg text-sm">
+                    Concluir e Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript Principal -->
+    <script>
+        // --- DADOS DA BARBEARIA ---
+        const BARBER_PHONE = "5511999998888"; // Substitua pelo número real com DDD (Ex: 5511999998888)
+
+        const servicesData = [
+            { id: 1, category: 'cabelo', name: 'Corte Social / Fade', price: 45, time: '35 min', desc: 'Corte moderno ou clássico com acabamento perfeito na tesoura ou máquina.', icon: 'fa-scissors' },
+            { id: 2, category: 'cabelo', name: 'Corte Navalhado', price: 55, time: '45 min', desc: 'Fade degradê zero com acabamento ultra preciso na lâmina.', icon: 'fa-razor' },
+            { id: 3, category: 'barba', name: 'Barba Tradicional', price: 35, time: '30 min', desc: 'Modelagem da barba com alinhamento na lâmina e hidratação.', icon: 'fa-user-ninja' },
+            { id: 4, category: 'barba', name: 'Barboterapia Premium', price: 50, time: '40 min', desc: 'RITUAL: Toalha quente, óleos essenciais, massagem facial e finalização.', icon: 'fa-hot-tub-person' },
+            { id: 5, category: 'combos', name: 'Combo: Corte + Barba', price: 75, time: '60 min', desc: 'Nosso combo mais pedido. Estilo completo para cabelo e barba.', icon: 'fa-crown' },
+            { id: 6, category: 'combos', name: 'Combo VIP BarberPro', price: 110, time: '80 min', desc: 'Corte + Barboterapia + Sobrancelha + Wash relaxante + Bebida Especial.', icon: 'fa-gem' },
+            { id: 7, category: 'tratamentos', name: 'Pigmentação de Barba/Cabelo', price: 40, time: '30 min', desc: 'Disfarce natural de falhas e fios brancos com produtos de alta fixação.', icon: 'fa-paint-brush' },
+            { id: 8, category: 'tratamentos', name: 'Sobrancelha Navalhada', price: 20, time: '15 min', desc: 'Design e limpeza da sobrancelha masculina.', icon: 'fa-eye' },
+            { id: 9, category: 'tratamentos', name: 'Selagem / Alisamento', price: 80, time: '60 min', desc: 'Redução de volume e alinhamento dos fios.', icon: 'fa-wand-magic-sparkles' }
+        ];
+
+        const barbersData = [
+            { id: 'qualquer', name: 'Sem preferência', role: 'Qualquer Barbeiro Disponível', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80' },
+            { id: 'carlos', name: 'Carlos "Mãos de Tesoura"', role: 'Especialista em Degradê & Fade', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80' },
+            { id: 'rodrigo', name: 'Rodrigo Mestre Barbeiro', role: 'Especialista em Barboterapia', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80' },
+            { id: 'lucas', name: 'Lucas Style', role: 'Visagismo e Cortes Modernos', img: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80' }
+        ];
+
+        const availableHours = ['09:00', '10:00', '11:00', '13:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+
+        // --- ESTADO DO AGENDAMENTO ATUAL ---
+        let bookingState = {
+            service: null,
+            barber: barbersData[0],
+            date: '',
+            time: '',
+            name: '',
+            phone: '',
+            notes: ''
+        };
+
+        // --- INICIALIZAÇÃO DA PÁGINA ---
+        document.addEventListener('DOMContentLoaded', () => {
+            renderServices(servicesData);
+            renderBarbers();
+            renderBookingServices();
+            renderBookingBarbers();
+            setMinBookingDate();
+            updateBadgeCount();
+
+            // Menu Mobile Toggle
+            const mobileBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const menuIcon = document.getElementById('menuIcon');
+
+            mobileBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                if (mobileMenu.classList.contains('hidden')) {
+                    menuIcon.className = 'fa-solid fa-bars text-2xl';
+                } else {
+                    menuIcon.className = 'fa-solid fa-xmark text-2xl';
+                }
+            });
+
+            // Fechar menu mobile ao clicar num link
+            document.querySelectorAll('.mobile-link').forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                    menuIcon.className = 'fa-solid fa-bars text-2xl';
+                });
+            });
+        });
+
+        // Configura data mínima para hoje no input date
+        function setMinBookingDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('bookingDate').min = today;
+        }
+
+        // --- RENDERIZAÇÃO DOS SERVIÇOS DA TABELA DE PREÇOS ---
+        function renderServices(services) {
+            const grid = document.getElementById('servicesGrid');
+            grid.innerHTML = services.map(s => `
+                <div class="bg-dark-900 border border-dark-700 hover:border-gold-500/40 rounded-xl p-6 transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between group">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="w-12 h-12 rounded-lg bg-gold-500/10 border border-gold-500/20 text-gold-400 flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                                <i class="fa-solid ${s.icon}"></i>
+                            </div>
+                            <span class="text-xs bg-dark-800 text-gray-400 px-3 py-1 rounded-full border border-dark-700">
+                                <i class="fa-regular fa-clock mr-1"></i> ${s.time}
+                            </span>
+                        </div>
+                        <h3 class="font-vintage text-xl font-bold text-white mb-2">${s.name}</h3>
+                        <p class="text-gray-400 text-sm mb-4 leading-relaxed">${s.desc}</p>
+                    </div>
+                    <div class="pt-4 border-t border-dark-800 flex items-center justify-between">
+                        <span class="font-vintage text-2xl font-extrabold text-gold-400">R$ ${s.price.toFixed(2).replace('.', ',')}</span>
+                        <button onclick="selectServiceAndScroll(${s.id})" class="text-xs font-semibold uppercase tracking-wider text-white hover:text-gold-400 flex items-center transition-colors">
+                            Agendar <i class="fa-solid fa-chevron-right ml-1 text-gold-400"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterServices(category) {
+            // Atualizar botões ativos
+            const buttons = document.querySelectorAll('#servicesFilter button');
+            buttons.forEach(btn => {
+                btn.classList.remove('active', 'bg-gold-500', 'text-black');
+                btn.classList.add('bg-dark-700', 'text-gray-300');
+            });
+            event.target.classList.add('active', 'bg-gold-500', 'text-black');
+            event.target.classList.remove('bg-dark-700', 'text-gray-300');
+
+            if (category === 'all') {
+                renderServices(servicesData);
+            } else {
+                const filtered = servicesData.filter(s => s.category === category);
+                renderServices(filtered);
+            }
+        }
+
+        // --- RENDERIZAÇÃO DOS BARBEIROS ---
+        function renderBarbers() {
+            const grid = document.getElementById('barbersGrid');
+            // Ignora a opção 'Sem preferência' na seção de visualização da equipe
+            const list = barbersData.filter(b => b.id !== 'qualquer');
+            grid.innerHTML = list.map(b => `
+                <div class="bg-dark-800 rounded-xl overflow-hidden border border-dark-700 group hover:border-gold-500/30 transition-all">
+                    <div class="h-64 overflow-hidden relative">
+                        <img src="${b.img}" alt="${b.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent opacity-80"></div>
+                    </div>
+                    <div class="p-5 text-center">
+                        <h4 class="font-vintage font-bold text-lg text-white mb-1">${b.name}</h4>
+                        <p class="text-gold-400 text-xs font-medium">${b.role}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- FORMULÁRIO DE AGENDAMENTO DINÂMICO ---
+
+        function renderBookingServices() {
+            const list = document.getElementById('bookingServicesList');
+            list.innerHTML = servicesData.map(s => `
+                <label class="flex items-center justify-between p-4 rounded-xl bg-dark-800 border border-dark-700 hover:border-gold-500/40 cursor-pointer transition-all">
+                    <div class="flex items-center space-x-3">
+                        <input type="radio" name="serviceOption" value="${s.id}" onchange="onSelectService(${s.id})" class="accent-gold-500 w-4 h-4">
+                        <div>
+                            <p class="font-bold text-white text-sm">${s.name}</p>
+                            <p class="text-xs text-gray-400"><i class="fa-regular fa-clock mr-1"></i>${s.time}</p>
+                        </div>
+                    </div>
+                    <span class="font-vintage text-gold-400 font-bold">R$ ${s.price.toFixed(2).replace('.', ',')}</span>
+                </label>
+            `).join('');
+        }
+
+        function renderBookingBarbers() {
+            const list = document.getElementById('bookingBarberList');
+            list.innerHTML = barbersData.map((b, index) => `
+                <label class="block cursor-pointer">
+                    <input type="radio" name="barberOption" value="${b.id}" ${index === 0 ? 'checked' : ''} onchange="onSelectBarber('${b.id}')" class="peer hidden">
+                    <div class="p-3 bg-dark-800 border border-dark-700 rounded-xl text-center peer-checked:border-gold-500 peer-checked:bg-gold-500/10 transition-all">
+                        <img src="${b.img}" class="w-12 h-12 rounded-full mx-auto mb-2 object-cover border border-gold-500/30">
+                        <p class="text-xs font-bold text-white truncate">${b.name}</p>
+                    </div>
+                </label>
+            `).join('');
+        }
+
+        function selectServiceAndScroll(serviceId) {
+            // Seleciona o serviço diretamente e avança para a etapa 2
+            onSelectService(serviceId);
+            // Marcar o radio correto
+            const radio = document.querySelector(`input[name="serviceOption"][value="${serviceId}"]`);
+            if (radio) radio.checked = true;
+
+            // Scroll suave até o formulário
+            document.getElementById('agendar').scrollIntoView({ behavior: 'smooth' });
+            nextStep(2);
+        }
+
+        function onSelectService(serviceId) {
+            bookingState.service = servicesData.find(s => s.id === serviceId);
+            document.getElementById('btnNext1').disabled = false;
+            document.getElementById('btnNext1').classList.remove('opacity-50', 'cursor-not-allowed');
+            updateSummary();
+        }
+
+        function onSelectBarber(barberId) {
+            bookingState.barber = barbersData.find(b => b.id === barberId);
+            updateSummary();
+        }
+
+        function updateTimeSlots() {
+            const dateInput = document.getElementById('bookingDate').value;
+            bookingState.date = dateInput;
+            const container = document.getElementById('timeSlotsGrid');
+
+            if (!dateInput) {
+                container.innerHTML = `<p class="col-span-3 text-xs text-gray-500 text-center py-4">Selecione uma data primeiro</p>`;
+                return;
+            }
+
+            // Exemplo de simulação de horários ocupados
+            container.innerHTML = availableHours.map(time => `
+                <button type="button" onclick="selectTime('${time}', this)" class="time-btn py-2 text-xs font-semibold bg-dark-900 border border-dark-700 text-gray-300 hover:border-gold-500 rounded-lg transition-all">
+                    ${time}
+                </button>
+            `).join('');
+
+            validateStep2();
+        }
+
+        function selectTime(time, btn) {
+            bookingState.time = time;
+            document.querySelectorAll('.time-btn').forEach(b => {
+                b.classList.remove('bg-gold-500', 'text-black', 'border-gold-500');
+                b.classList.add('bg-dark-900', 'text-gray-300');
+            });
+            btn.classList.add('bg-gold-500', 'text-black', 'border-gold-500');
+            btn.classList.remove('bg-dark-900', 'text-gray-300');
+
+            validateStep2();
+            updateSummary();
+        }
+
+        function validateStep2() {
+            const btn = document.getElementById('btnNext2');
+            if (bookingState.date && bookingState.time) {
+                btn.disabled = false;
+                btn.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        }
+
+        // Navegação do Form Wizard
+        function nextStep(step) {
+            if (step === 2 && !bookingState.service) return;
+            if (step === 3 && (!bookingState.date || !bookingState.time)) return;
+
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.add('hidden');
+            document.getElementById('step3').classList.add('hidden');
+
+            document.getElementById(`step${step}`).classList.remove('hidden');
+
+            // Atualiza os indicadores do Wizard
+            const ind1 = document.getElementById('step1-indicator');
+            const ind2 = document.getElementById('step2-indicator');
+            const ind3 = document.getElementById('step3-indicator');
+
+            if (step >= 1) {
+                ind1.className = "w-8 h-8 rounded-full bg-gold-500 text-black font-bold flex items-center justify-center text-sm";
+            }
+            if (step >= 2) {
+                ind2.className = "w-8 h-8 rounded-full bg-gold-500 text-black font-bold flex items-center justify-center text-sm";
+            } else {
+                ind2.className = "w-8 h-8 rounded-full bg-dark-700 text-gray-400 font-bold flex items-center justify-center text-sm";
+            }
+            if (step >= 3) {
+                ind3.className = "w-8 h-8 rounded-full bg-gold-500 text-black font-bold flex items-center justify-center text-sm";
+            } else {
+                ind3.className = "w-8 h-8 rounded-full bg-dark-700 text-gray-400 font-bold flex items-center justify-center text-sm";
+            }
+        }
+
+        function prevStep(step) {
+            nextStep(step);
+        }
+
+        function updateSummary() {
+            if (bookingState.service) {
+                document.getElementById('summaryService').innerText = bookingState.service.name;
+                document.getElementById('summaryPrice').innerText = `R$ ${bookingState.service.price.toFixed(2).replace('.', ',')}`;
+            }
+            if (bookingState.barber) {
+                document.getElementById('summaryBarber').innerText = bookingState.barber.name;
+            }
+            if (bookingState.date && bookingState.time) {
+                const formattedDate = bookingState.date.split('-').reverse().join('/');
+                document.getElementById('summaryDateTime').innerText = `${formattedDate} às ${bookingState.time}`;
+            }
+        }
+
+        // --- SUBMISSÃO E GERADOR DE LINK PARA WHATSAPP ---
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            bookingState.name = document.getElementById('clientName').value.trim();
+            bookingState.phone = document.getElementById('clientPhone').value.trim();
+            bookingState.notes = document.getElementById('clientNotes').value.trim();
+
+            if (!bookingState.name || !bookingState.phone) {
+                alert('Por favor, preencha seu nome e telefone.');
+                return;
+            }
+
+            // Salvar no LocalStorage (Histórico do Cliente)
+            saveBookingToStorage(bookingState);
+
+            // Formata mensagem para o WhatsApp
+            const dateFormatted = bookingState.date.split('-').reverse().join('/');
+            const message = `💈 *NOVO AGENDAMENTO - BARBERPRO* 💈\n\n` +
+                `👤 *Cliente:* ${bookingState.name}\n` +
+                `📞 *Telefone:* ${bookingState.phone}\n` +
+                `✂️ *Serviço:* ${bookingState.service.name} (R$ ${bookingState.service.price.toFixed(2)})\n` +
+                `💈 *Barbeiro:* ${bookingState.barber.name}\n` +
+                `📅 *Data:* ${dateFormatted}\n` +
+                `⏰ *Horário:* ${bookingState.time}\n` +
+                (bookingState.notes ? `📝 *Obs:* ${bookingState.notes}\n` : '') +
+                `\n_Por favor, confirme meu agendamento!_`;
+
+            const whatsappUrl = `https://wa.me/${BARBER_PHONE}?text=${encodeURIComponent(message)}`;
+
+            // Exibir Modal de Confirmação
+            document.getElementById('modalDetails').innerHTML = `
+                <p><strong class="text-gold-400">Cliente:</strong> ${bookingState.name}</p>
+                <p><strong class="text-gold-400">Serviço:</strong> ${bookingState.service.name} (R$ ${bookingState.service.price.toFixed(2)})</p>
+                <p><strong class="text-gold-400">Barbeiro:</strong> ${bookingState.barber.name}</p>
+                <p><strong class="text-gold-400">Data/Hora:</strong> ${dateFormatted} às ${bookingState.time}</p>
+            `;
+
+            document.getElementById('btnSendWhatsapp').href = whatsappUrl;
+            document.getElementById('confirmModal').classList.remove('hidden');
+
+            updateBadgeCount();
+        }
+
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            // Reseta o formulário
+            document.getElementById('bookingForm').reset();
+            bookingState = { service: null, barber: barbersData[0], date: '', time: '', name: '', phone: '', notes: '' };
+            nextStep(1);
+        }
+
+        // --- LOCAL STORAGE (GERENCIADOR DE AGENDAMENTOS DO USUÁRIO) ---
+        function saveBookingToStorage(booking) {
+            let current = JSON.parse(localStorage.getItem('barberpro_bookings') || '[]');
+            const newBooking = {
+                id: Date.now(),
+                serviceName: booking.service.name,
+                price: booking.service.price,
+                barberName: booking.barber.name,
+                date: booking.date.split('-').reverse().join('/'),
+                time: booking.time,
+                clientName: booking.name
+            };
+            current.push(newBooking);
+            localStorage.setItem('barberpro_bookings', JSON.stringify(current));
+        }
+
+        function getStoredBookings() {
+            return JSON.parse(localStorage.getItem('barberpro_bookings') || '[]');
+        }
+
+        function updateBadgeCount() {
+            const count = getStoredBookings().length;
+            const badgeDesktop = document.getElementById('agendamentosBadge');
+            const badgeMobile = document.getElementById('agendamentosBadgeMobile');
+
+            if (count > 0) {
+                badgeDesktop.innerText = count;
+                badgeDesktop.classList.remove('hidden');
+                badgeMobile.innerText = count;
+                badgeMobile.classList.remove('hidden');
+            } else {
+                badgeDesktop.classList.add('hidden');
+                badgeMobile.classList.add('hidden');
+            }
+        }
+
+        function openAgendamentosModal() {
+            const list = getStoredBookings();
+            const container = document.getElementById('agendamentosListModal');
+
+            if (list.length === 0) {
+                container.innerHTML = `<p class="text-gray-400 text-center py-6 text-sm">Você ainda não possui nenhum agendamento salvo neste aparelho.</p>`;
+            } else {
+                container.innerHTML = list.map(item => `
+                    <div class="bg-dark-800 p-4 rounded-xl border border-dark-700 flex justify-between items-center">
+                        <div>
+                            <p class="font-bold text-white text-sm">${item.serviceName}</p>
+                            <p class="text-xs text-gold-400 font-semibold">${item.date} às ${item.time} com ${item.barberName}</p>
+                            <p class="text-xs text-gray-400">R$ ${item.price.toFixed(2)}</p>
+                        </div>
+                        <button onclick="removeBooking(${item.id})" class="text-red-400 hover:text-red-300 p-2 text-sm" title="Cancelar Agendamento">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+
+            document.getElementById('agendamentosModal').classList.remove('hidden');
+        }
+
+        function closeAgendamentosModal() {
+            document.getElementById('agendamentosModal').classList.add('hidden');
+        }
+
+        function removeBooking(id) {
+            let list = getStoredBookings();
+            list = list.filter(item => item.id !== id);
+            localStorage.setItem('barberpro_bookings', JSON.stringify(list));
+            openAgendamentosModal();
+            updateBadgeCount();
+        }
+    </script>
+</body>
+</html>
