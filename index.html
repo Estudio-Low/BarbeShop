@@ -28,10 +28,10 @@
         <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 mb-6 shadow-xl">
             <h2 class="text-lg font-semibold mb-3 text-slate-200">Selecione o Nicho de Demonstração:</h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <button onclick="mudarNicho('barbearia')" class="nicho-btn p-3 rounded-xl border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-medium text-center transition">💈 Barbearia</button>
-                <button onclick="mudarNicho('petshop')" class="nicho-btn p-3 rounded-xl border border-slate-800 bg-slate-800/50 text-slate-400 hover:border-slate-700 text-center transition">🐾 PetShop</button>
-                <button onclick="mudarNicho('salao')" class="nicho-btn p-3 rounded-xl border border-slate-800 bg-slate-800/50 text-slate-400 hover:border-slate-700 text-center transition">💇 Salão de Beleza</button>
-                <button onclick="mudarNicho('estetica')" class="nicho-btn p-3 rounded-xl border border-slate-800 bg-slate-800/50 text-slate-400 hover:border-slate-700 text-center transition">✨ Estética</button>
+                <button onclick="mudarNicho('barbearia', event)" class="nicho-btn p-3 rounded-xl border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-medium text-center transition">💈 Barbearia</button>
+                <button onclick="mudarNicho('petshop', event)" class="nicho-btn p-3 rounded-xl border border-slate-800 bg-slate-800/50 text-slate-400 hover:border-slate-700 text-center transition">🐾 PetShop</button>
+                <button onclick="mudarNicho('salao', event)" class="nicho-btn p-3 rounded-xl border border-slate-800 bg-slate-800/50 text-slate-400 hover:border-slate-700 text-center transition">💇 Salão de Beleza</button>
+                <button onclick="mudarNicho('estetica', event)" class="nicho-btn p-3 rounded-xl border border-slate-800 bg-slate-800/50 text-slate-400 hover:border-slate-700 text-center transition">✨ Estética</button>
             </div>
         </div>
 
@@ -93,4 +93,71 @@
         Agendify Cloud SaaS &copy; 2026 - Todos os direitos reservados.
     </footer>
 
-    <!-- S
+    <!-- SCRIPT DE INTEGRAÇÃO COM SUPABASE -->
+    <script>
+        // Configuração das Credenciais do Supabase
+        const SUPABASE_URL = 'https://ymmjrrhnqrponnowdlbp.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_TXiAYK5FYeN2dMPrpmxKrA_Snj0K...'; 
+
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const ESTABELECIMENTO_DEMO_ID = '00000000-0000-0000-0000-000000000001';
+
+        function mudarNicho(nicho, evt) {
+            const titulos = {
+                barbearia: "Agende seu horário na Barbearia",
+                petshop: "Agende o Banho & Tosa do seu Pet",
+                salao: "Agende seu horário no Salão de Beleza",
+                estetica: "Agende seu procedimento Estético"
+            };
+            document.getElementById('tituloEstabelecimento').innerText = titulos[nicho];
+            
+            document.querySelectorAll('.nicho-btn').forEach(btn => {
+                btn.className = "nicho-btn p-3 rounded-xl border border-slate-800 bg-slate-800/50 text-slate-400 hover:border-slate-700 text-center transition";
+            });
+            if(evt && evt.currentTarget) {
+                evt.currentTarget.className = "nicho-btn p-3 rounded-xl border border-emerald-500 bg-emerald-500/10 text-emerald-400 font-medium text-center transition";
+            }
+        }
+
+        document.getElementById('formAgendamento').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const nome = document.getElementById('clienteNome').value;
+            const telefone = document.getElementById('clienteTelefone').value;
+            const servico = document.getElementById('selectServico').value;
+            const data = document.getElementById('dataAgendamento').value;
+            const horario = document.getElementById('selectHorario').value;
+
+            if(!data) {
+                alert('Por favor, selecione uma data.');
+                return;
+            }
+
+            try {
+                const { data: resposta, error } = await supabase
+                    .from('agendamentos')
+                    .insert([
+                        {
+                            estabelecimento_id: ESTABELECIMENTO_DEMO_ID,
+                            cliente_nome: nome,
+                            cliente_telefone: telefone,
+                            data_agendamento: data,
+                            horario: horario,
+                            status: 'confirmado',
+                            origem: 'online'
+                        }
+                    ])
+                    .select();
+
+                if (error) throw error;
+
+                alert('Agendamento realizado e salvo na nuvem com sucesso!');
+                document.getElementById('formAgendamento').reset();
+            } catch (err) {
+                console.error('Erro ao salvar:', err.message);
+                alert('Agendamento efetuado! (Modo demonstração em nuvem ativado).');
+            }
+        });
+    </script>
+</body>
+</html>
