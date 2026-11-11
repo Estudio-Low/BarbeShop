@@ -116,10 +116,10 @@
             <div class="flex items-center justify-between h-20">
                 <a href="#" onclick="event.preventDefault(); if(!emEdicaoVisual) showView('client')" class="flex items-center space-x-3 group">
                     <div class="w-10 h-10 rounded-full border border-gold-500 flex items-center justify-center bg-dark-800 text-gold-500">
-                        <i id="logoIcone" class="fa-solid fa-crown text-lg"></i>
+                        <i id="logoIcone" class="fa-solid fa-calendar-check text-lg"></i>
                     </div>
-                    <span id="logoNomeEmpresa" data-campo="nome" class="font-vintage text-xl sm:text-2xl font-bold tracking-wider gold-gradient-text" contenteditable="false">BARBERPRO CLASSIC</span>
-                    <span id="lblTipoNichoBadge" class="hidden sm:inline text-xs bg-gold-500/10 text-gold-400 border border-gold-500/30 px-2 py-0.5 rounded-full">BARBEARIA</span>
+                    <span id="logoNomeEmpresa" data-campo="nome" class="font-vintage text-xl sm:text-2xl font-bold tracking-wider gold-gradient-text" contenteditable="false">AGENDIFY</span>
+                    <span id="lblTipoNichoBadge" class="hidden sm:inline empty:hidden text-xs bg-gold-500/10 text-gold-400 border border-gold-500/30 px-2 py-0.5 rounded-full"></span>
                 </a>
 
                 <nav class="flex items-center space-x-4">
@@ -145,6 +145,136 @@
         <p id="carregandoTexto" class="text-sm">Carregando...</p>
     </div>
 
+    <!-- ================= PÁGINA DE VENDAS (endereço sem ?c=) ================= -->
+    <main id="vendasView" class="hidden min-h-screen bg-dark-900">
+        <nav class="sticky top-0 z-40 bg-dark-900/90 backdrop-blur-md border-b border-gold-500/20">
+            <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+                <a href="#topo" class="flex items-center gap-2">
+                    <span class="w-9 h-9 rounded-full border border-gold-500 flex items-center justify-center text-gold-500"><i class="fa-solid fa-calendar-check"></i></span>
+                    <span class="font-vintage text-xl font-bold tracking-wide gold-gradient-text">AGENDIFY</span>
+                </a>
+                <div class="hidden md:flex items-center gap-6 text-sm text-gray-300">
+                    <a href="#exemplos" class="hover:text-gold-400">Exemplos</a>
+                    <a href="#recursos" class="hover:text-gold-400">Recursos</a>
+                    <a href="#como" class="hover:text-gold-400">Como funciona</a>
+                    <a href="#planos" class="hover:text-gold-400">Planos</a>
+                </div>
+                <button type="button" data-vendas="whats" class="bg-gold-500 hover:bg-gold-400 text-onbrand font-bold px-4 py-2 rounded-lg text-sm"><i class="fa-brands fa-whatsapp mr-1"></i> Quero o meu</button>
+            </div>
+        </nav>
+
+        <!-- HERO -->
+        <section id="topo" class="relative overflow-hidden">
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-dark-700 via-dark-900 to-black"></div>
+            <div class="relative max-w-7xl mx-auto px-4 py-14 md:py-20 grid md:grid-cols-2 gap-12 items-center">
+                <div class="space-y-6 text-center md:text-left">
+                    <span class="inline-flex items-center gap-2 bg-dark-800 border border-gold-500/30 px-3 py-1.5 rounded-full text-gold-400 text-xs font-semibold">
+                        <i class="fa-solid fa-scissors"></i> Barbearias · Pet shops · Salões · Manicures · Estética
+                    </span>
+                    <h1 class="font-vintage text-4xl sm:text-6xl font-extrabold leading-tight text-white">Agenda cheia, <span class="gold-gradient-text">sem viver no WhatsApp.</span></h1>
+                    <p class="text-gray-400 text-lg max-w-xl mx-auto md:mx-0">Um site de agendamento com a cara do seu negócio. O cliente escolhe serviço e horário sozinho, e você acompanha tudo pelo celular.</p>
+                    <div class="flex flex-wrap gap-3 justify-center md:justify-start">
+                        <button type="button" data-vendas="whats" class="bg-gradient-to-r from-gold-600 to-gold-500 text-onbrand font-bold px-6 py-3.5 rounded-xl shadow-lg"><i class="fa-brands fa-whatsapp mr-2"></i>Quero o meu</button>
+                        <a href="#exemplos" class="border border-gold-500/40 text-gold-400 hover:bg-gold-500/10 font-semibold px-6 py-3.5 rounded-xl">Ver exemplos ao vivo</a>
+                    </div>
+                    <div class="flex flex-wrap gap-x-6 gap-y-2 justify-center md:justify-start text-sm text-gray-400">
+                        <span><i class="fa-solid fa-check text-gold-400 mr-1"></i>Sem app pra baixar</span>
+                        <span><i class="fa-solid fa-check text-gold-400 mr-1"></i>Funciona 24h</span>
+                        <span><i class="fa-solid fa-check text-gold-400 mr-1"></i>Link pra bio do Instagram</span>
+                    </div>
+                </div>
+                <div class="flex flex-col items-center gap-4">
+                    <div class="w-[300px] h-[610px] rounded-[2.75rem] border-[10px] border-dark-600 bg-black overflow-hidden shadow-2xl gold-border-glow">
+                        <iframe id="demoIframe" title="Exemplo ao vivo" class="w-full h-full bg-dark-900" loading="lazy"></iframe>
+                    </div>
+                    <div id="demoChips" class="flex flex-wrap justify-center gap-2 max-w-sm"></div>
+                    <p class="text-xs text-gray-500">Exemplo funcionando de verdade. Pode clicar e testar.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- EXEMPLOS POR NICHO -->
+        <section id="exemplos" class="py-20 bg-dark-800 scroll-mt-16">
+            <div class="max-w-7xl mx-auto px-4">
+                <h2 class="font-vintage text-3xl sm:text-4xl font-bold text-white text-center">Um modelo pronto pra cada nicho</h2>
+                <p class="text-gray-400 text-center mt-3 mb-12">Cores, fotos, serviços e preços do seu jeito.</p>
+                <div id="vitrineGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+        </section>
+
+        <!-- RECURSOS -->
+        <section id="recursos" class="py-20 bg-dark-900 scroll-mt-16">
+            <div class="max-w-6xl mx-auto px-4 grid lg:grid-cols-2 gap-8">
+                <div class="bg-dark-800 border border-dark-700 rounded-2xl p-8">
+                    <p class="text-xs uppercase tracking-wider text-gold-400 font-semibold">Pro seu cliente</p>
+                    <h3 class="font-vintage text-2xl font-bold text-white mt-1 mb-6">Agendar leva 30 segundos</h3>
+                    <ul class="space-y-5">
+                        <li class="flex gap-4"><i class="fa-solid fa-mobile-screen text-gold-400 text-xl w-6 mt-1"></i><div><p class="text-white font-semibold">Pelo link, sem baixar nada</p><p class="text-gray-400 text-sm">Abre direto do Instagram, Google ou WhatsApp.</p></div></li>
+                        <li class="flex gap-4"><i class="fa-solid fa-clock text-gold-400 text-xl w-6 mt-1"></i><div><p class="text-white font-semibold">Só aparece horário livre</p><p class="text-gray-400 text-sm">Respeita sua agenda, almoço, folgas e a duração de cada serviço.</p></div></li>
+                        <li class="flex gap-4"><i class="fa-brands fa-whatsapp text-gold-400 text-xl w-6 mt-1"></i><div><p class="text-white font-semibold">Confirmação no WhatsApp</p><p class="text-gray-400 text-sm">A mensagem chega pronta pra você com nome, serviço, data e hora.</p></div></li>
+                        <li class="flex gap-4"><i class="fa-solid fa-ban text-gold-400 text-xl w-6 mt-1"></i><div><p class="text-white font-semibold">Nada de horário duplicado</p><p class="text-gray-400 text-sm">Dois clientes nunca pegam o mesmo horário.</p></div></li>
+                    </ul>
+                </div>
+                <div class="bg-dark-800 border border-gold-500/30 rounded-2xl p-8 gold-border-glow">
+                    <p class="text-xs uppercase tracking-wider text-gold-400 font-semibold">Pra você</p>
+                    <h3 class="font-vintage text-2xl font-bold text-white mt-1 mb-6">Seu painel no celular</h3>
+                    <ul class="space-y-5">
+                        <li class="flex gap-4"><i class="fa-solid fa-calendar-day text-gold-400 text-xl w-6 mt-1"></i><div><p class="text-white font-semibold">Agenda do dia na mão</p><p class="text-gray-400 text-sm">Quem vem, que horas e quanto vai entrar. Marca concluído ou faltou.</p></div></li>
+                        <li class="flex gap-4"><i class="fa-solid fa-lock text-gold-400 text-xl w-6 mt-1"></i><div><p class="text-white font-semibold">Bloqueia horário ou fecha o dia</p><p class="text-gray-400 text-sm">Feriado, folga ou imprevisto: um toque e o site para de oferecer.</p></div></li>
+                        <li class="flex gap-4"><i class="fa-solid fa-phone text-gold-400 text-xl w-6 mt-1"></i><div><p class="text-white font-semibold">Encaixa quem ligou</p><p class="text-gray-400 text-sm">Agenda manual pra cliente que chamou ou chegou na hora.</p></div></li>
+                        <li class="flex gap-4"><i class="fa-solid fa-pen-to-square text-gold-400 text-xl w-6 mt-1"></i><div><p class="text-white font-semibold">Muda tudo sozinho</p><p class="text-gray-400 text-sm">Preços, serviços, fotos e horários, editando direto na tela.</p></div></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- COMO FUNCIONA -->
+        <section id="como" class="py-20 bg-dark-800 scroll-mt-16">
+            <div class="max-w-5xl mx-auto px-4">
+                <h2 class="font-vintage text-3xl sm:text-4xl font-bold text-white text-center mb-12">Como funciona</h2>
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="text-center"><div class="w-14 h-14 mx-auto rounded-full bg-gold-500 text-onbrand font-extrabold text-xl flex items-center justify-center">1</div><p class="text-white font-semibold mt-4">Você escolhe o plano</p><p class="text-gray-400 text-sm mt-1">E manda seus serviços, preços, fotos e horários.</p></div>
+                    <div class="text-center"><div class="w-14 h-14 mx-auto rounded-full bg-gold-500 text-onbrand font-extrabold text-xl flex items-center justify-center">2</div><p class="text-white font-semibold mt-4">A gente monta sua página</p><p class="text-gray-400 text-sm mt-1">Com as cores do seu negócio e seu acesso ao painel.</p></div>
+                    <div class="text-center"><div class="w-14 h-14 mx-auto rounded-full bg-gold-500 text-onbrand font-extrabold text-xl flex items-center justify-center">3</div><p class="text-white font-semibold mt-4">Você divulga o link</p><p class="text-gray-400 text-sm mt-1">Na bio do Instagram, no status e no Google. Pronto.</p></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PLANOS -->
+        <section id="planos" class="py-20 bg-dark-900 scroll-mt-16">
+            <div class="max-w-6xl mx-auto px-4">
+                <h2 class="font-vintage text-3xl sm:text-4xl font-bold text-white text-center">Planos</h2>
+                <p id="planosSetup" class="text-gray-400 text-center mt-3 mb-12"></p>
+                <div id="planosGrid" class="grid md:grid-cols-3 gap-6 items-stretch"></div>
+            </div>
+        </section>
+
+        <!-- PERGUNTAS -->
+        <section class="py-20 bg-dark-800">
+            <div class="max-w-3xl mx-auto px-4">
+                <h2 class="font-vintage text-3xl font-bold text-white text-center mb-10">Perguntas frequentes</h2>
+                <div class="space-y-3">
+                    <details class="bg-dark-900 border border-dark-700 rounded-xl p-5"><summary class="text-white font-semibold cursor-pointer">Meu cliente precisa baixar aplicativo?</summary><p class="text-gray-400 text-sm mt-3">Não. Ele abre o seu link no navegador do celular e agenda ali mesmo.</p></details>
+                    <details class="bg-dark-900 border border-dark-700 rounded-xl p-5"><summary class="text-white font-semibold cursor-pointer">Como fico sabendo de um agendamento novo?</summary><p class="text-gray-400 text-sm mt-3">Ele aparece no seu painel e o cliente te manda a confirmação pronta no WhatsApp.</p></details>
+                    <details class="bg-dark-900 border border-dark-700 rounded-xl p-5"><summary class="text-white font-semibold cursor-pointer">Consigo mudar preço e horário sozinho?</summary><p class="text-gray-400 text-sm mt-3">Sim. No painel você edita serviços, preços, fotos, dias e horários, e muda na hora.</p></details>
+                    <details class="bg-dark-900 border border-dark-700 rounded-xl p-5"><summary class="text-white font-semibold cursor-pointer">Serve pro meu tipo de negócio?</summary><p class="text-gray-400 text-sm mt-3">Se você atende com hora marcada, serve: barbearia, pet shop, salão, manicure, estética, sobrancelha, tatuagem, consultório e por aí vai.</p></details>
+                </div>
+            </div>
+        </section>
+
+        <!-- CTA FINAL -->
+        <section class="py-20 bg-dark-900">
+            <div class="max-w-3xl mx-auto px-4 text-center space-y-6">
+                <h2 class="font-vintage text-3xl sm:text-5xl font-extrabold text-white">Bora encher sua agenda?</h2>
+                <button type="button" data-vendas="whats" class="bg-gradient-to-r from-gold-600 to-gold-500 text-onbrand font-bold px-8 py-4 rounded-xl shadow-lg text-lg"><i class="fa-brands fa-whatsapp mr-2"></i>Falar no WhatsApp</button>
+            </div>
+        </section>
+
+        <footer class="bg-black text-gray-500 border-t border-dark-800 py-8 text-center text-xs">
+            Agendify &copy; 2026 · <a href="?painel" class="hover:text-gray-300">Área do estabelecimento</a>
+        </footer>
+    </main>
+
     <!-- ================= VISÃO DO CLIENTE FINAL ================= -->
     <main id="clientView" class="pt-20">
         <!-- Hero Section -->
@@ -163,7 +293,7 @@
                 </div>
                 <div class="md:w-5/12 w-full">
                     <div class="rounded-2xl overflow-hidden border-2 border-gold-500/30 gold-border-glow shadow-2xl relative group">
-                        <img id="pubImg" src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80" alt="Capa" onclick="trocarImagemVisualmente()" class="w-full h-[380px] object-cover transition-transform group-hover:scale-105">
+                        <img id="pubImg" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&q=80'" src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80" alt="Capa" onclick="trocarImagemVisualmente()" class="w-full h-[380px] object-cover transition-transform group-hover:scale-105">
                         <div id="hintTrocaFoto" class="hidden absolute inset-0 bg-black/60 flex items-center justify-center text-gold-400 font-bold text-sm pointer-events-none">
                             <i class="fa-solid fa-camera text-2xl mr-2"></i> Clique para trocar a imagem
                         </div>
@@ -271,7 +401,7 @@
                     <button id="btnMigrarLocal" onclick="migrarDadosLocais()" class="hidden bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm" title="Envia as empresas que estavam salvas só neste navegador">
                         <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Enviar dados antigos pro Supabase
                     </button>
-                    <button onclick="showView('client')" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700">Ver Site</button>
+                    <button onclick="window.open(location.pathname, '_blank')" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700"><i class="fa-solid fa-bullhorn mr-1"></i> Página de vendas</button>
                     <button onclick="sairAdmin()" class="bg-dark-800 text-red-400 px-4 py-2.5 rounded-lg text-sm border border-dark-700" title="Sair da conta admin"><i class="fa-solid fa-right-from-bracket"></i></button>
                 </div>
             </div>
@@ -416,6 +546,9 @@
                     <button type="button" id="btnCriarDono" onclick="criarAcessoDono()" class="w-full bg-dark-700 hover:bg-dark-600 text-gray-200 rounded-lg py-2 text-xs font-semibold">Criar acesso do dono</button>
                     <p class="text-[11px] text-gray-500">Ele entra pelo rodapé do site ("Área do estabelecimento") ou pelo link <span id="linkPainelTexto" class="text-gray-400"></span></p>
                 </div>
+                <label class="flex items-center gap-2 text-xs text-gray-300 cursor-pointer">
+                    <input type="checkbox" id="modalVitrine"> Mostrar como exemplo na página de vendas
+                </label>
                 <p id="modalDicaNicho" class="text-[11px] text-gray-500">A empresa nova já nasce com serviços, cores e textos do nicho escolhido.</p>
                 <div class="pt-3 flex justify-end gap-2">
                     <button type="button" onclick="document.getElementById('empresaModal').classList.add('hidden')" class="bg-dark-800 text-gray-300 px-4 py-2 rounded-lg text-sm">Cancelar</button>
@@ -501,6 +634,9 @@
                 servicos: [['Serviço Principal', '50.00', '40 min', 'fa-star'], ['Combo Especial', '80.00', '60 min', 'fa-gem']]
             }
         };
+        // >>> PÁGINA DE VENDAS: troque pelo SEU WhatsApp de vendas (55 + DDD + número)
+        const WHATS_VENDAS = '5549999999999';
+        const PRECO_SETUP = 599.90, PRECO_MENSAL = 79.90;
         const CORES_RAPIDAS = ['#d4af37', '#f472b6', '#fb7185', '#a78bfa', '#38bdf8', '#34d399', '#f97316', '#ef4444', '#e5e7eb'];
         // ======================================================
         // SUPABASE: conexão
@@ -511,10 +647,11 @@
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // Colunas da tabela "empresas" (mesmos nomes do objeto JS)
-        const COLUNAS = ['slug', 'nome', 'nicho', 'whatsapp', 'img', 'plano', 'status', 'titulo', 'sub', 'endereco', 'instagram', 'cor', 'fonte', 'agenda', 'servicos'];
+        const COLUNAS = ['slug', 'nome', 'nicho', 'whatsapp', 'img', 'plano', 'status', 'titulo', 'sub', 'endereco', 'instagram', 'cor', 'fonte', 'agenda', 'servicos', 'vitrine'];
         let EMPRESAS = [];      // cache do que veio do banco
         let souAdmin = false;
         let souDono = false, minhaEmpresaId = null;
+        var empresaPainelId = null;
         // Modo da página pelo endereço: ?c=slug (site do cliente) | ?painel (dono) | ?admin (você)
         const PARAMS = new URLSearchParams(location.search);
         const MODO = PARAMS.has('admin') ? 'admin' : PARAMS.has('painel') ? 'painel' : 'site';
@@ -527,7 +664,7 @@
         function erroBanco(error, prefixo = 'Erro no banco') {
             console.error(error);
             let msg = error?.message || String(error);
-            if (/does not exist|schema cache/i.test(msg)) msg = 'Tabelas não encontradas. Rode o arquivo agendify-supabase.sql no SQL Editor do Supabase.';
+            if (/does not exist|schema cache|could not find/i.test(msg)) msg = 'Banco desatualizado: rode o último arquivo .sql (v4) no SQL Editor do Supabase.';
             if (error?.code === '23505') msg = 'Esse link (slug) já está em uso por outra empresa.';
             if (error?.code === '42501' || /row-level security/i.test(msg)) msg = 'Sem permissão. Entre como admin.';
             toast(`❌ ${prefixo}: ${msg}`, 6000);
@@ -583,6 +720,7 @@
             emp.cor = emp.cor || n.cor;
             emp.fonte = FONTES[emp.fonte] ? emp.fonte : n.fonte;
             emp.instagram = emp.instagram || '';
+            emp.vitrine = !!emp.vitrine;
             emp.img = emp.img || n.img;
             emp.agenda = emp.agenda || agendaPadrao();
             emp.servicos = (emp.servicos || []).map(s => ({
@@ -748,10 +886,13 @@
                     const emp = EMPRESAS.find(x => x.slug === slug);
                     if (emp) { abrirPainelDono(emp.id); return; }
                 }
-                mostrarCarregando('Área do estabelecimento.');
+                mostrarCarregando('Área do estabelecimento: entre com o e-mail e a senha do seu negócio.');
                 openSuperAdminAuth('dono');
                 return;
             }
+
+            // Sem ?c= = página de vendas do Agendify
+            if (!slug) { abrirVendas(); return; }
 
             // ?c=slug = site público do cliente final (limpo, sem nada de admin)
             if (!(await carregarEmpresas(slug))) { mostrarCarregando('Não deu pra conectar no banco.'); return; }
@@ -773,7 +914,8 @@
         window.addEventListener('resize', ajustarBarra);
 
         function mostrarSo(id) {
-            ['clientView', 'superAdminView', 'donoView'].forEach(v => document.getElementById(v).classList.toggle('hidden', v !== id));
+            ['vendasView', 'clientView', 'superAdminView', 'donoView'].forEach(v => document.getElementById(v).classList.toggle('hidden', v !== id));
+            document.getElementById('mainHeader').classList.toggle('hidden', id === 'vendasView');
         }
 
         async function showView(view) {
@@ -1283,7 +1425,7 @@
         function atualizarBotoesTopo() {
             const mostra = (id, v) => { const el = document.getElementById(id); el.classList.toggle('hidden', !v); el.classList.toggle('flex', v); };
             mostra('btnSuperAdmin', MODO === 'admin');
-            mostra('btnPainelDono', MODO === 'painel' && (souDono || souAdmin));
+            mostra('btnPainelDono', MODO === 'painel' && (souDono || (souAdmin && !!empresaPainelId)));
         }
 
         let tipoLogin = 'admin';
@@ -1332,7 +1474,7 @@
             const empresas = getEmpresas().filter(e => !busca || `${e.nome} ${e.nicho} ${e.whatsapp}`.toLowerCase().includes(busca));
             document.getElementById('adminEmpresasTable').innerHTML = empresas.map(e => `
                 <tr class="hover:bg-dark-700/40 transition-colors">
-                    <td class="p-4 font-bold text-white"><span class="inline-block w-2.5 h-2.5 rounded-full mr-2" style="background:${esc(e.cor)}"></span>${esc(e.nome)} <span class="block text-xs font-normal text-gray-400">ID: #${esc(e.id)} · ?c=${esc(e.slug)}</span></td>
+                    <td class="p-4 font-bold text-white"><span class="inline-block w-2.5 h-2.5 rounded-full mr-2" style="background:${esc(e.cor)}"></span>${esc(e.nome)}${e.vitrine ? ' <i class="fa-solid fa-star text-gold-400 text-xs" title="Aparece na página de vendas"></i>' : ''} <span class="block text-xs font-normal text-gray-400">ID: #${esc(e.id)} · ?c=${esc(e.slug)}</span></td>
                     <td class="p-4 text-xs text-gold-400">${esc(e.nicho)}</td>
                     <td class="p-4 text-xs">${esc(fmtFone(e.whatsapp))}</td>
                     <td class="p-4 text-xs font-semibold">${esc(e.plano)}</td>
@@ -1362,6 +1504,7 @@
             document.getElementById('modalNicho').value = "Barbearia";
             document.getElementById('modalPlano').value = "Setup + Mensal";
             document.getElementById('modalStatus').value = "Ativo";
+            document.getElementById('modalVitrine').checked = false;
             document.getElementById('wrapModalImg').classList.remove('hidden');
             document.getElementById('modalDicaNicho').classList.remove('hidden');
             document.getElementById('blocoDono').classList.add('hidden');
@@ -1378,6 +1521,7 @@
             document.getElementById('modalWhats').value = e.whatsapp;
             document.getElementById('modalPlano').value = e.plano;
             document.getElementById('modalStatus').value = e.status;
+            document.getElementById('modalVitrine').checked = !!e.vitrine;
             document.getElementById('wrapModalImg').classList.add('hidden');
             document.getElementById('modalDicaNicho').classList.add('hidden');
             document.getElementById('blocoDono').classList.remove('hidden');
@@ -1394,7 +1538,8 @@
                 nicho: document.getElementById('modalNicho').value,
                 whatsapp: document.getElementById('modalWhats').value.replace(/\D/g, ''),
                 plano: document.getElementById('modalPlano').value,
-                status: document.getElementById('modalStatus').value
+                status: document.getElementById('modalStatus').value,
+                vitrine: document.getElementById('modalVitrine').checked
             };
             let emp;
             if (idEdit) {
@@ -1498,6 +1643,84 @@
         }
 
         // ======================================================
+        // PÁGINA DE VENDAS
+        // ======================================================
+        function corTexto(hex) {
+            const h = (hex || '#d4af37').replace('#', '');
+            const [r, g, b] = [0, 2, 4].map(i => parseInt(h.substr(i, 2), 16) || 0);
+            return (r * 0.299 + g * 0.587 + b * 0.114) / 255 > 0.6 ? '#000' : '#fff';
+        }
+
+        async function abrirVendas() {
+            aplicarTema('#d4af37', 'moderna');
+            document.title = 'Agendify | Agendamento online para barbearias, pet shops e salões';
+            mostrarSo('vendasView');
+            esconderCarregando();
+            renderPlanos();
+            const campos = 'id,slug,nome,nicho,img,cor,titulo,servicos';
+            let { data, error } = await sb.from('empresas').select(campos).eq('vitrine', true).order('id');
+            if (error || !data?.length) ({ data } = await sb.from('empresas').select(campos).order('id').limit(6));
+            renderVitrine((data || []).map(normalizarEmpresa));
+        }
+
+        function renderVitrine(lista) {
+            document.getElementById('vitrineGrid').innerHTML = lista.map(e => `
+                <a href="?c=${esc(e.slug)}" target="_blank" class="group bg-dark-900 border border-dark-700 rounded-2xl overflow-hidden hover:-translate-y-1 transition-transform" style="--c:${esc(e.cor)}">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="${esc(e.img)}" onerror="this.onerror=null;this.src='${IMG_SALAO}'" alt="${esc(e.nome)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                        <span class="absolute top-3 left-3 text-xs font-bold px-2.5 py-1 rounded-full" style="background:${esc(e.cor)};color:${corTexto(e.cor)}">${esc(e.nicho)}</span>
+                    </div>
+                    <div class="p-5">
+                        <h3 class="text-white font-bold text-lg">${esc(e.nome)}</h3>
+                        <p class="text-gray-400 text-sm mt-1 truncate">${e.servicos.slice(0, 3).map(s => esc(s.name)).join(' · ')}</p>
+                        <p class="mt-4 text-sm font-semibold" style="color:${esc(e.cor)}">Ver site ao vivo <i class="fa-solid fa-arrow-right ml-1"></i></p>
+                    </div>
+                </a>`).join('') || '<p class="col-span-full text-center text-gray-500">Marque empresas como exemplo no Super-Admin.</p>';
+
+            const chips = document.getElementById('demoChips');
+            chips.innerHTML = lista.map((e, i) => `<button type="button" data-demo="${esc(e.slug)}" class="text-xs font-semibold px-3 py-1.5 rounded-full border transition-colors ${i === 0 ? 'bg-gold-500 text-onbrand border-gold-500' : 'border-dark-600 text-gray-300 hover:border-gold-500'}">${esc(e.nicho)}</button>`).join('');
+            if (lista[0]) document.getElementById('demoIframe').src = `?c=${lista[0].slug}`;
+        }
+
+        function renderPlanos() {
+            document.getElementById('planosSetup').innerText = `Implantação única de R$ ${fmtBR(PRECO_SETUP)} + o plano que preferir.`;
+            const itens = ['Site de agendamento com a sua cara', 'Painel do dono no celular', 'Agendamentos ilimitados', 'Bloqueio de horários e folgas', 'Confirmação pelo WhatsApp', 'Edição de preços, fotos e horários'];
+            const planos = [
+                { id: 'Mensal', mes: PRECO_MENSAL, rodape: 'cobrado todo mês' },
+                { id: 'Trimestral', mes: PRECO_MENSAL * 0.95, rodape: `R$ ${fmtBR(PRECO_MENSAL * 3 * 0.95)} a cada 3 meses`, selo: 'economize 5%' },
+                { id: 'Anual', mes: PRECO_MENSAL * 0.9, rodape: `R$ ${fmtBR(PRECO_MENSAL * 12 * 0.9)} por ano`, selo: 'economize 10%', destaque: true }
+            ];
+            document.getElementById('planosGrid').innerHTML = planos.map(p => `
+                <div class="relative flex flex-col rounded-2xl p-8 ${p.destaque ? 'bg-dark-800 border-2 border-gold-500 gold-border-glow' : 'bg-dark-800 border border-dark-700'}">
+                    ${p.selo ? `<span class="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full ${p.destaque ? 'bg-gold-500 text-onbrand' : 'bg-dark-600 text-gold-400'}">${p.selo}</span>` : ''}
+                    <p class="text-gold-400 font-semibold uppercase tracking-wider text-sm">${p.id}</p>
+                    <p class="mt-3"><span class="text-gray-400 text-lg align-top">R$</span> <span class="font-vintage text-5xl font-extrabold text-white">${fmtBR(p.mes)}</span><span class="text-gray-400">/mês</span></p>
+                    <p class="text-xs text-gray-500 mt-1">${p.rodape}</p>
+                    <ul class="mt-6 space-y-2.5 text-sm text-gray-300 flex-1">${itens.map(i => `<li><i class="fa-solid fa-check text-gold-400 mr-2"></i>${i}</li>`).join('')}</ul>
+                    <button type="button" data-vendas="whats" data-plano="${p.id}" class="mt-8 w-full font-bold py-3 rounded-xl ${p.destaque ? 'bg-gradient-to-r from-gold-600 to-gold-500 text-onbrand' : 'border border-gold-500/40 text-gold-400 hover:bg-gold-500/10'}">Quero o ${p.id}</button>
+                </div>`).join('');
+        }
+
+        document.getElementById('vendasView').addEventListener('click', e => {
+            const demo = e.target.closest('[data-demo]');
+            if (demo) {
+                document.getElementById('demoIframe').src = `?c=${demo.dataset.demo}`;
+                document.querySelectorAll('#demoChips [data-demo]').forEach(b => {
+                    const ativo = b === demo;
+                    b.classList.toggle('bg-gold-500', ativo); b.classList.toggle('text-onbrand', ativo); b.classList.toggle('border-gold-500', ativo);
+                    b.classList.toggle('border-dark-600', !ativo); b.classList.toggle('text-gray-300', !ativo);
+                });
+                return;
+            }
+            const w = e.target.closest('[data-vendas="whats"]');
+            if (w) {
+                const plano = w.dataset.plano;
+                const msg = `Olá! Vi o Agendify e quero um site de agendamento pro meu negócio${plano ? ` (plano ${plano})` : ''}.`;
+                window.open(`https://wa.me/${WHATS_VENDAS}?text=${encodeURIComponent(msg)}`, '_blank');
+            }
+        });
+
+        // ======================================================
         // ACESSO DO DONO (criado pelo Super-Admin)
         // ======================================================
         async function carregarDonosModal(empId) {
@@ -1505,7 +1728,7 @@
             el.innerHTML = '<span class="text-gray-500">Carregando...</span>';
             const { data, error } = await sb.from('donos').select('user_id, email').eq('empresa_id', empId);
             if (error) { el.innerHTML = '<span class="text-red-400">Rode o agendify-supabase-v3.sql pra liberar o painel do dono.</span>'; return; }
-            el.innerHTML = data.map(d => `<div class="flex justify-between items-center bg-dark-800 rounded px-2 py-1.5"><span><i class="fa-solid fa-user mr-1 text-gray-500"></i>${esc(d.email || d.user_id)}</span><button type="button" onclick="removerDono('${d.user_id}', ${empId})" class="text-red-400 hover:text-red-300">remover</button></div>`).join('') || '<span class="text-gray-500">Nenhum dono com acesso ainda.</span>';
+            el.innerHTML = data.map(d => `<div class="flex justify-between items-center bg-dark-800 rounded px-2 py-1.5"><span><i class="fa-solid fa-user mr-1 text-gray-500"></i>${esc(d.email || d.user_id)}</span><span class="flex gap-3"><button type="button" onclick="novaSenhaDono('${esc(d.email)}', ${empId})" class="text-gold-400 hover:text-white">nova senha</button><button type="button" onclick="removerDono('${d.user_id}', ${empId})" class="text-red-400 hover:text-red-300">remover</button></span></div>`).join('') || '<span class="text-gray-500">Nenhum dono com acesso ainda.</span>';
         }
 
         async function criarAcessoDono() {
@@ -1515,16 +1738,39 @@
             if (!email || password.length < 6) { toast('Preencha o e-mail e uma senha com 6+ caracteres.'); return; }
             const btn = document.getElementById('btnCriarDono');
             btn.disabled = true; btn.innerText = 'Criando...';
-            const { data, error } = await sbCadastro.auth.signUp({ email, password });
+            // 1) cria o login (se o e-mail já tiver conta, segue pro passo 2)
+            const { error } = await sbCadastro.auth.signUp({ email, password });
+            if (error && !/registered|exists/i.test(error.message)) {
+                btn.disabled = false; btn.innerText = 'Criar acesso do dono';
+                toast(/rate limit/i.test(error.message) ? '❌ Limite de e-mails do Supabase. Desligue "Confirm email" em Authentication > Sign In / Providers > Email.' : `❌ ${error.message}`, 8000);
+                return;
+            }
+            // 2) confirma o e-mail, define a senha e vincula à empresa
+            const ok = await vincularDono(empId, email, password);
             btn.disabled = false; btn.innerText = 'Criar acesso do dono';
-            if (error) { toast(`❌ ${/registered|exists/i.test(error.message) ? 'Esse e-mail já tem conta.' : error.message}`, 6000); return; }
-            if (!data.user || (data.user.identities && data.user.identities.length === 0)) { toast('Esse e-mail já tem conta no Supabase. Use outro e-mail.', 6000); return; }
-            const { error: e2 } = await sb.from('donos').insert({ user_id: data.user.id, empresa_id: empId, email });
-            if (e2) { erroBanco(e2.code === '23505' ? { message: 'Esse usuário já é dono de outra empresa.' } : e2, 'Não vinculou'); return; }
+            if (!ok) return;
             document.getElementById('donoEmail').value = '';
             document.getElementById('donoSenha').value = '';
+            toast(`✅ Acesso pronto! ${email} já pode entrar com essa senha.`, 6000);
+        }
+
+        async function vincularDono(empId, email, senha) {
+            const { error } = await sb.rpc('admin_vincular_dono', { p_empresa: empId, p_email: email, p_senha: senha || null });
+            if (error) {
+                const m = error.message || '';
+                if (m.includes('USUARIO_NAO_ENCONTRADO')) toast('❌ O login não foi criado. Confira se o cadastro por e-mail está ligado no Supabase.', 8000);
+                else erroBanco(error, 'Não vinculou');
+                return false;
+            }
             carregarDonosModal(empId);
-            toast(data.session ? '✅ Acesso criado! Já pode entrar.' : '✅ Acesso criado. Ele precisa confirmar pelo e-mail antes de entrar.', 6000);
+            return true;
+        }
+
+        async function novaSenhaDono(email, empId) {
+            const senha = prompt(`Nova senha para ${email} (6+ caracteres):`, '');
+            if (senha === null) return;
+            if (senha.length < 6) { toast('A senha precisa ter 6+ caracteres.'); return; }
+            if (await vincularDono(empId, email, senha)) toast('✅ Senha trocada!');
         }
 
         async function removerDono(userId, empId) {
@@ -1537,7 +1783,7 @@
         // ======================================================
         // PAINEL DO DONO: agenda do dia, bloqueios, manual
         // ======================================================
-        let empresaPainelId = null, dataPainel = null, timerPainel = null, diaPainel = { ags: [], bls: [] };
+        let dataPainel = null, timerPainel = null, diaPainel = { ags: [], bls: [] };
 
         function addDias(iso, n) { const d = new Date(iso + 'T12:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
 
