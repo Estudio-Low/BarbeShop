@@ -152,6 +152,21 @@
         body.tl.ver-site .gold-gradient-text { background-image: linear-gradient(135deg, rgb(var(--g600)), rgb(var(--g700))); }
         body.tl.ver-site .barra-mobile { background: color-mix(in srgb, var(--t-surface) 92%, transparent); }
 
+        /* Ordem das seções: padrão = serviços, galeria, agendar */
+        #corpoSite { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-areas: "srv" "gal" "ag"; }
+        #corpoSite > .secao-servicos { grid-area: srv; }
+        #corpoSite > #secaoGaleria { grid-area: gal; }
+        #corpoSite > #agendar { grid-area: ag; }
+        /* Barbearia: cortes em cima; embaixo tabela de serviços | reserva lado a lado */
+        [data-tema="barbearia"] #corpoSite { grid-template-areas: "gal" "srv" "ag"; }
+        @media (min-width: 1024px) {
+            [data-tema="barbearia"] #corpoSite { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "gal gal" "srv ag"; column-gap: 2rem; max-width: 84rem; margin: 0 auto; align-items: start; padding: 0 1rem; }
+            [data-tema="barbearia"] #corpoSite > #secaoGaleria { padding-bottom: 1rem; }
+            [data-tema="barbearia"] #corpoSite > #agendar { position: sticky; top: 5.5rem; }
+            [data-tema="barbearia"] #agendar .card-agendar { max-width: none; margin-left: 0; margin-right: 0; padding: 2rem; }
+            [data-tema="barbearia"] #corpoSite > .secao-servicos > div, [data-tema="barbearia"] #corpoSite > #secaoGaleria > div { padding-left: 0; padding-right: 0; }
+        }
+
         /* ---------- BARBEARIA: escura, clássica, poste de barbeiro ---------- */
         [data-tema="barbearia"] { --raio-btn: .35rem; --raio-card: .5rem; }
         [data-tema="barbearia"] .hero-fundo { background: radial-gradient(ellipse at top, #222226, #0f0f11 60%, #000); }
@@ -471,6 +486,7 @@
             <div class="hero-deco relative z-10"></div>
         </section>
 
+        <div id="corpoSite">
         <!-- Serviços -->
         <section class="secao-servicos py-12 md:py-20 bg-dark-800">
             <div class="max-w-7xl mx-auto px-4">
@@ -542,6 +558,8 @@
                 </form>
             </div>
         </section>
+
+        </div>
 
         <!-- RODAPÉ -->
         <footer class="bg-black text-gray-400 border-t border-dark-800 pt-12 pb-28 md:pb-12">
