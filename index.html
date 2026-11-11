@@ -4,6 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Agendify - Cloud SaaS & Edição Visual</title>
+    <!-- App instalável (PWA) -->
+    <meta name="theme-color" content="#0f0f11">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Agendify">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/png" href="icon-192.png">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase (banco de dados, login e fotos) -->
@@ -13,7 +21,7 @@
     <!-- Google Fonts: Cinzel (clássica), Playfair (elegante), Poppins (moderna) & Inter (interface) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Playfair+Display:wght@600;700;800&family=Poppins:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Poppins:wght@500;600;700;800&family=Nunito:wght@700;800;900&family=DM+Serif+Display&family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
         // As cores "gold" agora vêm de variáveis CSS: cada empresa tem a sua cor de destaque
@@ -70,6 +78,104 @@
         .campo-painel { width: 100%; background: #17171a; border: 1px solid #2d2d33; color: #fff; border-radius: 0.5rem; padding: 0.55rem 0.7rem; font-size: 0.875rem; outline: none; }
         .campo-painel:focus { border-color: rgb(var(--g500)); }
         .whitespace-pre-line { white-space: pre-line; }
+
+        /* ===================== SITE DO CLIENTE: BASE + CELULAR ===================== */
+        html.embed ::-webkit-scrollbar { display: none; }
+        html.embed, html.embed body { scrollbar-width: none; }
+        .hero-grid { display: grid; gap: 2rem; align-items: center; padding: 2.25rem 1.25rem 3rem; }
+        @media (min-width: 768px) { .hero-grid { grid-template-columns: 1.05fr .95fr; gap: 3.5rem; padding: 5rem 2rem; min-height: 78vh; } }
+        .hero-texto { text-align: center; }
+        .hero-sub { margin-left: auto; margin-right: auto; }
+        @media (min-width: 768px) { .hero-texto { text-align: left; } .hero-sub { margin-left: 0; } }
+        .hero-moldura { border-radius: 1rem; }
+        #pubImg { height: 230px; }
+        @media (min-width: 768px) { #pubImg { height: 420px; } }
+        #pubTitulo { overflow-wrap: break-word; hyphens: auto; }
+        .hero-deco { display: none; }
+        .btn-tema { border-radius: var(--raio-btn, .75rem); }
+        .card-agendar { border-radius: var(--raio-card, 1rem); }
+        .barra-mobile { background: rgb(15 15 17 / .92); }
+        .hero-enfeites i { position: absolute; color: rgb(var(--g500)); animation: flutuar 7s ease-in-out infinite; }
+        .hero-enfeites i:nth-child(2n) { animation-delay: -2.5s; animation-duration: 9s; }
+        .hero-enfeites i:nth-child(3n) { animation-delay: -4s; }
+        @keyframes flutuar { 0%, 100% { translate: 0 0; } 50% { translate: 0 -12px; } }
+        @media (prefers-reduced-motion: reduce) { .hero-enfeites i { animation: none; } }
+
+        /* ===================== TEMAS CLAROS (pet, salão, manicure, estética) ===================== */
+        body.tl.ver-site { background: var(--t-bg); color: var(--t-text); }
+        body.tl.ver-site #clientView .bg-dark-900, body.tl.ver-site #clientView .bg-black { background-color: var(--t-bg); }
+        body.tl.ver-site #clientView .bg-dark-800 { background-color: var(--t-surface); }
+        body.tl.ver-site #clientView .text-white { color: var(--t-text); }
+        body.tl.ver-site #clientView .text-gray-400, body.tl.ver-site #clientView .text-gray-500, body.tl.ver-site #clientView .text-gray-600 { color: var(--t-muted); }
+        body.tl.ver-site #clientView .border-dark-700, body.tl.ver-site #clientView .border-dark-800 { border-color: var(--t-line); }
+        body.tl.ver-site #clientView .text-gold-400 { color: rgb(var(--g700)); }
+        body.tl.ver-site #clientView input, body.tl.ver-site #clientView select { background: var(--t-bg); color: var(--t-text); border-color: var(--t-line); }
+        body.tl.ver-site #clientView footer { background: var(--t-footer); }
+        body.tl.ver-site #mainHeader { background: color-mix(in srgb, var(--t-surface) 88%, transparent); border-color: var(--t-line); }
+        body.tl.ver-site #mainHeader .bg-dark-800 { background: var(--t-surface); }
+        body.tl.ver-site #mainHeader .text-gold-500 { color: rgb(var(--g600)); }
+        body.tl.ver-site .gold-gradient-text { background-image: linear-gradient(135deg, rgb(var(--g600)), rgb(var(--g700))); }
+        body.tl.ver-site .barra-mobile { background: color-mix(in srgb, var(--t-surface) 92%, transparent); }
+
+        /* ---------- BARBEARIA: escura, clássica, poste de barbeiro ---------- */
+        [data-tema="barbearia"] { --raio-btn: .35rem; --raio-card: .5rem; }
+        [data-tema="barbearia"] .hero-fundo { background: radial-gradient(ellipse at top, #222226, #0f0f11 60%, #000); }
+        [data-tema="barbearia"] #pubTitulo, [data-tema="barbearia"] .titulo-secao { text-transform: uppercase; letter-spacing: .04em; }
+        [data-tema="barbearia"] .hero-moldura { border: 2px solid rgb(var(--g500) / .5); border-radius: .5rem; box-shadow: 0 0 0 8px rgb(var(--g500) / .06), 0 25px 50px -12px #000; }
+        [data-tema="barbearia"] .hero-deco { display: block; height: 12px; background: repeating-linear-gradient(-45deg, rgb(var(--g500)) 0 14px, #f3f4f6 14px 28px, #1e3a8a 28px 42px, #f3f4f6 42px 56px); }
+
+        /* ---------- PETSHOP: clara, divertida, foto redonda e patinhas ---------- */
+        [data-tema="petshop"] { --t-bg: #f3f9fd; --t-surface: #ffffff; --t-line: #dbe8f1; --t-text: #0f2a3d; --t-muted: #557083; --t-footer: #e6f1f8; --raio-btn: 999px; --raio-card: 2rem; }
+        [data-tema="petshop"] .hero-fundo { background: radial-gradient(rgb(var(--g500) / .16) 2px, transparent 2.5px) 0 0 / 26px 26px, linear-gradient(180deg, rgb(var(--g500) / .14), transparent 75%); }
+        [data-tema="petshop"] .hero-moldura { border-radius: 999px; width: min(72vw, 400px); aspect-ratio: 1; margin: 0 auto; border: 10px solid #fff; box-shadow: 0 25px 50px -20px rgb(var(--g700) / .5); }
+        [data-tema="petshop"] #pubImg { height: 100%; }
+        [data-tema="petshop"] #pubTitulo { font-weight: 900; }
+        [data-tema="petshop"] .hero-deco { display: block; height: 56px; margin-top: -56px; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80' preserveAspectRatio='none'%3E%3Cpath fill='%23ffffff' d='M0 44C240 92 480 4 720 34s480 46 720 0V80H0Z'/%3E%3C/svg%3E") bottom / 100% 100% no-repeat; }
+        [data-tema="petshop"] .card-agendar { border-color: transparent; box-shadow: 0 30px 60px -30px rgb(var(--g700) / .35); }
+
+        /* ---------- SALÃO: foto de fundo inteira, título itálico, sofisticado ---------- */
+        [data-tema="salao"] { --t-bg: #fdf6f7; --t-surface: #ffffff; --t-line: #f1dde3; --t-text: #3a1f2a; --t-muted: #86636f; --t-footer: #f8e9ee; --raio-btn: .2rem; --raio-card: .2rem; }
+        [data-tema="salao"] .hero { min-height: 78vh; display: flex; align-items: center; }
+        @media (min-width: 768px) { [data-tema="salao"] .hero { min-height: 88vh; } }
+        [data-tema="salao"] .hero-fundo { display: none; }
+        [data-tema="salao"] .hero-grid { position: static; grid-template-columns: 1fr; min-height: 0; }
+        [data-tema="salao"] .hero-midia { position: absolute; inset: 0; z-index: 0; }
+        [data-tema="salao"] .hero-moldura { height: 100%; border-radius: 0; }
+        [data-tema="salao"] #pubImg { height: 100%; }
+        [data-tema="salao"] .hero-moldura::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(25 10 16 / .35), rgb(25 10 16 / .78)); pointer-events: none; }
+        [data-tema="salao"] .hero-texto { position: relative; z-index: 2; text-align: center; max-width: 46rem; margin: 0 auto; }
+        [data-tema="salao"] .hero-sub { margin: 0 auto; }
+        body.ver-site #clientView[data-tema="salao"] .hero-texto .text-white, body.ver-site #clientView[data-tema="salao"] .hero-texto .text-gray-400, body.tl.ver-site #clientView[data-tema="salao"] .hero-texto .hero-badge { color: #fff; }
+        [data-tema="salao"] #pubTitulo { font-style: italic; font-weight: 600; }
+        body.ver-site #clientView[data-tema="salao"] .hero-badge { background: transparent; border-color: rgb(255 255 255 / .5); color: #fff; }
+        [data-tema="salao"] .card-agendar { border-width: 0; border-top: 3px solid rgb(var(--g500)); box-shadow: 0 20px 50px -30px rgb(58 31 42 / .4); }
+
+        /* ---------- MANICURE: pastel, foto em arco à esquerda, brilhinhos ---------- */
+        [data-tema="manicure"] { --t-bg: #fbf6fd; --t-surface: #ffffff; --t-line: #efe2f6; --t-text: #33213f; --t-muted: #7d6a89; --t-footer: #f4eafa; --raio-btn: 999px; --raio-card: 2rem; }
+        [data-tema="manicure"] .hero-fundo { background: radial-gradient(circle at 85% 18%, rgb(var(--g500) / .22), transparent 42%), radial-gradient(circle at 8% 92%, rgb(167 139 250 / .2), transparent 45%); }
+        @media (min-width: 768px) { [data-tema="manicure"] .hero-grid { grid-template-columns: .9fr 1.1fr; } [data-tema="manicure"] .hero-midia { order: -1; } }
+        [data-tema="manicure"] .hero-moldura { border-radius: 999px 999px 1.5rem 1.5rem; max-width: 360px; margin: 0 auto; box-shadow: 0 30px 60px -25px rgb(var(--g700) / .55); }
+        [data-tema="manicure"] #pubImg { height: 300px; }
+        @media (min-width: 768px) { [data-tema="manicure"] #pubImg { height: 470px; } }
+        body.tl.ver-site #clientView[data-tema="manicure"] .hero-badge { background: rgb(var(--g500) / .12); border-color: transparent; }
+        [data-tema="manicure"] .card-agendar { border-color: transparent; box-shadow: 0 30px 60px -30px rgb(var(--g700) / .4); }
+
+        /* ---------- ESTÉTICA: spa minimalista, arco alto com moldura deslocada ---------- */
+        [data-tema="estetica"] { --t-bg: #f5f3ee; --t-surface: #fbfaf7; --t-line: #e3ded2; --t-text: #2c3630; --t-muted: #6b746e; --t-footer: #ece8de; --raio-btn: 0; --raio-card: 0; }
+        @media (min-width: 768px) { [data-tema="estetica"] .hero-fundo { background: linear-gradient(90deg, transparent 58%, rgb(var(--g500) / .1) 58%); } }
+        [data-tema="estetica"] #pubTitulo { font-weight: 600; font-size: clamp(2.1rem, 7vw, 4.25rem); line-height: 1.02; }
+        [data-tema="estetica"] .hero-moldura { overflow: visible; border-radius: 999px 999px 0 0; max-width: 340px; margin: 0 auto; }
+        [data-tema="estetica"] .hero-moldura::before { content: ''; position: absolute; inset: 0; transform: translate(14px, 14px); border: 1px solid rgb(var(--g500)); border-radius: 999px 999px 0 0; z-index: -1; }
+        [data-tema="estetica"] #pubImg { border-radius: 999px 999px 0 0; height: 340px; }
+        @media (min-width: 768px) { [data-tema="estetica"] #pubImg { height: 500px; } }
+        [data-tema="estetica"] .group:hover #pubImg { transform: none; }
+        body.tl.ver-site #clientView[data-tema="estetica"] .hero-badge { background: transparent; border: 0; border-top: 1px solid rgb(var(--g500)); border-radius: 0; padding: .6rem 0 0; letter-spacing: .25em; }
+        [data-tema="estetica"] .titulo-secao { font-weight: 600; letter-spacing: .02em; }
+        [data-tema="estetica"] .card-agendar { border-color: var(--t-line); }
+
+        /* ---------- MODERNO (outros nichos): escuro, brilho de canto ---------- */
+        [data-tema="moderno"] .hero-fundo { background: radial-gradient(ellipse at top right, rgb(var(--g500) / .2), transparent 50%), #0f0f11; }
+        [data-tema="moderno"] .hero-moldura { border-radius: 1.5rem; border: 1px solid rgb(var(--g500) / .3); }
     </style>
 </head>
 <body class="antialiased selection:bg-gold-500 selection:text-black">
@@ -113,26 +219,29 @@
     <!-- Header / Navbar -->
     <header id="mainHeader" class="fixed w-full top-0 z-40 bg-dark-900/90 backdrop-blur-md border-b border-gold-500/20 transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <a href="#" onclick="event.preventDefault(); if(!emEdicaoVisual) showView('client')" class="flex items-center space-x-3 group">
-                    <div class="w-10 h-10 rounded-full border border-gold-500 flex items-center justify-center bg-dark-800 text-gold-500">
-                        <i id="logoIcone" class="fa-solid fa-calendar-check text-lg"></i>
+            <div class="flex items-center justify-between gap-3 h-16 md:h-20">
+                <a href="#" onclick="event.preventDefault(); if(!emEdicaoVisual) window.scrollTo({ top: 0, behavior: 'smooth' })" class="flex items-center gap-2 sm:gap-3 min-w-0 group">
+                    <div class="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-full border border-gold-500 flex items-center justify-center bg-dark-800 text-gold-500">
+                        <i id="logoIcone" class="fa-solid fa-calendar-check md:text-lg"></i>
                     </div>
-                    <span id="logoNomeEmpresa" data-campo="nome" class="font-vintage text-xl sm:text-2xl font-bold tracking-wider gold-gradient-text" contenteditable="false">AGENDIFY</span>
-                    <span id="lblTipoNichoBadge" class="hidden sm:inline empty:hidden text-xs bg-gold-500/10 text-gold-400 border border-gold-500/30 px-2 py-0.5 rounded-full"></span>
+                    <span id="logoNomeEmpresa" data-campo="nome" class="font-vintage text-base sm:text-2xl font-bold tracking-wider gold-gradient-text truncate" contenteditable="false">AGENDIFY</span>
+                    <span id="lblTipoNichoBadge" class="hidden lg:inline empty:hidden shrink-0 text-xs bg-gold-500/10 text-gold-400 border border-gold-500/30 px-2 py-0.5 rounded-full"></span>
                 </a>
 
-                <nav class="flex items-center space-x-4">
-                    <button onclick="openAgendamentosModal()" class="relative text-gold-500 hover:text-white text-sm font-medium transition-colors">
+                <nav class="flex items-center gap-3 shrink-0">
+                    <button id="btnInstalar" onclick="instalarApp()" class="hidden btn-tema items-center gap-1.5 bg-gold-500 text-onbrand font-bold px-3 py-1.5 text-xs shadow" title="Instalar como app no celular">
+                        <i class="fa-solid fa-download"></i> Instalar
+                    </button>
+                    <button onclick="openAgendamentosModal()" class="relative text-gold-500 hover:text-white text-sm font-medium transition-colors" title="Meus agendamentos">
                         <i class="fa-solid fa-calendar-check text-lg"></i>
                         <span id="agendamentosBadge" class="hidden absolute -top-2 -right-3 bg-gold-500 text-onbrand font-bold text-xs w-4 h-4 rounded-full flex items-center justify-center">0</span>
                     </button>
-                    <button id="btnPainelDono" onclick="abrirPainelDono(empresaPainelId || minhaEmpresaId)" class="hidden bg-dark-800 border border-gold-500/30 text-gold-400 hover:bg-dark-700 px-4 py-2 rounded-lg text-xs font-semibold items-center gap-1.5 transition-all">
-                        <i class="fa-solid fa-store"></i> Meu Painel
+                    <button id="btnPainelDono" onclick="abrirPainelDono(empresaPainelId || minhaEmpresaId)" class="hidden bg-dark-800 border border-gold-500/30 text-gold-400 hover:bg-dark-700 px-3 py-2 rounded-lg text-xs font-semibold items-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-store"></i> <span class="hidden sm:inline">Meu Painel</span>
                     </button>
                     <!-- Só aparece no endereço ?admin (o cliente final nunca vê) -->
-                    <button id="btnSuperAdmin" onclick="openSuperAdminAuth()" class="hidden bg-dark-800 border border-gold-500/30 text-gold-400 hover:bg-dark-700 px-4 py-2 rounded-lg text-xs font-semibold items-center gap-1.5 transition-all">
-                        <i class="fa-solid fa-shield-halved"></i> Super-Admin (Dono SaaS)
+                    <button id="btnSuperAdmin" onclick="openSuperAdminAuth()" class="hidden bg-dark-800 border border-gold-500/30 text-gold-400 hover:bg-dark-700 px-3 py-2 rounded-lg text-xs font-semibold items-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-shield-halved"></i> <span class="hidden sm:inline">Super-Admin</span>
                     </button>
                 </nav>
             </div>
@@ -276,46 +385,51 @@
     </main>
 
     <!-- ================= VISÃO DO CLIENTE FINAL ================= -->
-    <main id="clientView" class="pt-20">
-        <!-- Hero Section -->
-        <section class="relative min-h-[80vh] flex items-center py-16 overflow-hidden">
-            <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-dark-700 via-dark-900 to-black opacity-90"></div>
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full flex flex-col md:flex-row items-center justify-between gap-8">
-                <div class="md:w-1/2 space-y-6 text-center md:text-left">
-                    <div class="inline-flex items-center space-x-2 bg-dark-800 border border-gold-500/30 px-3 py-1.5 rounded-full text-gold-400 text-xs font-semibold uppercase">
-                        <i class="fa-solid fa-store"></i> <span id="lblTipoNicho">BARBEARIA</span>
+    <!-- O visual muda pelo atributo data-tema (barbearia, petshop, salao, manicure, estetica, moderno) -->
+    <main id="clientView" class="pt-16 md:pt-20" data-tema="barbearia">
+        <section id="hero" class="hero relative overflow-hidden">
+            <div class="hero-fundo absolute inset-0 z-0"></div>
+            <div id="heroEnfeites" class="hero-enfeites absolute inset-0 z-0 pointer-events-none overflow-hidden"></div>
+            <div class="hero-grid relative z-10 max-w-7xl mx-auto w-full">
+                <div class="hero-texto w-full min-w-0 space-y-5">
+                    <div class="hero-badge inline-flex items-center gap-2 bg-dark-800 border border-gold-500/30 px-3 py-1.5 rounded-full text-gold-400 text-xs font-semibold uppercase">
+                        <i id="heroBadgeIcone" class="fa-solid fa-store"></i> <span id="lblTipoNicho"></span>
                     </div>
-                    <h1 id="pubTitulo" data-campo="titulo" class="font-vintage text-4xl sm:text-5xl font-extrabold leading-tight">AGENDAMENTOS ONLINE EM TEMPO REAL</h1>
-                    <p id="pubSub" data-campo="sub" class="text-gray-400 text-base max-w-xl whitespace-pre-line">Bem-vindo ao portal de atendimento oficial. Escolha seu serviço abaixo e garanta seu horário.</p>
-                    <a href="#agendar" class="inline-flex items-center gap-2 bg-gradient-to-r from-gold-600 to-gold-500 text-onbrand font-bold px-6 py-3 rounded-xl shadow-lg">
-                        <i class="fa-solid fa-calendar-plus"></i> Agendar agora
+                    <h1 id="pubTitulo" data-campo="titulo" class="font-vintage text-[1.65rem] sm:text-5xl font-extrabold leading-tight text-white"></h1>
+                    <p id="pubSub" data-campo="sub" class="hero-sub text-gray-400 text-sm sm:text-base max-w-xl whitespace-pre-line"></p>
+                    <a id="heroCta" href="#agendar" class="btn-tema inline-flex items-center gap-2 bg-gradient-to-r from-gold-600 to-gold-500 text-onbrand font-bold px-6 py-3 shadow-lg">
+                        <i class="fa-solid fa-calendar-plus"></i> <span id="heroCtaTexto">Agendar agora</span>
                     </a>
                 </div>
-                <div class="md:w-5/12 w-full">
-                    <div class="rounded-2xl overflow-hidden border-2 border-gold-500/30 gold-border-glow shadow-2xl relative group">
-                        <img id="pubImg" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&q=80'" src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80" alt="Capa" onclick="trocarImagemVisualmente()" class="w-full h-[380px] object-cover transition-transform group-hover:scale-105">
-                        <div id="hintTrocaFoto" class="hidden absolute inset-0 bg-black/60 flex items-center justify-center text-gold-400 font-bold text-sm pointer-events-none">
+                <div class="hero-midia w-full">
+                    <div class="hero-moldura relative group overflow-hidden">
+                        <img id="pubImg" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&q=80'" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=" alt="Capa" onclick="trocarImagemVisualmente()" class="w-full object-cover transition-transform duration-700 group-hover:scale-105">
+                        <div id="hintTrocaFoto" class="hidden absolute inset-0 bg-black/60 flex items-center justify-center text-white font-bold text-sm pointer-events-none z-10">
                             <i class="fa-solid fa-camera text-2xl mr-2"></i> Clique para trocar a imagem
                         </div>
                     </div>
                 </div>
             </div>
+            <div class="hero-deco relative z-10"></div>
         </section>
 
-        <!-- Serviços Disponíveis -->
-        <section class="py-16 bg-dark-800">
+        <!-- Serviços -->
+        <section class="secao-servicos py-12 md:py-20 bg-dark-800">
             <div class="max-w-7xl mx-auto px-4">
-                <h2 class="text-center font-vintage text-3xl font-bold text-white mb-12">SERVIÇOS DISPONÍVEIS</h2>
-                <div class="grid md:grid-cols-3 gap-6" id="pubServicesGrid"></div>
+                <div class="text-center mb-8 md:mb-12">
+                    <h2 id="tituloServicos" class="titulo-secao font-vintage text-2xl md:text-4xl font-bold text-white">Serviços</h2>
+                    <p id="subServicos" class="text-gray-400 text-sm mt-2"></p>
+                </div>
+                <div id="pubServicesGrid"></div>
             </div>
         </section>
 
         <!-- Formulário de Agendamento -->
-        <section id="agendar" class="py-16 bg-dark-900 scroll-mt-24">
-            <div class="max-w-3xl mx-auto px-4 bg-dark-800 border border-gold-500/30 rounded-2xl p-6 sm:p-10 shadow-xl">
-                <h2 class="font-vintage text-2xl font-bold text-white text-center mb-6">AGENDE SEU HORÁRIO ONLINE</h2>
+        <section id="agendar" class="py-12 md:py-20 bg-dark-900 scroll-mt-20">
+            <div id="cardAgendar" class="card-agendar max-w-3xl mx-4 sm:mx-auto bg-dark-800 border border-gold-500/30 p-5 sm:p-10 shadow-xl">
+                <h2 id="tituloAgendar" class="titulo-secao font-vintage text-xl sm:text-3xl font-bold text-white text-center mb-6">Agende seu horário</h2>
 
-                <div id="avisoStatusEdicao" class="hidden mb-4 text-xs bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg p-3"></div>
+                <div id="avisoStatusEdicao" class="hidden mb-4 text-xs bg-red-500/10 border border-red-500/30 text-red-400 rounded-lg p-3"></div>
 
                 <!-- Aviso de suspensão (empresa em atraso / cancelada) -->
                 <div id="avisoSuspenso" class="hidden text-center space-y-3 py-6">
@@ -326,57 +440,64 @@
 
                 <form id="bookingForm" onsubmit="handleBooking(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs text-gold-400 mb-1">Serviço:</label>
+                        <label class="block text-xs text-gold-400 mb-1">Serviço</label>
                         <select id="selectServico" required class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none"></select>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs text-gold-400 mb-1">Data:</label>
+                            <label class="block text-xs text-gold-400 mb-1">Data</label>
                             <input type="date" id="selectData" required class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs text-gold-400 mb-1">Horário:</label>
+                            <label class="block text-xs text-gold-400 mb-1">Horário</label>
                             <select id="selectHora" required class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none"></select>
                         </div>
                     </div>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs text-gold-400 mb-1">Seu Nome:</label>
-                            <input type="text" id="inputNome" required placeholder="Nome completo" class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none">
+                            <label class="block text-xs text-gold-400 mb-1">Seu nome</label>
+                            <input type="text" id="inputNome" required placeholder="Nome completo" autocomplete="name" class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none">
                         </div>
                         <div>
-                            <label class="block text-xs text-gold-400 mb-1">WhatsApp:</label>
-                            <input type="tel" id="inputFone" required placeholder="(11) 99999-9999" class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none">
+                            <label class="block text-xs text-gold-400 mb-1">WhatsApp</label>
+                            <input type="tel" id="inputFone" required placeholder="(11) 99999-9999" autocomplete="tel" class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none">
                         </div>
                     </div>
-                    <button type="submit" class="w-full mt-4 bg-gradient-to-r from-gold-600 to-gold-500 text-onbrand font-bold py-3.5 rounded-xl shadow-lg">
+                    <button type="submit" class="btn-tema w-full mt-2 bg-gradient-to-r from-gold-600 to-gold-500 text-onbrand font-bold py-3.5 shadow-lg">
                         <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Confirmar via WhatsApp
                     </button>
                 </form>
             </div>
         </section>
 
-        <!-- RODAPÉ COM INFORMAÇÕES DE LOCALIZAÇÃO DO CLIENTE -->
-        <footer class="bg-black text-gray-400 border-t border-dark-800 py-12">
-            <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-3 gap-8 text-sm">
+        <!-- RODAPÉ -->
+        <footer class="bg-black text-gray-400 border-t border-dark-800 pt-12 pb-28 md:pb-12">
+            <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-3 gap-8 text-sm text-center md:text-left">
                 <div>
-                    <h3 id="footerNomeEmpresa" data-campo="nome" class="font-vintage text-white text-lg font-bold mb-3">BARBERPRO CLASSIC</h3>
-                    <p id="footerEndereco" data-campo="endereco" class="text-xs leading-relaxed whitespace-pre-line">Rua das Flores, 123 - Centro</p>
+                    <h3 id="footerNomeEmpresa" data-campo="nome" class="font-vintage text-white text-lg font-bold mb-3"></h3>
+                    <p id="footerEndereco" data-campo="endereco" class="text-xs leading-relaxed whitespace-pre-line"></p>
                 </div>
                 <div>
                     <h4 class="font-vintage text-gold-400 font-bold mb-3">Horário de Atendimento</h4>
-                    <p id="footerHorario" data-abre="agenda" class="text-xs leading-relaxed whitespace-pre-line">Segunda a Sábado: 09:00 - 20:00</p>
+                    <p id="footerHorario" data-abre="agenda" class="text-xs leading-relaxed whitespace-pre-line"></p>
                 </div>
                 <div>
                     <h4 class="font-vintage text-gold-400 font-bold mb-3">Contato Direto</h4>
-                    <p class="text-xs" data-abre="geral">WhatsApp: <a id="footerWhats" href="#" target="_blank" class="hover:text-gold-400">5511999998888</a></p>
+                    <p class="text-xs" data-abre="geral">WhatsApp: <a id="footerWhats" href="#" target="_blank" class="hover:text-gold-400"></a></p>
                     <p id="footerInstaWrap" class="text-xs mt-2 hidden" data-abre="geral"><i class="fa-brands fa-instagram mr-1"></i><a id="footerInsta" href="#" target="_blank" class="hover:text-gold-400"></a></p>
                 </div>
             </div>
             <div class="text-center text-xs text-gray-600 mt-8 pt-4 border-t border-dark-800">
-                Powered by Agendify Cloud SaaS &copy; 2026 · <a id="linkAreaDono" href="?painel" class="hover:text-gray-400">Área do estabelecimento</a>
+                Powered by Agendify &copy; 2026 · <a id="linkAreaDono" href="?painel" class="hover:text-gray-400">Área do estabelecimento</a>
             </div>
         </footer>
+
+        <!-- Botão fixo de agendar (só no celular) -->
+        <div id="barraAgendarMobile" class="barra-mobile md:hidden fixed bottom-0 inset-x-0 z-30 p-3 border-t border-gold-500/20 backdrop-blur hidden">
+            <a href="#agendar" class="btn-tema flex items-center justify-center gap-2 w-full bg-gradient-to-r from-gold-600 to-gold-500 text-onbrand font-bold py-3 shadow-lg">
+                <i class="fa-solid fa-calendar-plus"></i> <span id="barraCtaTexto">Agendar horário</span>
+            </a>
+        </div>
     </main>
 
     <!-- ================= SUPER-ADMIN (PAINEL DO DONO DO SAAS) ================= -->
@@ -432,15 +553,15 @@
     </main>
 
     <!-- ================= PAINEL DO DONO DO ESTABELECIMENTO ================= -->
-    <main id="donoView" class="hidden pt-24 pb-16 min-h-screen bg-dark-900">
+    <main id="donoView" class="hidden pt-20 md:pt-24 pb-16 min-h-screen bg-dark-900">
         <div class="max-w-4xl mx-auto px-4 space-y-5">
             <div class="flex flex-wrap gap-3 justify-between items-center">
                 <div>
                     <p class="text-xs text-gold-400 uppercase font-semibold tracking-wider">Painel do Estabelecimento</p>
-                    <h1 id="donoNome" class="font-vintage text-3xl font-bold text-white"></h1>
+                    <h1 id="donoNome" class="font-vintage text-2xl md:text-3xl font-bold text-white"></h1>
                 </div>
                 <div class="flex flex-wrap gap-2">
-                    <button type="button" data-dono="editar" class="bg-gold-500 text-onbrand font-bold px-4 py-2.5 rounded-lg text-sm"><i class="fa-solid fa-pen mr-1"></i> Editar página, horários e preços</button>
+                    <button type="button" data-dono="editar" class="bg-gold-500 text-onbrand font-bold px-4 py-2.5 rounded-lg text-sm"><i class="fa-solid fa-pen mr-1"></i> <span class="sm:hidden">Editar página</span><span class="hidden sm:inline">Editar página, horários e preços</span></button>
                     <button type="button" data-dono="ver-site" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700"><i class="fa-solid fa-eye mr-1"></i> Ver meu site</button>
                     <button type="button" data-dono="copiar-link" class="bg-dark-800 text-gray-300 px-3 py-2.5 rounded-lg text-sm border border-dark-700" title="Copiar link pra mandar pros clientes"><i class="fa-solid fa-link"></i></button>
                     <button type="button" onclick="sairAdmin()" class="bg-dark-800 text-red-400 px-3 py-2.5 rounded-lg text-sm border border-dark-700" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></button>
@@ -569,6 +690,19 @@
         </div>
     </div>
 
+    <!-- MODAL INSTALAR (iPhone) -->
+    <div id="iosModal" class="fixed inset-0 z-[60] hidden bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-4" onclick="if(event.target===this) this.classList.add('hidden')">
+        <div class="bg-dark-900 border border-gold-500/40 w-full max-w-sm rounded-2xl p-6 space-y-4">
+            <h3 class="font-vintage text-lg font-bold text-white">Instalar no iPhone</h3>
+            <ol class="space-y-3 text-sm text-gray-300">
+                <li class="flex gap-3 items-center"><span class="w-8 h-8 shrink-0 rounded-full bg-gold-500/15 text-gold-400 flex items-center justify-center"><i class="fa-solid fa-arrow-up-from-bracket"></i></span> Toque em <b>Compartilhar</b> na barra do Safari</li>
+                <li class="flex gap-3 items-center"><span class="w-8 h-8 shrink-0 rounded-full bg-gold-500/15 text-gold-400 flex items-center justify-center"><i class="fa-regular fa-square-plus"></i></span> Escolha <b>Adicionar à Tela de Início</b></li>
+                <li class="flex gap-3 items-center"><span class="w-8 h-8 shrink-0 rounded-full bg-gold-500/15 text-gold-400 flex items-center justify-center"><i class="fa-solid fa-check"></i></span> Toque em <b>Adicionar</b>. Pronto!</li>
+            </ol>
+            <button type="button" onclick="document.getElementById('iosModal').classList.add('hidden')" class="w-full bg-gold-500 text-onbrand font-bold py-2.5 rounded-lg text-sm">Entendi</button>
+        </div>
+    </div>
+
     <!-- TOAST (avisos rápidos no lugar do alert) -->
     <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-dark-800 border border-gold-500/40 text-white text-sm px-4 py-3 rounded-xl shadow-2xl"></div>
 
@@ -581,12 +715,27 @@
         const FONTES = {
             vintage:  { nome: 'Clássica', css: "'Cinzel', serif" },
             elegante: { nome: 'Elegante', css: "'Playfair Display', serif" },
-            moderna:  { nome: 'Moderna',  css: "'Poppins', sans-serif" }
+            moderna:  { nome: 'Moderna',  css: "'Poppins', sans-serif" },
+            arredondada: { nome: 'Divertida', css: "'Nunito', sans-serif" },
+            display:  { nome: 'Charmosa', css: "'DM Serif Display', serif" },
+            delicada: { nome: 'Delicada', css: "'Cormorant Garamond', serif" }
+        };
+        // Cada tema muda layout, fundo, formato da foto, cartões e textos das seções
+        const TEMAS = {
+            barbearia: { nome: 'Barbearia clássica', claro: false, badge: 'fa-scissors', servicos: 'Tabela de serviços', subServicos: 'Escolha o seu e reserve a cadeira', agendar: 'Reserve sua cadeira', cta: 'Reservar horário', enfeites: [] },
+            petshop:   { nome: 'Pet divertido', claro: true, badge: 'fa-paw', servicos: 'Cuidados para o seu pet', subServicos: 'Banho, tosa e muito carinho com hora marcada', agendar: 'Agende o cuidado do seu pet', cta: 'Agendar agora',
+                         enfeites: [['fa-paw', '8%', '5%', 2.6, -20, .16], ['fa-bone', '70%', '3%', 2, 25, .12], ['fa-paw', '18%', '88%', 2, 15, .14], ['fa-paw', '78%', '82%', 3, -10, .1], ['fa-heart', '45%', '48%', 1.2, 0, .12]] },
+            salao:     { nome: 'Salão sofisticado', claro: true, badge: 'fa-wand-magic-sparkles', servicos: 'Nossos serviços', subServicos: 'Técnica e cuidado em cada detalhe', agendar: 'Reserve seu momento', cta: 'Reservar horário', enfeites: [] },
+            manicure:  { nome: 'Nail delicado', claro: true, badge: 'fa-hand-sparkles', servicos: 'Menu de unhas', subServicos: 'Escolha seu serviço favorito', agendar: 'Marque seu horário', cta: 'Quero agendar',
+                         enfeites: [['fa-star', '12%', '8%', .9, 0, .35], ['fa-star', '22%', '92%', 1.3, 0, .3], ['fa-star', '72%', '6%', .7, 0, .35], ['fa-heart', '82%', '90%', 1.1, -12, .25], ['fa-star', '50%', '52%', .6, 0, .3]] },
+            estetica:  { nome: 'Spa minimalista', claro: true, badge: 'fa-spa', servicos: 'Tratamentos', subServicos: 'Bem-estar com hora marcada', agendar: 'Agende sua sessão', cta: 'Agendar sessão',
+                         enfeites: [['fa-leaf', '10%', '4%', 3.5, -30, .08], ['fa-leaf', '75%', '90%', 4.5, 140, .07]] },
+            moderno:   { nome: 'Moderno escuro', claro: false, badge: 'fa-calendar-check', servicos: 'Serviços', subServicos: 'Escolha e agende em segundos', agendar: 'Agende seu horário', cta: 'Agendar agora', enfeites: [] }
         };
         const IMG_SALAO = 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&q=80';
         const NICHOS = {
             'Barbearia': {
-                cor: '#d4af37', fonte: 'vintage', logo: 'fa-crown', emoji: '💈',
+                cor: '#d4af37', fonte: 'vintage', tema: 'barbearia', logo: 'fa-crown', emoji: '💈',
                 img: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80',
                 titulo: 'SEU ESTILO, NO SEU HORÁRIO',
                 sub: 'Escolha o serviço, o dia e o horário. A confirmação chega no seu WhatsApp.',
@@ -594,39 +743,39 @@
                 servicos: [['Corte Social / Fade', '45.00', '35 min', 'fa-scissors'], ['Barba Tradicional', '35.00', '30 min', 'fa-user-ninja'], ['Combo Corte + Barba', '75.00', '60 min', 'fa-crown']]
             },
             'PetShop': {
-                cor: '#38bdf8', fonte: 'moderna', logo: 'fa-paw', emoji: '🐾',
+                cor: '#38bdf8', fonte: 'arredondada', tema: 'petshop', logo: 'fa-paw', emoji: '🐾',
                 img: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80',
-                titulo: 'O MELHOR CUIDADO PARA O SEU PET',
+                titulo: 'O melhor cuidado para o seu pet',
                 sub: 'Agende banho, tosa e tratamentos especiais para seu companheiro.',
                 icones: ['fa-paw', 'fa-dog', 'fa-cat', 'fa-bath', 'fa-bone', 'fa-syringe'],
                 servicos: [['Banho & Tosa Completa', '60.00', '50 min', 'fa-paw'], ['Hidratação de Pelos', '40.00', '30 min', 'fa-dog'], ['Banho Simples', '35.00', '30 min', 'fa-bath']]
             },
             'Salão de Beleza': {
-                cor: '#f472b6', fonte: 'elegante', logo: 'fa-wand-magic-sparkles', emoji: '💇‍♀️',
+                cor: '#b76e79', fonte: 'elegante', tema: 'salao', logo: 'fa-wand-magic-sparkles', emoji: '💇‍♀️',
                 img: IMG_SALAO,
-                titulo: 'SUA BELEZA EM BOAS MÃOS',
+                titulo: 'Sua beleza em boas mãos',
                 sub: 'Corte, cor e tratamento com hora marcada. Escolha e confirme pelo WhatsApp.',
                 icones: ['fa-scissors', 'fa-wand-magic-sparkles', 'fa-spray-can', 'fa-paintbrush', 'fa-gem', 'fa-star'],
                 servicos: [['Corte Feminino', '70.00', '45 min', 'fa-scissors'], ['Escova', '50.00', '40 min', 'fa-wand-magic-sparkles'], ['Coloração', '150.00', '90 min', 'fa-paintbrush']]
             },
             'Manicure': {
-                cor: '#fb7185', fonte: 'elegante', logo: 'fa-hand-sparkles', emoji: '💅',
+                cor: '#e8678a', fonte: 'display', tema: 'manicure', logo: 'fa-hand-sparkles', emoji: '💅',
                 img: IMG_SALAO,
-                titulo: 'UNHAS IMPECÁVEIS, HORA MARCADA',
+                titulo: 'Unhas impecáveis, hora marcada',
                 sub: 'Mão, pé e alongamento. Escolha o horário e receba a confirmação no WhatsApp.',
                 icones: ['fa-hand-sparkles', 'fa-gem', 'fa-paintbrush', 'fa-heart', 'fa-star', 'fa-droplet'],
                 servicos: [['Mão', '30.00', '40 min', 'fa-hand-sparkles'], ['Pé e Mão', '55.00', '70 min', 'fa-heart'], ['Alongamento em Gel', '140.00', '120 min', 'fa-gem']]
             },
             'Estética': {
-                cor: '#a78bfa', fonte: 'elegante', logo: 'fa-spa', emoji: '✨',
+                cor: '#7c9a82', fonte: 'delicada', tema: 'estetica', logo: 'fa-spa', emoji: '✨',
                 img: IMG_SALAO,
-                titulo: 'CUIDADO QUE APARECE',
+                titulo: 'Cuidado que aparece',
                 sub: 'Tratamentos faciais e corporais com hora marcada.',
                 icones: ['fa-spa', 'fa-leaf', 'fa-droplet', 'fa-face-smile', 'fa-sun', 'fa-star'],
                 servicos: [['Limpeza de Pele', '120.00', '60 min', 'fa-face-smile'], ['Drenagem Linfática', '100.00', '50 min', 'fa-droplet'], ['Design de Sobrancelha', '40.00', '30 min', 'fa-star']]
             },
             'Outro': {
-                cor: '#34d399', fonte: 'moderna', logo: 'fa-calendar-check', emoji: '📅',
+                cor: '#34d399', fonte: 'moderna', tema: 'moderno', logo: 'fa-calendar-check', emoji: '📅',
                 img: IMG_SALAO,
                 titulo: 'AGENDE ONLINE EM SEGUNDOS',
                 sub: 'Escolha o serviço e o horário. A confirmação chega no seu WhatsApp.',
@@ -637,7 +786,7 @@
         // >>> PÁGINA DE VENDAS: troque pelo SEU WhatsApp de vendas (55 + DDD + número)
         const WHATS_VENDAS = '5549999999999';
         const PRECO_SETUP = 599.90, PRECO_MENSAL = 79.90;
-        const CORES_RAPIDAS = ['#d4af37', '#f472b6', '#fb7185', '#a78bfa', '#38bdf8', '#34d399', '#f97316', '#ef4444', '#e5e7eb'];
+        const CORES_RAPIDAS = ['#d4af37', '#b91c1c', '#b76e79', '#e8678a', '#a78bfa', '#7c9a82', '#38bdf8', '#34d399', '#f97316'];
         // ======================================================
         // SUPABASE: conexão
         // ======================================================
@@ -647,7 +796,7 @@
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // Colunas da tabela "empresas" (mesmos nomes do objeto JS)
-        const COLUNAS = ['slug', 'nome', 'nicho', 'whatsapp', 'img', 'plano', 'status', 'titulo', 'sub', 'endereco', 'instagram', 'cor', 'fonte', 'agenda', 'servicos', 'vitrine'];
+        const COLUNAS = ['slug', 'nome', 'nicho', 'whatsapp', 'img', 'plano', 'status', 'titulo', 'sub', 'endereco', 'instagram', 'cor', 'fonte', 'agenda', 'servicos', 'vitrine', 'tema'];
         let EMPRESAS = [];      // cache do que veio do banco
         let souAdmin = false;
         let souDono = false, minhaEmpresaId = null;
@@ -719,6 +868,7 @@
             emp.slug = emp.slug || slugify(emp.nome || 'empresa');
             emp.cor = emp.cor || n.cor;
             emp.fonte = FONTES[emp.fonte] ? emp.fonte : n.fonte;
+            emp.tema = TEMAS[emp.tema] ? emp.tema : n.tema;
             emp.instagram = emp.instagram || '';
             emp.vitrine = !!emp.vitrine;
             emp.img = emp.img || n.img;
@@ -741,7 +891,7 @@
         function novaEmpresaDoNicho(nicho, dados) {
             const n = NICHOS[nicho] || NICHOS['Outro'];
             return normalizarEmpresa({
-                id: null, nicho, cor: n.cor, fonte: n.fonte, img: n.img,
+                id: null, nicho, cor: n.cor, fonte: n.fonte, tema: n.tema, img: n.img,
                 titulo: n.titulo, sub: n.sub, endereco: 'Endereço do estabelecimento',
                 agenda: agendaPadrao(),
                 servicos: n.servicos.map((s, i) => ({ id: Date.now() + i, name: s[0], price: s[1], time: s[2], icon: s[3] })),
@@ -916,6 +1066,10 @@
         function mostrarSo(id) {
             ['vendasView', 'clientView', 'superAdminView', 'donoView'].forEach(v => document.getElementById(v).classList.toggle('hidden', v !== id));
             document.getElementById('mainHeader').classList.toggle('hidden', id === 'vendasView');
+            document.body.classList.toggle('ver-site', id === 'clientView');
+            if (id !== 'clientView') document.querySelector('meta[name="theme-color"]').content = '#0f0f11';
+            atualizarBotaoInstalar();
+            atualizarBarraMobile();
         }
 
         async function showView(view) {
@@ -944,11 +1098,14 @@
             empresaAtivaId = emp.id;
             if (!emEdicaoVisual && MODO === 'site') history.replaceState(null, '', `?c=${emp.slug}`);
             renderSite(emp);
+            if (!emEdicaoVisual && MODO === 'site') configurarApp(emp, false);
+            atualizarBarraMobile();
         }
 
         // Desenha o site inteiro a partir do objeto da empresa (usado no público e na edição ao vivo)
         function renderSite(emp) {
             aplicarTema(emp.cor, emp.fonte);
+            aplicarLayout(emp);
             document.title = `${emp.nome} | Agendamento Online`;
             setCampo('nome', emp.nome);
             setCampo('titulo', emp.titulo || 'AGENDAMENTOS ONLINE EM TEMPO REAL');
@@ -988,27 +1145,104 @@
             document.querySelectorAll(`[data-campo="${campo}"]`).forEach(el => { if (el !== document.activeElement) el.innerText = valor; });
         }
 
+        let temaAtual = null;
+        function aplicarLayout(emp) {
+            const t = TEMAS[emp.tema] || TEMAS.moderno;
+            const cv = document.getElementById('clientView');
+            cv.dataset.tema = emp.tema;
+            document.body.classList.toggle('tl', t.claro);
+            document.querySelector('meta[name="theme-color"]').content = t.claro ? getComputedStyle(cv).getPropertyValue('--t-surface').trim() || '#ffffff' : '#0f0f11';
+            document.getElementById('heroBadgeIcone').className = `fa-solid ${t.badge}`;
+            document.getElementById('tituloServicos').innerText = t.servicos;
+            document.getElementById('subServicos').innerText = t.subServicos;
+            document.getElementById('tituloAgendar').innerText = t.agendar;
+            document.getElementById('heroCtaTexto').innerText = t.cta;
+            document.getElementById('barraCtaTexto').innerText = t.cta;
+            if (temaAtual !== emp.tema) {
+                temaAtual = emp.tema;
+                document.getElementById('heroEnfeites').innerHTML = t.enfeites.map(([ic, top, left, tam, rot, op]) =>
+                    `<i class="fa-solid ${ic}" style="top:${top};left:${left};font-size:${tam}rem;rotate:${rot}deg;opacity:${op}"></i>`).join('');
+            }
+        }
+
+        const GRADE_TEMA = {
+            barbearia: 'max-w-3xl mx-auto',
+            petshop: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5',
+            salao: 'max-w-4xl mx-auto grid md:grid-cols-2 md:gap-x-12',
+            manicure: 'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4',
+            estetica: 'grid grid-cols-1 md:grid-cols-3 gap-6',
+            moderno: 'grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-6'
+        };
+
+        function cardServico(s, i, ed, tema) {
+            const nome = cls => `<h3 class="srv-nome ${cls}" data-sf="name" contenteditable="${ed}">${esc(s.name)}</h3>`;
+            const tempo = `<span class="srv-time-val" data-sf="time" contenteditable="${ed}">${esc(s.time)}</span>`;
+            const preco = `<span class="srv-price" data-sf="price" contenteditable="${ed}">${fmtBR(s.price)}</span>`;
+            const icone = cls => `<button type="button" ${ed ? `data-acao="srv-icone" data-idx="${i}" title="Clique pra trocar o ícone"` : 'tabindex="-1"'} class="${cls} ${ed ? 'abre-painel' : 'cursor-default'}"><i class="fa-solid ${esc(s.icon)}"></i></button>`;
+            const agendar = (cls, txt = 'Agendar') => `<a href="#agendar" onclick="escolherServico(${i})" class="${cls}">${txt} <i class="fa-solid fa-arrow-right ml-1 text-[10px]"></i></a>`;
+            const barra = ed ? `<div class="absolute top-2 right-2 z-10 flex gap-1 text-xs">
+                <button type="button" data-acao="srv-up" data-idx="${i}" class="w-7 h-7 rounded bg-dark-700 hover:bg-dark-600 text-gray-300" title="Mover pra trás"><i class="fa-solid fa-arrow-left"></i></button>
+                <button type="button" data-acao="srv-down" data-idx="${i}" class="w-7 h-7 rounded bg-dark-700 hover:bg-dark-600 text-gray-300" title="Mover pra frente"><i class="fa-solid fa-arrow-right"></i></button>
+                <button type="button" data-acao="srv-dup" data-idx="${i}" class="w-7 h-7 rounded bg-dark-700 hover:bg-dark-600 text-gray-300" title="Duplicar"><i class="fa-solid fa-copy"></i></button>
+                <button type="button" data-acao="srv-del" data-idx="${i}" class="w-7 h-7 rounded bg-red-500/20 hover:bg-red-500 text-red-400 hover:text-white" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+            </div>` : '';
+            const caixa = (cls, miolo) => `<div class="card-servico-item relative ${cls} ${ed ? 'pt-11' : ''}" data-id="${esc(s.id)}" data-idx="${i}">${barra}${miolo}</div>`;
+
+            switch (tema) {
+                case 'barbearia': // tabela de barbearia, com pontilhado até o preço
+                    return caixa('flex items-center gap-4 py-4 px-2 border-b border-dark-700', `
+                        ${icone('w-10 h-10 shrink-0 rounded-full border border-gold-500/40 text-gold-400 flex items-center justify-center')}
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-end gap-3">${nome('font-vintage text-sm sm:text-lg font-bold text-white uppercase tracking-wide')}<span class="hidden sm:block flex-1 border-b border-dotted border-gold-500/40 mb-1.5"></span></div>
+                            <p class="text-gray-400 text-xs mt-0.5">${tempo} · ${agendar('text-gold-400 font-semibold hover:underline')}</p>
+                        </div>
+                        <span class="font-vintage text-base sm:text-xl font-bold text-gold-400 whitespace-nowrap">R$ ${preco}</span>`);
+                case 'petshop': // cartão fofo, ícone em bolha, preço em pílula
+                    return caixa('bg-dark-800 rounded-[1.75rem] p-6 text-center border border-dark-700 shadow-sm hover:-translate-y-1 transition-transform', `
+                        ${icone('w-16 h-16 mx-auto rounded-full bg-gold-500 text-onbrand text-2xl flex items-center justify-center mb-4 shadow-lg')}
+                        ${nome('font-vintage text-xl font-extrabold text-white')}
+                        <p class="text-gray-400 text-sm mt-1"><i class="fa-regular fa-clock mr-1"></i>${tempo}</p>
+                        <div class="mt-4 inline-flex items-center gap-3 bg-gold-500/10 rounded-full pl-4 pr-1 py-1">
+                            <span class="font-extrabold text-gold-400 whitespace-nowrap">R$ ${preco}</span>
+                            ${agendar('bg-gold-500 text-onbrand text-xs font-bold px-3 py-1.5 rounded-full')}
+                        </div>`);
+                case 'salao': // lista elegante em duas colunas
+                    return caixa('py-5 border-b border-dark-700', `
+                        <div class="flex items-baseline justify-between gap-4">${nome('font-vintage text-lg sm:text-xl text-white')}<span class="font-vintage text-lg sm:text-xl text-gold-400 whitespace-nowrap">R$ ${preco}</span></div>
+                        <div class="flex items-center justify-between mt-1 text-sm text-gray-400">
+                            <span class="flex items-center gap-2">${icone('text-gold-400 text-xs')}${tempo}</span>
+                            ${agendar('text-[11px] uppercase tracking-[0.2em] text-gold-400 hover:underline', 'Reservar')}
+                        </div>`);
+                case 'manicure': // pílulas pastel
+                    return caixa('rounded-[2rem] p-4 sm:p-5 bg-gold-500/10 border border-gold-500/20 flex items-center gap-4', `
+                        ${icone('w-12 h-12 shrink-0 rounded-2xl bg-dark-800 text-gold-400 text-xl flex items-center justify-center shadow-sm')}
+                        <div class="flex-1 min-w-0">${nome('font-vintage text-lg text-white')}<p class="text-gray-400 text-xs">${tempo}</p></div>
+                        <div class="text-right shrink-0"><p class="font-bold text-gold-400 whitespace-nowrap">R$ ${preco}</p>${agendar('text-[11px] text-gray-400 hover:underline')}</div>`);
+                case 'estetica': // minimalista de spa
+                    return caixa('bg-dark-800 border-t-2 border-gold-500 p-6 md:p-8 text-center', `
+                        ${icone('text-gold-400 text-2xl mb-3')}
+                        <p class="text-[11px] uppercase tracking-[0.3em] text-gray-400 mb-2">${tempo}</p>
+                        ${nome('font-vintage text-2xl text-white')}
+                        <p class="font-vintage text-xl text-gold-400 mt-3">R$ ${preco}</p>
+                        ${agendar('inline-block mt-5 text-xs uppercase tracking-[0.25em] border border-gold-500/50 text-gold-400 px-5 py-2 hover:bg-gold-500/10', 'Agendar sessão')}`);
+                default: // moderno: linha no celular, cartão no computador
+                    return caixa('bg-dark-900 border border-dark-700 rounded-xl p-4 md:p-6 flex md:flex-col items-center md:items-stretch gap-4 md:gap-0', `
+                        ${icone('w-11 h-11 shrink-0 rounded-lg bg-gold-500/10 text-gold-400 flex items-center justify-center text-lg md:mb-4')}
+                        <div class="flex-1 min-w-0">${nome('font-vintage text-base md:text-xl font-bold text-white md:mb-2')}<p class="text-gray-400 text-xs">Duração: ${tempo}</p></div>
+                        <div class="text-right md:text-left md:pt-4 md:mt-4 md:border-t md:border-dark-800 md:flex md:items-center md:justify-between shrink-0">
+                            <span class="font-vintage text-lg md:text-2xl font-bold text-gold-400 whitespace-nowrap">R$ ${preco}</span>
+                            ${agendar('block md:inline text-xs font-semibold text-gold-400 hover:underline mt-1 md:mt-0')}
+                        </div>`);
+            }
+        }
+
         function renderServicosGrid(servicos) {
-            const ed = emEdicaoVisual;
-            document.getElementById('pubServicesGrid').innerHTML = servicos.map((s, i) => `
-                <div class="card-servico-item relative bg-dark-900 border border-dark-700 rounded-xl p-6 flex flex-col justify-between" data-id="${esc(s.id)}" data-idx="${i}">
-                    ${ed ? `<div class="absolute top-3 right-3 flex gap-1 text-xs">
-                        <button type="button" data-acao="srv-up" data-idx="${i}" class="w-7 h-7 rounded bg-dark-700 hover:bg-dark-600 text-gray-300" title="Mover pra trás"><i class="fa-solid fa-arrow-left"></i></button>
-                        <button type="button" data-acao="srv-down" data-idx="${i}" class="w-7 h-7 rounded bg-dark-700 hover:bg-dark-600 text-gray-300" title="Mover pra frente"><i class="fa-solid fa-arrow-right"></i></button>
-                        <button type="button" data-acao="srv-dup" data-idx="${i}" class="w-7 h-7 rounded bg-dark-700 hover:bg-dark-600 text-gray-300" title="Duplicar"><i class="fa-solid fa-copy"></i></button>
-                        <button type="button" data-acao="srv-del" data-idx="${i}" class="w-7 h-7 rounded bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                    </div>` : ''}
-                    <div>
-                        <button type="button" ${ed ? `data-acao="srv-icone" data-idx="${i}" title="Clique pra trocar o ícone"` : 'tabindex="-1"'} class="w-10 h-10 rounded-lg bg-gold-500/10 text-gold-400 flex items-center justify-center text-lg mb-4 ${ed ? 'abre-painel' : 'cursor-default'}"><i class="fa-solid ${esc(s.icon)}"></i></button>
-                        <h3 class="srv-nome font-vintage text-xl font-bold text-white mb-2" data-sf="name" contenteditable="${ed}">${esc(s.name)}</h3>
-                        <p class="srv-time text-gray-400 text-xs mb-1">Duração: <span class="srv-time-val" data-sf="time" contenteditable="${ed}">${esc(s.time)}</span></p>
-                    </div>
-                    <div class="pt-4 border-t border-dark-800 flex items-center justify-between mt-4">
-                        <span class="font-vintage text-2xl font-bold text-gold-400">R$ <span class="srv-price" data-sf="price" contenteditable="${ed}">${fmtBR(s.price)}</span></span>
-                        <a href="#agendar" onclick="escolherServico(${i})" class="text-xs font-semibold text-gold-400 hover:text-white">Agendar <i class="fa-solid fa-arrow-right ml-1"></i></a>
-                    </div>
-                </div>
-            `).join('') || `<p class="md:col-span-3 text-center text-gray-500">Nenhum serviço cadastrado.</p>`;
+            const emp = empresaAtual();
+            const tema = (emp && emp.tema) || 'moderno';
+            const grade = document.getElementById('pubServicesGrid');
+            grade.className = GRADE_TEMA[tema] || GRADE_TEMA.moderno;
+            grade.innerHTML = servicos.map((s, i) => cardServico(s, i, emEdicaoVisual, tema)).join('')
+                || `<p class="text-center text-gray-500">Nenhum serviço cadastrado.</p>`;
             renderSelectServico(servicos);
         }
 
@@ -1074,6 +1308,8 @@
             ajustarBarra();
             marcarSujo(false);
             renderSite(rascunho);
+            atualizarBotaoInstalar();
+            atualizarBarraMobile();
             abrirPainel(window.innerWidth >= 1024 ? 'geral' : null);
             window.scrollTo({ top: 0 });
         }
@@ -1095,6 +1331,8 @@
             document.getElementById('painelEdicao').classList.add('hidden');
             ajustarBarra();
             document.querySelectorAll('[contenteditable="true"]').forEach(el => el.contentEditable = "false");
+            atualizarBotaoInstalar();
+            atualizarBarraMobile();
         }
 
         function sairDaEdicao() {
@@ -1209,8 +1447,9 @@
                 }
                 case 'cor': rascunho.cor = b.dataset.cor; break;
                 case 'fonte': rascunho.fonte = b.dataset.fonte; break;
+                case 'tema': rascunho.tema = b.dataset.tema; break;
                 case 'padrao-nicho':
-                    rascunho.cor = n.cor; rascunho.fonte = n.fonte;
+                    rascunho.cor = n.cor; rascunho.fonte = n.fonte; rascunho.tema = n.tema;
                     rascunho.servicos.forEach((s, k) => { if (!n.icones.includes(s.icon)) s.icon = n.icones[k % n.icones.length]; });
                     break;
                 case 'img-padrao': rascunho.img = n.img; break;
@@ -1281,12 +1520,16 @@
                             <input type="color" data-f="cor" value="${esc(d.cor)}" class="w-10 h-10 rounded cursor-pointer bg-transparent">
                             ${CORES_RAPIDAS.map(cor => `<button type="button" data-acao="cor" data-cor="${cor}" class="w-8 h-8 rounded-full border-2 ${cor === d.cor ? 'border-white' : 'border-transparent'}" style="background:${cor}"></button>`).join('')}
                         </div>`)}
+                    ${lbl('Layout da página', `
+                        <div class="grid grid-cols-2 gap-2">
+                            ${Object.entries(TEMAS).map(([k, t]) => `<button type="button" data-acao="tema" data-tema="${k}" class="rounded-lg px-3 py-2.5 text-left text-xs border ${k === d.tema ? 'border-gold-500 bg-gold-500/10 text-white' : 'border-dark-700 text-gray-300'}"><i class="fa-solid ${t.badge} mr-1.5 text-gold-400"></i>${t.nome}<span class="block text-[10px] text-gray-500 mt-0.5">${t.claro ? 'fundo claro' : 'fundo escuro'}</span></button>`).join('')}
+                        </div>`, 'Muda o formato da foto, os cartões, o fundo e os títulos.')}
                     ${lbl('Estilo dos títulos', `
                         <div class="grid grid-cols-3 gap-2">
                             ${Object.entries(FONTES).map(([k, f]) => `<button type="button" data-acao="fonte" data-fonte="${k}" class="rounded-lg py-3 border ${k === d.fonte ? 'border-gold-500 bg-gold-500/10 text-white' : 'border-dark-700 text-gray-300'}" style="font-family:${f.css}"><span class="block text-lg">Aa</span><span class="text-[11px]">${f.nome}</span></button>`).join('')}
                         </div>`)}
                     <button type="button" data-acao="padrao-nicho" class="w-full border border-gold-500/40 text-gold-400 hover:bg-gold-500/10 rounded-lg py-2 text-xs font-semibold">
-                        <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Aplicar visual padrão de ${esc(d.nicho)}
+                        <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Aplicar visual padrão de ${esc(d.nicho)} (layout, cor e fonte)
                     </button>
                 `;
             }
@@ -1643,6 +1886,77 @@
         }
 
         // ======================================================
+        // APP INSTALÁVEL (PWA) + BARRA DE AGENDAR NO CELULAR
+        // ======================================================
+        const EMBED = window.self !== window.top; // dentro do celular de exemplo da página de vendas
+        if (EMBED) document.documentElement.classList.add('embed');
+        const EH_IOS = /iphone|ipad|ipod/i.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        const jaInstalado = () => matchMedia('(display-mode: standalone)').matches || navigator.standalone === true;
+        let promptInstalar = null, appPronto = false;
+
+        if ('serviceWorker' in navigator && location.protocol === 'https:' && !EMBED) navigator.serviceWorker.register('sw.js').catch(() => {});
+        window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); promptInstalar = e; atualizarBotaoInstalar(); });
+        window.addEventListener('appinstalled', () => { promptInstalar = null; atualizarBotaoInstalar(); toast('✅ App instalado na tela inicial!'); });
+
+        // Cada empresa vira um app com o próprio nome (site do cliente ou painel do dono)
+        function configurarApp(emp, painel = false) {
+            if (EMBED || !emp) return;
+            const abs = p => new URL(p, location.href).href;
+            const inicio = abs(painel ? `?c=${emp.slug}&painel` : `?c=${emp.slug}`);
+            const curto = (painel ? 'Painel ' : '') + emp.nome;
+            const manifest = {
+                id: inicio, name: painel ? `${emp.nome} · Painel` : emp.nome,
+                short_name: curto.length > 14 ? curto.slice(0, 13).trim() + '…' : curto,
+                start_url: inicio, scope: abs('./'), display: 'standalone', orientation: 'portrait',
+                background_color: '#0f0f11', theme_color: emp.cor || '#0f0f11',
+                icons: [
+                    { src: abs('icon-192.png'), sizes: '192x192', type: 'image/png', purpose: 'any' },
+                    { src: abs('icon-512.png'), sizes: '512x512', type: 'image/png', purpose: 'any' },
+                    { src: abs('icon-512.png'), sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+                ]
+            };
+            let link = document.querySelector('link[rel="manifest"]');
+            if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); }
+            if (link.href.startsWith('blob:')) URL.revokeObjectURL(link.href);
+            link.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
+            document.querySelector('meta[name="apple-mobile-web-app-title"]').content = manifest.short_name;
+            appPronto = true;
+            atualizarBotaoInstalar();
+        }
+
+        function atualizarBotaoInstalar() {
+            const btn = document.getElementById('btnInstalar');
+            const tela = !document.getElementById('clientView').classList.contains('hidden') || !document.getElementById('donoView').classList.contains('hidden');
+            const mostra = appPronto && tela && !EMBED && !emEdicaoVisual && !jaInstalado() && (promptInstalar || EH_IOS);
+            btn.classList.toggle('hidden', !mostra);
+            btn.classList.toggle('inline-flex', !!mostra);
+        }
+
+        async function instalarApp() {
+            if (promptInstalar) {
+                promptInstalar.prompt();
+                await promptInstalar.userChoice.catch(() => {});
+                promptInstalar = null;
+                atualizarBotaoInstalar();
+            } else if (EH_IOS) {
+                document.getElementById('iosModal').classList.remove('hidden');
+            } else {
+                toast('No menu do navegador, escolha "Instalar app" ou "Adicionar à tela inicial".', 5000);
+            }
+        }
+
+        // Botão fixo "Agendar" no celular: some quando o formulário já está na tela
+        let formularioVisivel = false;
+        new IntersectionObserver(([en]) => { formularioVisivel = en.isIntersecting; atualizarBarraMobile(); }, { threshold: 0.15 })
+            .observe(document.getElementById('agendar'));
+        function atualizarBarraMobile() {
+            const emp = empresaAtual ? (() => { try { return empresaAtual(); } catch { return null; } })() : null;
+            const naTela = !document.getElementById('clientView').classList.contains('hidden');
+            const bloqueada = emp && emp.status !== 'Ativo';
+            document.getElementById('barraAgendarMobile').classList.toggle('hidden', !naTela || emEdicaoVisual || formularioVisivel || !!bloqueada);
+        }
+
+        // ======================================================
         // PÁGINA DE VENDAS
         // ======================================================
         function corTexto(hex) {
@@ -1815,6 +2129,7 @@
             esconderCarregando();
             mostrarSo('donoView');
             atualizarBotoesTopo();
+            configurarApp(emp, true);
             dataPainel = dataPainel || hojeISO();
             await renderPainelDono();
             clearInterval(timerPainel);
