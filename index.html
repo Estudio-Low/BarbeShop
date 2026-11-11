@@ -8,18 +8,26 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts: Cinzel & Inter -->
+    <!-- Google Fonts: Cinzel (clássica), Playfair (elegante), Poppins (moderna) & Inter (interface) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Playfair+Display:wght@600;700;800&family=Poppins:wght@500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <script>
+        // As cores "gold" agora vêm de variáveis CSS: cada empresa tem a sua cor de destaque
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
                     colors: {
-                        gold: { 400: '#f1c40f', 500: '#d4af37', 600: '#aa8c2c', 700: '#856d20' },
+                        gold: {
+                            300: 'rgb(var(--g300) / <alpha-value>)',
+                            400: 'rgb(var(--g400) / <alpha-value>)',
+                            500: 'rgb(var(--g500) / <alpha-value>)',
+                            600: 'rgb(var(--g600) / <alpha-value>)',
+                            700: 'rgb(var(--g700) / <alpha-value>)'
+                        },
+                        onbrand: 'rgb(var(--onbrand) / <alpha-value>)',
                         dark: { 900: '#0f0f11', 800: '#17171a', 700: '#222226', 600: '#2d2d33' }
                     },
                     fontFamily: { vintage: ['Cinzel', 'serif'], sans: ['Inter', 'sans-serif'] }
@@ -28,64 +36,94 @@
         }
     </script>
     <style>
+        :root {
+            --g300: 252 232 173; --g400: 241 196 15; --g500: 212 175 55; --g600: 170 140 44; --g700: 133 109 32;
+            --onbrand: 0 0 0;
+            --font-title: 'Cinzel', serif;
+            --barra-h: 44px;
+        }
         body { background-color: #0f0f11; color: #e5e7eb; font-family: 'Inter', sans-serif; }
-        .font-vintage { font-family: 'Cinzel', serif; }
-        .gold-gradient-text { background: linear-gradient(135deg, #fce8ad 0%, #d4af37 50%, #aa8c2c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .gold-border-glow { box-shadow: 0 0 15px rgba(212, 175, 55, 0.15); }
-        
+        .font-vintage { font-family: var(--font-title); }
+        .gold-gradient-text { background: linear-gradient(135deg, rgb(var(--g300)) 0%, rgb(var(--g500)) 50%, rgb(var(--g600)) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .gold-border-glow { box-shadow: 0 0 15px rgb(var(--g500) / 0.15); }
+
         /* Estilo visual durante modo de edição */
         .modo-edicao [contenteditable="true"] {
-            outline: 2px dashed #d4af37 !important;
+            outline: 2px dashed rgb(var(--g500)) !important;
             outline-offset: 4px;
             border-radius: 4px;
             cursor: text;
         }
-        .modo-edicao [contenteditable="true"]:hover {
-            background-color: rgba(212, 175, 55, 0.1);
+        .modo-edicao [contenteditable="true"]:hover { background-color: rgb(var(--g500) / 0.1); }
+        .modo-edicao [contenteditable="true"]:focus { outline-style: solid !important; background-color: rgb(var(--g500) / 0.08); }
+        .modo-edicao .img-editavel { outline: 3px solid rgb(var(--g500)) !important; cursor: pointer; }
+        .modo-edicao .abre-painel { outline: 2px dotted rgb(var(--g500) / 0.7); outline-offset: 4px; border-radius: 4px; cursor: pointer; }
+
+        /* Painel lateral de edição */
+        #painelEdicao { top: var(--barra-h); height: calc(100vh - var(--barra-h)); }
+        @media (min-width: 1024px) {
+            body.painel-aberto #clientView, body.painel-aberto #mainHeader > div { padding-right: 380px; }
         }
-        .modo-edicao .img-editavel {
-            outline: 3px solid #d4af37 !important;
-            cursor: pointer;
-        }
+        .aba-ativa { background: rgb(var(--g500)); color: rgb(var(--onbrand)); }
+        .campo-painel { width: 100%; background: #17171a; border: 1px solid #2d2d33; color: #fff; border-radius: 0.5rem; padding: 0.55rem 0.7rem; font-size: 0.875rem; outline: none; }
+        .campo-painel:focus { border-color: rgb(var(--g500)); }
+        .whitespace-pre-line { white-space: pre-line; }
     </style>
 </head>
 <body class="antialiased selection:bg-gold-500 selection:text-black">
 
     <!-- BARRA FLUTUANTE DE MODO EDIÇÃO VISUAL -->
-    <div id="barraModoEdicao" class="hidden fixed top-0 left-0 w-full bg-gold-500 text-black py-2.5 px-4 z-50 flex justify-between items-center font-bold text-sm shadow-xl">
+    <div id="barraModoEdicao" class="hidden fixed top-0 left-0 w-full bg-gold-500 text-onbrand py-2 px-4 z-50 flex flex-wrap gap-2 justify-between items-center font-bold text-sm shadow-xl">
         <div class="flex items-center gap-2">
             <i class="fa-solid fa-pen-to-square text-lg"></i>
-            <span>MODO DE EDIÇÃO VISUAL ATIVO — Clique em qualquer texto ou foto para alterar!</span>
+            <span>EDITANDO: <span id="barraNomeEmpresa"></span></span>
+            <span id="indicadorSujo" class="hidden bg-black/80 text-white text-[11px] font-semibold px-2 py-0.5 rounded-full">● alterações não salvas</span>
         </div>
-        <div class="flex items-center gap-3">
-            <button onclick="adicionarNovoServicoVisualmente()" class="bg-black text-white hover:bg-dark-800 px-3 py-1 rounded text-xs">
+        <div class="flex items-center gap-2">
+            <button type="button" data-acao="toggle-painel" class="bg-black/80 text-white hover:bg-black px-3 py-1 rounded text-xs">
+                <i class="fa-solid fa-sliders mr-1"></i> Painel
+            </button>
+            <button type="button" data-acao="srv-add" class="bg-black/80 text-white hover:bg-black px-3 py-1 rounded text-xs">
                 + Novo Serviço
             </button>
-            <button onclick="salvarEdicaoVisualDirecta()" class="bg-green-700 hover:bg-green-800 text-white px-4 py-1.5 rounded text-xs uppercase tracking-wider font-extrabold shadow">
-                <i class="fa-solid fa-floppy-disk mr-1"></i> Salvar Alterações
+            <button type="button" onclick="salvarEdicaoVisualDirecta()" class="bg-green-700 hover:bg-green-800 text-white px-4 py-1.5 rounded text-xs uppercase tracking-wider font-extrabold shadow" title="Atalho: Ctrl+S">
+                <i class="fa-solid fa-floppy-disk mr-1"></i> Salvar
             </button>
-            <button onclick="desativarModoEdicao()" class="bg-red-700 hover:bg-red-800 text-white px-3 py-1 rounded text-xs">
-                Sair Sem Salvar
+            <button type="button" onclick="sairDaEdicao()" class="bg-red-700 hover:bg-red-800 text-white px-3 py-1 rounded text-xs">
+                Sair
             </button>
         </div>
     </div>
+
+    <!-- PAINEL LATERAL DE EDIÇÃO -->
+    <aside id="painelEdicao" class="hidden fixed right-0 z-[45] w-full lg:w-[380px] bg-dark-900 border-l border-gold-500/30 shadow-2xl flex flex-col">
+        <div class="flex gap-1 p-2 border-b border-dark-700 text-xs font-semibold">
+            <button type="button" data-aba="geral" class="flex-1 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-store mr-1"></i>Geral</button>
+            <button type="button" data-aba="visual" class="flex-1 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-palette mr-1"></i>Visual</button>
+            <button type="button" data-aba="servicos" class="flex-1 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-list mr-1"></i>Serviços</button>
+            <button type="button" data-aba="agenda" class="flex-1 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-clock mr-1"></i>Agenda</button>
+            <button type="button" data-acao="toggle-painel" class="px-2 text-gray-400 hover:text-white" title="Fechar painel"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div id="painelConteudo" class="flex-1 overflow-y-auto p-4 space-y-4 text-sm"></div>
+        <div class="p-3 border-t border-dark-700 text-[11px] text-gray-500">Dica: dá pra clicar direto nos textos do site. Ctrl+S salva.</div>
+    </aside>
 
     <!-- Header / Navbar -->
     <header id="mainHeader" class="fixed w-full top-0 z-40 bg-dark-900/90 backdrop-blur-md border-b border-gold-500/20 transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
-                <a href="#" onclick="showView('client')" class="flex items-center space-x-3 group">
+                <a href="#" onclick="event.preventDefault(); if(!emEdicaoVisual) showView('client')" class="flex items-center space-x-3 group">
                     <div class="w-10 h-10 rounded-full border border-gold-500 flex items-center justify-center bg-dark-800 text-gold-500">
-                        <i class="fa-solid fa-crown text-lg"></i>
+                        <i id="logoIcone" class="fa-solid fa-crown text-lg"></i>
                     </div>
-                    <span id="logoNomeEmpresa" class="font-vintage text-xl sm:text-2xl font-bold tracking-wider gold-gradient-text" contenteditable="false">BARBERPRO CLASSIC</span>
-                    <span id="lblTipoNichoBadge" class="text-xs bg-gold-500/10 text-gold-400 border border-gold-500/30 px-2 py-0.5 rounded-full" contenteditable="false">BARBEARIA</span>
+                    <span id="logoNomeEmpresa" data-campo="nome" class="font-vintage text-xl sm:text-2xl font-bold tracking-wider gold-gradient-text" contenteditable="false">BARBERPRO CLASSIC</span>
+                    <span id="lblTipoNichoBadge" class="hidden sm:inline text-xs bg-gold-500/10 text-gold-400 border border-gold-500/30 px-2 py-0.5 rounded-full">BARBEARIA</span>
                 </a>
 
                 <nav class="flex items-center space-x-4">
                     <button onclick="openAgendamentosModal()" class="relative text-gold-500 hover:text-white text-sm font-medium transition-colors">
                         <i class="fa-solid fa-calendar-check text-lg"></i>
-                        <span id="agendamentosBadge" class="hidden absolute -top-2 -right-3 bg-gold-500 text-black font-bold text-xs w-4 h-4 rounded-full flex items-center justify-center">0</span>
+                        <span id="agendamentosBadge" class="hidden absolute -top-2 -right-3 bg-gold-500 text-onbrand font-bold text-xs w-4 h-4 rounded-full flex items-center justify-center">0</span>
                     </button>
                     <button onclick="openSuperAdminAuth()" class="bg-dark-800 border border-gold-500/30 text-gold-400 hover:bg-dark-700 px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all">
                         <i class="fa-solid fa-shield-halved"></i> Super-Admin (Dono SaaS)
@@ -105,10 +143,13 @@
                     <div class="inline-flex items-center space-x-2 bg-dark-800 border border-gold-500/30 px-3 py-1.5 rounded-full text-gold-400 text-xs font-semibold uppercase">
                         <i class="fa-solid fa-store"></i> <span id="lblTipoNicho">BARBEARIA</span>
                     </div>
-                    <h1 id="pubTitulo" class="font-vintage text-4xl sm:text-5xl font-extrabold leading-tight">AGENDAMENTOS ONLINE EM TEMPO REAL</h1>
-                    <p id="pubSub" class="text-gray-400 text-base max-w-xl">Bem-vindo ao portal de atendimento oficial. Escolha seu serviço abaixo e garanta seu horário.</p>
+                    <h1 id="pubTitulo" data-campo="titulo" class="font-vintage text-4xl sm:text-5xl font-extrabold leading-tight">AGENDAMENTOS ONLINE EM TEMPO REAL</h1>
+                    <p id="pubSub" data-campo="sub" class="text-gray-400 text-base max-w-xl whitespace-pre-line">Bem-vindo ao portal de atendimento oficial. Escolha seu serviço abaixo e garanta seu horário.</p>
+                    <a href="#agendar" class="inline-flex items-center gap-2 bg-gradient-to-r from-gold-600 to-gold-500 text-onbrand font-bold px-6 py-3 rounded-xl shadow-lg">
+                        <i class="fa-solid fa-calendar-plus"></i> Agendar agora
+                    </a>
                 </div>
-                <div class="md:w-5/12">
+                <div class="md:w-5/12 w-full">
                     <div class="rounded-2xl overflow-hidden border-2 border-gold-500/30 gold-border-glow shadow-2xl relative group">
                         <img id="pubImg" src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80" alt="Capa" onclick="trocarImagemVisualmente()" class="w-full h-[380px] object-cover transition-transform group-hover:scale-105">
                         <div id="hintTrocaFoto" class="hidden absolute inset-0 bg-black/60 flex items-center justify-center text-gold-400 font-bold text-sm pointer-events-none">
@@ -128,9 +169,19 @@
         </section>
 
         <!-- Formulário de Agendamento -->
-        <section class="py-16 bg-dark-900">
+        <section id="agendar" class="py-16 bg-dark-900 scroll-mt-24">
             <div class="max-w-3xl mx-auto px-4 bg-dark-800 border border-gold-500/30 rounded-2xl p-6 sm:p-10 shadow-xl">
                 <h2 class="font-vintage text-2xl font-bold text-white text-center mb-6">AGENDE SEU HORÁRIO ONLINE</h2>
+
+                <div id="avisoStatusEdicao" class="hidden mb-4 text-xs bg-red-500/10 border border-red-500/30 text-red-300 rounded-lg p-3"></div>
+
+                <!-- Aviso de suspensão (empresa em atraso / cancelada) -->
+                <div id="avisoSuspenso" class="hidden text-center space-y-3 py-6">
+                    <i class="fa-solid fa-lock text-4xl text-gray-500"></i>
+                    <p class="text-white font-semibold">Agendamento online temporariamente indisponível.</p>
+                    <p class="text-gray-400 text-sm">Entre em contato direto com o estabelecimento pelo WhatsApp.</p>
+                </div>
+
                 <form id="bookingForm" onsubmit="handleBooking(event)" class="space-y-4">
                     <div>
                         <label class="block text-xs text-gold-400 mb-1">Serviço:</label>
@@ -143,10 +194,7 @@
                         </div>
                         <div>
                             <label class="block text-xs text-gold-400 mb-1">Horário:</label>
-                            <select id="selectHora" required class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none">
-                                <option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option>
-                                <option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option>
-                            </select>
+                            <select id="selectHora" required class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none"></select>
                         </div>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
@@ -159,7 +207,7 @@
                             <input type="tel" id="inputFone" required placeholder="(11) 99999-9999" class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none">
                         </div>
                     </div>
-                    <button type="submit" class="w-full mt-4 bg-gradient-to-r from-gold-600 to-gold-500 text-black font-bold py-3.5 rounded-xl shadow-lg">
+                    <button type="submit" class="w-full mt-4 bg-gradient-to-r from-gold-600 to-gold-500 text-onbrand font-bold py-3.5 rounded-xl shadow-lg">
                         <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Confirmar via WhatsApp
                     </button>
                 </form>
@@ -170,16 +218,17 @@
         <footer class="bg-black text-gray-400 border-t border-dark-800 py-12">
             <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-3 gap-8 text-sm">
                 <div>
-                    <h3 id="footerNomeEmpresa" class="font-vintage text-white text-lg font-bold mb-3">BARBERPRO CLASSIC</h3>
-                    <p id="footerEndereco" class="text-xs leading-relaxed">Rua das Flores, 123 - Centro<br>São Paulo - SP, CEP 01000-000</p>
+                    <h3 id="footerNomeEmpresa" data-campo="nome" class="font-vintage text-white text-lg font-bold mb-3">BARBERPRO CLASSIC</h3>
+                    <p id="footerEndereco" data-campo="endereco" class="text-xs leading-relaxed whitespace-pre-line">Rua das Flores, 123 - Centro</p>
                 </div>
                 <div>
                     <h4 class="font-vintage text-gold-400 font-bold mb-3">Horário de Atendimento</h4>
-                    <p id="footerHorario" class="text-xs leading-relaxed">Segunda a Sábado: 09:00 - 20:00<br>Domingo: Fechado</p>
+                    <p id="footerHorario" data-abre="agenda" class="text-xs leading-relaxed whitespace-pre-line">Segunda a Sábado: 09:00 - 20:00</p>
                 </div>
                 <div>
-                    <h4 class="font-vintage text-gold-400 font-bold mb-3">Contato Directo</h4>
-                    <p class="text-xs">WhatsApp: <span id="footerWhats">5511999998888</span></p>
+                    <h4 class="font-vintage text-gold-400 font-bold mb-3">Contato Direto</h4>
+                    <p class="text-xs" data-abre="geral">WhatsApp: <a id="footerWhats" href="#" target="_blank" class="hover:text-gold-400">5511999998888</a></p>
+                    <p id="footerInstaWrap" class="text-xs mt-2 hidden" data-abre="geral"><i class="fa-brands fa-instagram mr-1"></i><a id="footerInsta" href="#" target="_blank" class="hover:text-gold-400"></a></p>
                 </div>
             </div>
             <div class="text-center text-xs text-gray-600 mt-8 pt-4 border-t border-dark-800">
@@ -191,15 +240,22 @@
     <!-- ================= SUPER-ADMIN (PAINEL DO DONO DO SAAS) ================= -->
     <main id="superAdminView" class="hidden pt-24 pb-16 min-h-screen bg-dark-900">
         <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between items-center pb-6 border-b border-dark-700 mb-8">
+            <div class="flex flex-wrap gap-4 justify-between items-center pb-6 border-b border-dark-700 mb-8">
                 <div>
                     <h1 class="font-vintage text-3xl font-bold text-white">Painel Super-Admin (Gestão de Clientes SaaS)</h1>
                     <p class="text-gray-400 text-sm">Controle assinaturas, mensalidades e edite empresas visualmente na tela.</p>
                 </div>
-                <div class="flex gap-3">
-                    <button onclick="openNovaEmpresaModal()" class="bg-gold-500 hover:bg-gold-400 text-black font-bold px-4 py-2.5 rounded-lg text-sm">
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="openNovaEmpresaModal()" class="bg-gold-500 hover:bg-gold-400 text-onbrand font-bold px-4 py-2.5 rounded-lg text-sm">
                         <i class="fa-solid fa-plus-circle mr-1"></i> Cadastrar Nova Empresa
                     </button>
+                    <button onclick="exportarBackup()" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700" title="Baixa um .json com todas as empresas">
+                        <i class="fa-solid fa-download mr-1"></i> Backup
+                    </button>
+                    <label class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700 cursor-pointer" title="Restaura empresas de um .json">
+                        <i class="fa-solid fa-upload mr-1"></i> Importar
+                        <input type="file" accept=".json,application/json" class="hidden" onchange="importarBackup(this)">
+                    </label>
                     <button onclick="showView('client')" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700">Ver Site</button>
                 </div>
             </div>
@@ -208,6 +264,7 @@
             <div class="bg-dark-800 rounded-xl border border-dark-700 overflow-hidden shadow-xl">
                 <div class="p-4 border-b border-dark-700 flex justify-between items-center">
                     <h3 class="font-vintage font-bold text-lg text-white">Empresas Cadastradas na Plataforma</h3>
+                    <input id="buscaEmpresa" oninput="renderAdminTabela()" placeholder="Buscar empresa..." class="bg-dark-900 border border-dark-700 text-white rounded-lg px-3 py-1.5 text-sm outline-none w-48">
                 </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm text-gray-300">
@@ -232,15 +289,15 @@
     <div id="authModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-dark-900 border border-gold-500/45 w-full max-w-sm rounded-2xl p-6 text-center space-y-4">
             <h3 class="font-vintage text-xl font-bold text-white">Segurança Super-Admin</h3>
-            <input type="password" id="adminPassInput" placeholder="Senha mestre (1234)" class="w-full bg-dark-800 border border-dark-700 text-white rounded-lg p-3 text-center outline-none">
+            <input type="password" id="adminPassInput" placeholder="Senha mestre" onkeydown="if(event.key==='Enter') verificarSenhaAdmin()" class="w-full bg-dark-800 border border-dark-700 text-white rounded-lg p-3 text-center outline-none">
             <div class="flex gap-2">
                 <button onclick="document.getElementById('authModal').classList.add('hidden')" class="w-1/2 bg-dark-800 text-gray-300 py-2.5 rounded-lg text-sm">Cancelar</button>
-                <button onclick="verificarSenhaAdmin()" class="w-1/2 bg-gold-500 text-black font-bold py-2.5 rounded-lg text-sm">Entrar</button>
+                <button onclick="verificarSenhaAdmin()" class="w-1/2 bg-gold-500 text-onbrand font-bold py-2.5 rounded-lg text-sm">Entrar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE FORMULÁRIO RÁPIDO DE EMPRESA -->
+    <!-- MODAL DE FORMULÁRIO RÁPIDO DE EMPRESA (cadastrar e editar) -->
     <div id="empresaModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-dark-900 border border-gold-500/40 w-full max-w-lg rounded-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-dark-700 pb-3">
@@ -256,21 +313,16 @@
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">Nicho:</label>
-                        <select id="modalNicho" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
-                            <option value="Barbearia">Barbearia</option>
-                            <option value="PetShop">PetShop</option>
-                            <option value="Salão de Beleza">Salão de Beleza</option>
-                            <option value="Estética">Estética</option>
-                        </select>
+                        <select id="modalNicho" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none"></select>
                     </div>
                     <div>
                         <label class="block text-xs text-gray-400 mb-1">WhatsApp de Contato:</label>
                         <input type="text" id="modalWhats" required placeholder="5511999999999" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
                     </div>
                 </div>
-                <div>
-                    <label class="block text-xs text-gray-400 mb-1">Link da Imagem de Capa (URL):</label>
-                    <input type="text" id="modalImg" required class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
+                <div id="wrapModalImg">
+                    <label class="block text-xs text-gray-400 mb-1">Link da Imagem de Capa (URL) <span class="text-gray-600">(opcional, dá pra trocar no editor)</span>:</label>
+                    <input type="text" id="modalImg" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
                 </div>
                 <div class="grid grid-cols-2 gap-3">
                     <div>
@@ -290,9 +342,10 @@
                         </select>
                     </div>
                 </div>
+                <p id="modalDicaNicho" class="text-[11px] text-gray-500">A empresa nova já nasce com serviços, cores e textos do nicho escolhido.</p>
                 <div class="pt-3 flex justify-end gap-2">
                     <button type="button" onclick="document.getElementById('empresaModal').classList.add('hidden')" class="bg-dark-800 text-gray-300 px-4 py-2 rounded-lg text-sm">Cancelar</button>
-                    <button type="submit" class="bg-gold-500 text-black font-bold px-5 py-2 rounded-lg text-sm">Salvar Empresa</button>
+                    <button type="submit" class="bg-gold-500 text-onbrand font-bold px-5 py-2 rounded-lg text-sm">Salvar Empresa</button>
                 </div>
             </form>
         </div>
@@ -309,21 +362,81 @@
         </div>
     </div>
 
+    <!-- TOAST (avisos rápidos no lugar do alert) -->
+    <div id="toast" class="hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-dark-800 border border-gold-500/40 text-white text-sm px-4 py-3 rounded-xl shadow-2xl"></div>
+
     <!-- SCRIPT PRINCIPAL E LÓGICA DE EDIÇÃO NA TELA -->
     <script>
+        // ======================================================
+        // CONFIGURAÇÃO DOS NICHOS (modelos prontos ao cadastrar)
+        // ======================================================
+        const DIAS = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        const FONTES = {
+            vintage:  { nome: 'Clássica', css: "'Cinzel', serif" },
+            elegante: { nome: 'Elegante', css: "'Playfair Display', serif" },
+            moderna:  { nome: 'Moderna',  css: "'Poppins', sans-serif" }
+        };
+        const IMG_SALAO = 'https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&q=80';
+        const NICHOS = {
+            'Barbearia': {
+                cor: '#d4af37', fonte: 'vintage', logo: 'fa-crown', emoji: '💈',
+                img: 'https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80',
+                titulo: 'SEU ESTILO, NO SEU HORÁRIO',
+                sub: 'Escolha o serviço, o dia e o horário. A confirmação chega no seu WhatsApp.',
+                icones: ['fa-scissors', 'fa-user-ninja', 'fa-crown', 'fa-spray-can', 'fa-fire', 'fa-star'],
+                servicos: [['Corte Social / Fade', '45.00', '35 min', 'fa-scissors'], ['Barba Tradicional', '35.00', '30 min', 'fa-user-ninja'], ['Combo Corte + Barba', '75.00', '60 min', 'fa-crown']]
+            },
+            'PetShop': {
+                cor: '#38bdf8', fonte: 'moderna', logo: 'fa-paw', emoji: '🐾',
+                img: 'https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80',
+                titulo: 'O MELHOR CUIDADO PARA O SEU PET',
+                sub: 'Agende banho, tosa e tratamentos especiais para seu companheiro.',
+                icones: ['fa-paw', 'fa-dog', 'fa-cat', 'fa-bath', 'fa-bone', 'fa-syringe'],
+                servicos: [['Banho & Tosa Completa', '60.00', '50 min', 'fa-paw'], ['Hidratação de Pelos', '40.00', '30 min', 'fa-dog'], ['Banho Simples', '35.00', '30 min', 'fa-bath']]
+            },
+            'Salão de Beleza': {
+                cor: '#f472b6', fonte: 'elegante', logo: 'fa-wand-magic-sparkles', emoji: '💇‍♀️',
+                img: IMG_SALAO,
+                titulo: 'SUA BELEZA EM BOAS MÃOS',
+                sub: 'Corte, cor e tratamento com hora marcada. Escolha e confirme pelo WhatsApp.',
+                icones: ['fa-scissors', 'fa-wand-magic-sparkles', 'fa-spray-can', 'fa-paintbrush', 'fa-gem', 'fa-star'],
+                servicos: [['Corte Feminino', '70.00', '45 min', 'fa-scissors'], ['Escova', '50.00', '40 min', 'fa-wand-magic-sparkles'], ['Coloração', '150.00', '90 min', 'fa-paintbrush']]
+            },
+            'Manicure': {
+                cor: '#fb7185', fonte: 'elegante', logo: 'fa-hand-sparkles', emoji: '💅',
+                img: IMG_SALAO,
+                titulo: 'UNHAS IMPECÁVEIS, HORA MARCADA',
+                sub: 'Mão, pé e alongamento. Escolha o horário e receba a confirmação no WhatsApp.',
+                icones: ['fa-hand-sparkles', 'fa-gem', 'fa-paintbrush', 'fa-heart', 'fa-star', 'fa-droplet'],
+                servicos: [['Mão', '30.00', '40 min', 'fa-hand-sparkles'], ['Pé e Mão', '55.00', '70 min', 'fa-heart'], ['Alongamento em Gel', '140.00', '120 min', 'fa-gem']]
+            },
+            'Estética': {
+                cor: '#a78bfa', fonte: 'elegante', logo: 'fa-spa', emoji: '✨',
+                img: IMG_SALAO,
+                titulo: 'CUIDADO QUE APARECE',
+                sub: 'Tratamentos faciais e corporais com hora marcada.',
+                icones: ['fa-spa', 'fa-leaf', 'fa-droplet', 'fa-face-smile', 'fa-sun', 'fa-star'],
+                servicos: [['Limpeza de Pele', '120.00', '60 min', 'fa-face-smile'], ['Drenagem Linfática', '100.00', '50 min', 'fa-droplet'], ['Design de Sobrancelha', '40.00', '30 min', 'fa-star']]
+            },
+            'Outro': {
+                cor: '#34d399', fonte: 'moderna', logo: 'fa-calendar-check', emoji: '📅',
+                img: IMG_SALAO,
+                titulo: 'AGENDE ONLINE EM SEGUNDOS',
+                sub: 'Escolha o serviço e o horário. A confirmação chega no seu WhatsApp.',
+                icones: ['fa-star', 'fa-calendar-check', 'fa-heart', 'fa-gem', 'fa-leaf', 'fa-bolt'],
+                servicos: [['Serviço Principal', '50.00', '40 min', 'fa-star'], ['Combo Especial', '80.00', '60 min', 'fa-gem']]
+            }
+        };
+        const CORES_RAPIDAS = ['#d4af37', '#f472b6', '#fb7185', '#a78bfa', '#38bdf8', '#34d399', '#f97316', '#ef4444', '#e5e7eb'];
+        const SENHA_MESTRE = '1234'; // ATENÇÃO: senha no front-end é só pra demo (ver Supabase Auth)
+
         const empresasIniciais = [
             {
-                id: 1,
-                nome: "BarberPro Classic",
-                nicho: "Barbearia",
-                whatsapp: "5511999998888",
-                img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80",
-                plano: "Setup + Mensal",
-                status: "Ativo",
+                id: 1, nome: "BarberPro Classic", nicho: "Barbearia", whatsapp: "5511999998888",
+                img: NICHOS['Barbearia'].img, plano: "Setup + Mensal", status: "Ativo",
                 titulo: "AGENDAMENTOS ONLINE EM TEMPO REAL",
                 sub: "Bem-vindo ao portal de atendimento oficial de BarberPro Classic. Escolha seu serviço abaixo.",
                 endereco: "Rua das Flores, 123 - Centro, São Paulo - SP",
-                horarios: "Segunda a Sábado: 09:00 - 20:00",
                 servicos: [
                     { id: 101, name: "Corte Social / Fade", price: "45.00", time: "35 min", icon: "fa-scissors" },
                     { id: 102, name: "Barba Tradicional", price: "35.00", time: "30 min", icon: "fa-user-ninja" },
@@ -331,17 +444,12 @@
                 ]
             },
             {
-                id: 2,
-                nome: "PetShop Amigo Fiel",
-                nicho: "PetShop",
-                whatsapp: "5511988887777",
-                img: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80",
-                plano: "Anual",
-                status: "Ativo",
+                id: 2, nome: "PetShop Amigo Fiel", nicho: "PetShop", whatsapp: "5511988887777",
+                img: NICHOS['PetShop'].img, plano: "Anual", status: "Ativo",
                 titulo: "O MELHOR CUIDADO PARA O SEU PET",
                 sub: "Agende banho, tosa e tratamentos especiais para seu companheiro.",
                 endereco: "Av. dos Animais, 450 - Bairro Jardim",
-                horarios: "Segunda a Sexta: 08:30 - 18:30",
+                agenda: agendaPadrao([1, 2, 3, 4, 5], '08:30', '18:30'),
                 servicos: [
                     { id: 201, name: "Banho & Tosa Completa", price: "60.00", time: "50 min", icon: "fa-paw" },
                     { id: 202, name: "Hidratação de Pelos", price: "40.00", time: "30 min", icon: "fa-dog" }
@@ -349,267 +457,854 @@
             }
         ];
 
+        // ======================================================
+        // CAMADA DE DADOS: único lugar pra trocar por Supabase
+        // ======================================================
         function getEmpresas() {
             const data = localStorage.getItem('agendify_empresas');
-            return data ? JSON.parse(data) : empresasIniciais;
+            const lista = data ? JSON.parse(data) : empresasIniciais;
+            return lista.map(normalizarEmpresa);
         }
 
         function saveEmpresas(lista) {
-            localStorage.setItem('agendify_empresas', JSON.stringify(lista));
+            try {
+                localStorage.setItem('agendify_empresas', JSON.stringify(lista));
+                return true;
+            } catch (err) {
+                toast('❌ Não deu pra salvar: o navegador ficou sem espaço (provavelmente a foto é pesada). Use um link de imagem.', 6000);
+                return false;
+            }
         }
 
+        function getAgendamentos() { return JSON.parse(localStorage.getItem('agendify_agendamentos') || '[]'); }
+        function saveAgendamentos(lista) { localStorage.setItem('agendify_agendamentos', JSON.stringify(lista)); }
+
+        // Completa campos novos em empresas antigas (compatível com os dados que você já tem salvos)
+        function normalizarEmpresa(e) {
+            const n = NICHOS[e.nicho] || NICHOS['Outro'];
+            const emp = { ...e };
+            emp.slug = emp.slug || slugify(emp.nome || 'empresa');
+            emp.cor = emp.cor || n.cor;
+            emp.fonte = FONTES[emp.fonte] ? emp.fonte : n.fonte;
+            emp.instagram = emp.instagram || '';
+            emp.img = emp.img || n.img;
+            emp.agenda = emp.agenda || agendaPadrao();
+            emp.servicos = (emp.servicos || []).map(s => ({
+                id: String(s.id), name: s.name || 'Serviço', price: precoNum(s.price),
+                time: s.time || '30 min', icon: s.icon || n.icones[0]
+            }));
+            return emp;
+        }
+
+        function agendaPadrao(diasAbertos = [1, 2, 3, 4, 5, 6], inicio = '09:00', fim = '20:00') {
+            return {
+                intervalo: 30,
+                pausa: { ativa: false, inicio: '12:00', fim: '13:00' },
+                dias: DIAS.map((_, i) => ({ aberto: diasAbertos.includes(i), inicio, fim }))
+            };
+        }
+
+        function novaEmpresaDoNicho(nicho, dados) {
+            const n = NICHOS[nicho] || NICHOS['Outro'];
+            return normalizarEmpresa({
+                id: Date.now(), nicho, cor: n.cor, fonte: n.fonte, img: n.img,
+                titulo: n.titulo, sub: n.sub, endereco: 'Endereço do estabelecimento',
+                agenda: agendaPadrao(),
+                servicos: n.servicos.map((s, i) => ({ id: Date.now() + i, name: s[0], price: s[1], time: s[2], icon: s[3] })),
+                ...dados
+            });
+        }
+
+        // ======================================================
+        // UTILITÁRIOS
+        // ======================================================
+        function esc(t) { return String(t ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+        function slugify(t) { return String(t).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'empresa'; }
+        function slugUnico(slug, idAtual) {
+            const usados = getEmpresas().filter(e => e.id != idAtual).map(e => e.slug);
+            let s = slug, i = 2;
+            while (usados.includes(s)) s = `${slug}-${i++}`;
+            return s;
+        }
+        function precoNum(v) {
+            let s = String(v ?? '').replace(/[^\d,.]/g, '');
+            if (s.includes(',') && s.includes('.')) s = s.replace(/\./g, '');
+            const n = parseFloat(s.replace(',', '.'));
+            return isNaN(n) ? '0.00' : n.toFixed(2);
+        }
+        function fmtBR(v) { return Number(v).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+        function minutos(hhmm) { const [h, m] = String(hhmm).split(':').map(Number); return h * 60 + (m || 0); }
+        function hhmm(min) { return String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0'); }
+        function duracaoMin(time) { const n = parseInt(String(time).replace(/\D/g, '')); return isNaN(n) ? 30 : n; }
+        function hojeISO() { const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); }
+        function fmtFone(f) {
+            const d = String(f).replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, '');
+            if (d.length === 11) return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+            if (d.length === 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+            return f;
+        }
+        function linkEmpresa(emp) { return `${location.origin}${location.pathname}?c=${emp.slug}`; }
+        function copiarTexto(txt) {
+            if (navigator.clipboard) navigator.clipboard.writeText(txt).then(() => toast('🔗 Link copiado!'), () => prompt('Copie o link:', txt));
+            else prompt('Copie o link:', txt);
+        }
+        let toastTimer;
+        function toast(msg, ms = 2800) {
+            const t = document.getElementById('toast');
+            t.innerText = msg; t.classList.remove('hidden');
+            clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.add('hidden'), ms);
+        }
+
+        // Cor de destaque da empresa: gera os tons 300 a 700 a partir de uma cor só
+        function aplicarTema(hex, fonte) {
+            const h = (hex || '#d4af37').replace('#', '');
+            const rgb = [0, 2, 4].map(i => parseInt(h.substr(i, 2), 16) || 0);
+            const mix = (alvo, t) => rgb.map(c => Math.round(c + (alvo - c) * t)).join(' ');
+            const r = document.documentElement.style;
+            r.setProperty('--g300', mix(255, 0.55));
+            r.setProperty('--g400', mix(255, 0.25));
+            r.setProperty('--g500', rgb.join(' '));
+            r.setProperty('--g600', mix(0, 0.2));
+            r.setProperty('--g700', mix(0, 0.38));
+            const brilho = (rgb[0] * 0.299 + rgb[1] * 0.587 + rgb[2] * 0.114) / 255;
+            r.setProperty('--onbrand', brilho > 0.6 ? '0 0 0' : '255 255 255');
+            r.setProperty('--font-title', (FONTES[fonte] || FONTES.vintage).css);
+        }
+
+        // Texto do rodapé gerado a partir da agenda (ex: "Segunda a Sábado: 09:00 - 20:00")
+        function textoHorarios(agenda) {
+            const ordem = [1, 2, 3, 4, 5, 6, 0];
+            const chave = i => { const d = agenda.dias[i]; return d.aberto ? `${d.inicio} - ${d.fim}` : 'Fechado'; };
+            const grupos = [];
+            ordem.forEach(i => {
+                const g = grupos[grupos.length - 1];
+                if (g && g.chave === chave(i)) g.dias.push(i); else grupos.push({ chave: chave(i), dias: [i] });
+            });
+            const linhas = grupos.map(g => {
+                const nome = g.dias.length === 1 ? DIAS[g.dias[0]] : `${DIAS[g.dias[0]]} ${g.dias.length === 2 ? 'e' : 'a'} ${DIAS[g.dias[g.dias.length - 1]]}`;
+                return `${nome}: ${g.chave}`;
+            });
+            if (agenda.pausa?.ativa) linhas.push(`Intervalo: ${agenda.pausa.inicio} - ${agenda.pausa.fim}`);
+            return linhas.join('\n');
+        }
+
+        // Horários livres de um dia (respeita agenda, almoço, duração do serviço e horários já marcados)
+        function horariosDisponiveis(emp, dataISO, servico) {
+            if (!dataISO) return null;
+            const dia = emp.agenda.dias[new Date(dataISO + 'T12:00').getDay()];
+            if (!dia) return null;
+            if (!dia.aberto) return 'fechado';
+            const passo = Number(emp.agenda.intervalo) || 30;
+            const dur = servico ? duracaoMin(servico.time) : passo;
+            const ini = minutos(dia.inicio), fim = minutos(dia.fim);
+            const p = emp.agenda.pausa;
+            const ocupados = getAgendamentos().filter(a => a.empresaId == emp.id && a.data === dataISO).map(a => a.hora);
+            const agoraMin = dataISO === hojeISO() ? new Date().getHours() * 60 + new Date().getMinutes() : -1;
+            const lista = [];
+            for (let t = ini; t + dur <= fim; t += passo) {
+                if (p?.ativa && t < minutos(p.fim) && t + dur > minutos(p.inicio)) continue;
+                if (t <= agoraMin) continue;
+                if (ocupados.includes(hhmm(t))) continue;
+                lista.push(hhmm(t));
+            }
+            return lista;
+        }
+
+        // ======================================================
+        // ESTADO
+        // ======================================================
         let empresaAtivaId = 1;
         let emEdicaoVisual = false;
+        let rascunho = null;      // cópia da empresa sendo editada (só vai pro banco ao Salvar)
+        let alteracoesPendentes = false;
+        let abaPainel = 'geral';
+
+        function empresaAtual() {
+            if (emEdicaoVisual && rascunho) return rascunho;
+            const empresas = getEmpresas();
+            return empresas.find(e => e.id == empresaAtivaId) || empresas[0];
+        }
 
         document.addEventListener('DOMContentLoaded', () => {
+            // Link próprio por cliente: ?c=nome-da-empresa
+            const slug = new URLSearchParams(location.search).get('c');
+            const achada = slug && getEmpresas().find(e => e.slug === slug);
+            if (achada) empresaAtivaId = achada.id;
+            document.getElementById('modalNicho').innerHTML = Object.keys(NICHOS).map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
+            document.getElementById('selectData').min = hojeISO();
+            document.getElementById('selectData').addEventListener('change', atualizarHorarios);
+            document.getElementById('selectServico').addEventListener('change', atualizarHorarios);
             carregarSitePublico();
-            document.getElementById('selectData').min = new Date().toISOString().split('T')[0];
         });
 
+        window.addEventListener('beforeunload', e => { if (emEdicaoVisual && alteracoesPendentes) { e.preventDefault(); e.returnValue = ''; } });
+        window.addEventListener('resize', ajustarBarra);
+
         function showView(view) {
-            if(view === 'client') {
+            if (view === 'client') {
                 document.getElementById('superAdminView').classList.add('hidden');
                 document.getElementById('clientView').classList.remove('hidden');
                 carregarSitePublico();
             } else {
+                if (emEdicaoVisual && alteracoesPendentes && !confirm('Você tem alterações não salvas. Descartar?')) return;
                 desativarModoEdicao();
+                aplicarTema('#d4af37', 'vintage');
                 document.getElementById('clientView').classList.add('hidden');
                 document.getElementById('superAdminView').classList.remove('hidden');
+                history.replaceState(null, '', location.pathname);
                 renderAdminTabela();
             }
         }
 
         function carregarSitePublico() {
-            const empresas = getEmpresas();
-            const emp = empresas.find(e => e.id == empresaAtivaId) || empresas[0];
+            const emp = empresaAtual();
+            if (!emp) return;
+            empresaAtivaId = emp.id;
+            if (!emEdicaoVisual) history.replaceState(null, '', `?c=${emp.slug}`);
+            renderSite(emp);
+        }
 
-            document.getElementById('logoNomeEmpresa').innerText = emp.nome;
+        // Desenha o site inteiro a partir do objeto da empresa (usado no público e na edição ao vivo)
+        function renderSite(emp) {
+            aplicarTema(emp.cor, emp.fonte);
+            document.title = `${emp.nome} | Agendamento Online`;
+            setCampo('nome', emp.nome);
+            setCampo('titulo', emp.titulo || 'AGENDAMENTOS ONLINE EM TEMPO REAL');
+            setCampo('sub', emp.sub || 'Bem-vindo ao portal oficial.');
+            setCampo('endereco', emp.endereco || 'Endereço do estabelecimento');
             document.getElementById('lblTipoNichoBadge').innerText = emp.nicho;
             document.getElementById('lblTipoNicho').innerText = emp.nicho;
-            document.getElementById('pubTitulo').innerText = emp.titulo || "AGENDAMENTOS ONLINE EM TEMPO REAL";
-            document.getElementById('pubSub').innerText = emp.sub || `Bem-vindo ao portal oficial.`;
-            document.getElementById('pubImg').src = emp.img;
+            document.getElementById('logoIcone').className = `fa-solid ${(NICHOS[emp.nicho] || NICHOS['Outro']).logo} text-lg`;
+            if (document.getElementById('pubImg').getAttribute('src') !== emp.img) document.getElementById('pubImg').src = emp.img;
 
-            // Preenche rodapé
-            document.getElementById('footerNomeEmpresa').innerText = emp.nome;
-            document.getElementById('footerEndereco').innerText = emp.endereco || "Endereço do cliente";
-            document.getElementById('footerHorario').innerText = emp.horarios || "Horários de funcionamento";
-            document.getElementById('footerWhats').innerText = emp.whatsapp;
+            document.getElementById('footerHorario').innerText = textoHorarios(emp.agenda);
+            const w = document.getElementById('footerWhats');
+            w.innerText = fmtFone(emp.whatsapp); w.href = `https://wa.me/${emp.whatsapp}`;
+            const insta = (emp.instagram || '').replace(/^@/, '').trim();
+            document.getElementById('footerInstaWrap').classList.toggle('hidden', !insta);
+            document.getElementById('footerInsta').innerText = '@' + insta;
+            document.getElementById('footerInsta').href = `https://instagram.com/${insta}`;
+
+            document.querySelectorAll('[data-campo]').forEach(el => el.contentEditable = emEdicaoVisual ? 'true' : 'false');
+            document.getElementById('pubImg').classList.toggle('img-editavel', emEdicaoVisual);
+            document.querySelectorAll('[data-abre]').forEach(el => el.classList.toggle('abre-painel', emEdicaoVisual));
+
+            // Bloqueio por inadimplência
+            const bloqueada = emp.status !== 'Ativo';
+            document.getElementById('bookingForm').classList.toggle('hidden', bloqueada && !emEdicaoVisual);
+            document.getElementById('avisoSuspenso').classList.toggle('hidden', !(bloqueada && !emEdicaoVisual));
+            const aviso = document.getElementById('avisoStatusEdicao');
+            aviso.classList.toggle('hidden', !(bloqueada && emEdicaoVisual));
+            aviso.innerText = `⚠️ Status "${emp.status}": no site público o agendamento aparece BLOQUEADO para os clientes.`;
 
             renderServicosGrid(emp.servicos);
+            atualizarBadgeAgendamentos();
+        }
+
+        function setCampo(campo, valor) {
+            document.querySelectorAll(`[data-campo="${campo}"]`).forEach(el => { if (el !== document.activeElement) el.innerText = valor; });
         }
 
         function renderServicosGrid(servicos) {
-            document.getElementById('pubServicesGrid').innerHTML = servicos.map(s => `
-                <div class="card-servico-item bg-dark-900 border border-dark-700 rounded-xl p-6 flex flex-col justify-between" data-id="${s.id}">
+            const ed = emEdicaoVisual;
+            document.getElementById('pubServicesGrid').innerHTML = servicos.map((s, i) => `
+                <div class="card-servico-item relative bg-dark-900 border border-dark-700 rounded-xl p-6 flex flex-col justify-between" data-id="${esc(s.id)}" data-idx="${i}">
+                    ${ed ? `<div class="absolute top-3 right-3 flex gap-1 text-xs">
+                        <button type="button" data-acao="srv-up" data-idx="${i}" class="w-7 h-7 rounded bg-dark-700 hover:bg-dark-600 text-gray-300" title="Mover pra trás"><i class="fa-solid fa-arrow-left"></i></button>
+                        <button type="button" data-acao="srv-down" data-idx="${i}" class="w-7 h-7 rounded bg-dark-700 hover:bg-dark-600 text-gray-300" title="Mover pra frente"><i class="fa-solid fa-arrow-right"></i></button>
+                        <button type="button" data-acao="srv-dup" data-idx="${i}" class="w-7 h-7 rounded bg-dark-700 hover:bg-dark-600 text-gray-300" title="Duplicar"><i class="fa-solid fa-copy"></i></button>
+                        <button type="button" data-acao="srv-del" data-idx="${i}" class="w-7 h-7 rounded bg-red-500/20 hover:bg-red-500 text-red-300 hover:text-white" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                    </div>` : ''}
                     <div>
-                        <div class="w-10 h-10 rounded-lg bg-gold-500/10 text-gold-400 flex items-center justify-center text-lg mb-4"><i class="fa-solid ${s.icon || 'fa-scissors'}"></i></div>
-                        <h3 class="srv-nome font-vintage text-xl font-bold text-white mb-2" contenteditable="${emEdicaoVisual}">${s.name}</h3>
-                        <p class="srv-time text-gray-400 text-xs mb-1">Duração: <span class="srv-time-val" contenteditable="${emEdicaoVisual}">${s.time}</span></p>
+                        <button type="button" ${ed ? `data-acao="srv-icone" data-idx="${i}" title="Clique pra trocar o ícone"` : 'tabindex="-1"'} class="w-10 h-10 rounded-lg bg-gold-500/10 text-gold-400 flex items-center justify-center text-lg mb-4 ${ed ? 'abre-painel' : 'cursor-default'}"><i class="fa-solid ${esc(s.icon)}"></i></button>
+                        <h3 class="srv-nome font-vintage text-xl font-bold text-white mb-2" data-sf="name" contenteditable="${ed}">${esc(s.name)}</h3>
+                        <p class="srv-time text-gray-400 text-xs mb-1">Duração: <span class="srv-time-val" data-sf="time" contenteditable="${ed}">${esc(s.time)}</span></p>
                     </div>
                     <div class="pt-4 border-t border-dark-800 flex items-center justify-between mt-4">
-                        <span class="font-vintage text-2xl font-bold text-gold-400">R$ <span class="srv-price" contenteditable="${emEdicaoVisual}">${s.price}</span></span>
+                        <span class="font-vintage text-2xl font-bold text-gold-400">R$ <span class="srv-price" data-sf="price" contenteditable="${ed}">${fmtBR(s.price)}</span></span>
+                        <a href="#agendar" onclick="escolherServico(${i})" class="text-xs font-semibold text-gold-400 hover:text-white">Agendar <i class="fa-solid fa-arrow-right ml-1"></i></a>
                     </div>
                 </div>
-            `).join('');
-
-            document.getElementById('selectServico').innerHTML = servicos.map(s => `<option value="${s.name}"> ${s.name} - R$ ${s.price}</option>`).join('');
+            `).join('') || `<p class="md:col-span-3 text-center text-gray-500">Nenhum serviço cadastrado.</p>`;
+            renderSelectServico(servicos);
         }
 
-        // --- ATIVAÇÃO DO MODO DE EDIÇÃO VISUAL DIRETO NA TELA ---
+        function renderSelectServico(servicos) {
+            const sel = document.getElementById('selectServico');
+            const atual = sel.value;
+            sel.innerHTML = servicos.map((s, i) => `<option value="${i}">${esc(s.name)} - R$ ${fmtBR(s.price)} (${esc(s.time)})</option>`).join('');
+            if (atual && servicos[atual]) sel.value = atual;
+            atualizarHorarios();
+        }
+
+        function escolherServico(i) { document.getElementById('selectServico').value = i; atualizarHorarios(); }
+
+        function atualizarHorarios() {
+            const emp = empresaAtual();
+            const dataEl = document.getElementById('selectData');
+            if (!dataEl.value) dataEl.value = proximoDiaAberto(emp);
+            const servico = emp.servicos[document.getElementById('selectServico').value];
+            const r = horariosDisponiveis(emp, dataEl.value, servico);
+            const sel = document.getElementById('selectHora');
+            if (r === 'fechado') sel.innerHTML = `<option value="">Fechado neste dia</option>`;
+            else if (!r || !r.length) sel.innerHTML = `<option value="">Sem horários livres</option>`;
+            else sel.innerHTML = r.map(h => `<option value="${h}">${h}</option>`).join('');
+        }
+
+        function proximoDiaAberto(emp) {
+            const d = new Date(hojeISO() + 'T12:00');
+            for (let i = 0; i < 14; i++) {
+                const iso = d.toISOString().slice(0, 10);
+                const r = horariosDisponiveis(emp, iso, emp.servicos[0]);
+                if (Array.isArray(r) && r.length) return iso;
+                d.setDate(d.getDate() + 1);
+            }
+            return hojeISO();
+        }
+
+        // ======================================================
+        // MODO DE EDIÇÃO VISUAL
+        // ======================================================
         function ativarEdicaoVisualParaEmpresa(id) {
             empresaAtivaId = id;
-            showView('client');
+            const original = getEmpresas().find(e => e.id == id);
+            if (!original) return;
+            rascunho = structuredClone(original);
             emEdicaoVisual = true;
-
-            // Ajusta barra flutuante
+            alteracoesPendentes = false;
+            document.getElementById('superAdminView').classList.add('hidden');
+            document.getElementById('clientView').classList.remove('hidden');
             document.getElementById('barraModoEdicao').classList.remove('hidden');
-            document.getElementById('mainHeader').style.top = "44px";
             document.getElementById('hintTrocaFoto').classList.remove('hidden');
             document.body.classList.add('modo-edicao');
+            ajustarBarra();
+            marcarSujo(false);
+            renderSite(rascunho);
+            abrirPainel(window.innerWidth >= 1024 ? 'geral' : null);
+            window.scrollTo({ top: 0 });
+        }
 
-            // Habilita edição editável nos textos
-            document.getElementById('logoNomeEmpresa').contentEditable = "true";
-            document.getElementById('pubTitulo').contentEditable = "true";
-            document.getElementById('pubSub').contentEditable = "true";
-            document.getElementById('footerEndereco').contentEditable = "true";
-            document.getElementById('footerHorario').contentEditable = "true";
-            document.getElementById('footerWhats').contentEditable = "true";
-
-            // Habilita nos serviços
-            document.querySelectorAll('.srv-nome, .srv-time-val, .srv-price').forEach(el => el.contentEditable = "true");
+        function ajustarBarra() {
+            const barra = document.getElementById('barraModoEdicao');
+            const h = emEdicaoVisual ? barra.offsetHeight : 0;
+            document.documentElement.style.setProperty('--barra-h', h + 'px');
+            document.getElementById('mainHeader').style.top = h + 'px';
         }
 
         function desativarModoEdicao() {
             emEdicaoVisual = false;
+            rascunho = null;
+            alteracoesPendentes = false;
             document.getElementById('barraModoEdicao').classList.add('hidden');
-            document.getElementById('mainHeader').style.top = "0px";
             document.getElementById('hintTrocaFoto').classList.add('hidden');
-            document.body.classList.remove('modo-edicao');
-
+            document.body.classList.remove('modo-edicao', 'painel-aberto');
+            document.getElementById('painelEdicao').classList.add('hidden');
+            ajustarBarra();
             document.querySelectorAll('[contenteditable="true"]').forEach(el => el.contentEditable = "false");
         }
 
-        function trocarImagemVisualmente() {
-            if(!emEdicaoVisual) return;
-            const novaUrl = prompt("Digite o link (URL) da nova foto de capa/ilustração:", document.getElementById('pubImg').src);
-            if(novaUrl && novaUrl.trim() !== '') {
-                document.getElementById('pubImg').src = novaUrl;
-            }
-        }
-
-        function adicionarNovoServicoVisualmente() {
-            if(!emEdicaoVisual) return;
-            const grid = document.getElementById('pubServicesGrid');
-            const newId = Date.now();
-            const novoCardHtml = `
-                <div class="card-servico-item bg-dark-900 border border-dark-700 rounded-xl p-6 flex flex-col justify-between" data-id="${newId}">
-                    <div>
-                        <div class="w-10 h-10 rounded-lg bg-gold-500/10 text-gold-400 flex items-center justify-center text-lg mb-4"><i class="fa-solid fa-star"></i></div>
-                        <h3 class="srv-nome font-vintage text-xl font-bold text-white mb-2" contenteditable="true">Novo Serviço Especial</h3>
-                        <p class="srv-time text-gray-400 text-xs mb-1">Duração: <span class="srv-time-val" contenteditable="true">30 min</span></p>
-                    </div>
-                    <div class="pt-4 border-t border-dark-800 flex items-center justify-between mt-4">
-                        <span class="font-vintage text-2xl font-bold text-gold-400">R$ <span class="srv-price" contenteditable="true">50.00</span></span>
-                    </div>
-                </div>
-            `;
-            grid.insertAdjacentHTML('beforeend', novoCardHtml);
-        }
-
-        function salvarEdicaoVisualDirecta() {
-            let empresas = getEmpresas();
-            let emp = empresas.find(e => e.id == empresaAtivaId);
-            if(!emp) return;
-
-            // Extrai textos alterados visualmente na página
-            emp.nome = document.getElementById('logoNomeEmpresa').innerText.trim();
-            emp.titulo = document.getElementById('pubTitulo').innerText.trim();
-            emp.sub = document.getElementById('pubSub').innerText.trim();
-            emp.img = document.getElementById('pubImg').src;
-            emp.endereco = document.getElementById('footerEndereco').innerText.trim();
-            emp.horarios = document.getElementById('footerHorario').innerText.trim();
-            emp.whatsapp = document.getElementById('footerWhats').innerText.trim();
-
-            // Extrai lista de serviços editados
-            const novosServicos = [];
-            document.querySelectorAll('.card-servico-item').forEach(card => {
-                const sId = card.getAttribute('data-id');
-                const sNome = card.querySelector('.srv-nome').innerText.trim();
-                const sTime = card.querySelector('.srv-time-val').innerText.trim();
-                const sPrice = card.querySelector('.srv-price').innerText.trim();
-                novosServicos.push({ id: sId, name: sNome, time: sTime, price: sPrice, icon: "fa-scissors" });
-            });
-            emp.servicos = novosServicos;
-
-            // Salva na memória
-            empresas = empresas.map(e => e.id == empresaAtivaId ? emp : e);
-            saveEmpresas(empresas);
-
-            alert('✅ Alterações visuais salvas com sucesso no sistema!');
+        function sairDaEdicao() {
+            if (alteracoesPendentes && !confirm('Sair sem salvar? As alterações feitas desde o último "Salvar" serão perdidas.')) return;
             desativarModoEdicao();
             carregarSitePublico();
         }
 
-        // --- PAINEL SUPER-ADMIN CONTROLE ---
-        function openSuperAdminAuth() {
-            document.getElementById('adminPassInput').value = '';
-            document.getElementById('authModal').classList.remove('hidden');
+        function marcarSujo(v = true) {
+            alteracoesPendentes = v;
+            document.getElementById('indicadorSujo').classList.toggle('hidden', !v);
+            if (rascunho) document.getElementById('barraNomeEmpresa').innerText = rascunho.nome;
         }
 
-        function verificarSenhaAdmin() {
-            if(document.getElementById('adminPassInput').value === '1234') {
-                document.getElementById('authModal').classList.add('hidden');
-                showView('superadmin');
-            } else {
-                alert('Senha incorreta!');
+        function salvarEdicaoVisualDirecta() {
+            if (!emEdicaoVisual || !rascunho) return;
+            if (document.activeElement && document.activeElement.isContentEditable) document.activeElement.blur();
+            rascunho.slug = slugUnico(slugify(rascunho.slug || rascunho.nome), rascunho.id);
+            const empresas = getEmpresas().map(e => e.id == rascunho.id ? normalizarEmpresa(structuredClone(rascunho)) : e);
+            if (!saveEmpresas(empresas)) return;
+            marcarSujo(false);
+            if (abaPainel === 'geral') renderPainel();
+            toast('✅ Alterações salvas! Você continua no modo edição.');
+        }
+
+        function trocarImagemVisualmente() {
+            if (!emEdicaoVisual) return;
+            abrirPainel('visual');
+        }
+
+        function adicionarNovoServicoVisualmente() {
+            if (!emEdicaoVisual) return;
+            const n = NICHOS[rascunho.nicho] || NICHOS['Outro'];
+            rascunho.servicos.push({ id: String(Date.now()), name: 'Novo Serviço', price: '50.00', time: '30 min', icon: n.icones[0] });
+            marcarSujo();
+            renderServicosGrid(rascunho.servicos);
+            if (abaPainel === 'servicos' && painelAberto()) renderPainel(); else abrirPainel('servicos');
+            const cards = document.querySelectorAll('.srv-nome');
+            const ultimo = cards[cards.length - 1];
+            if (ultimo) { ultimo.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+        }
+
+        // --- Edição direto no texto do site ---
+        document.addEventListener('input', e => {
+            if (!emEdicaoVisual || !rascunho) return;
+            const el = e.target;
+            if (!(el instanceof HTMLElement) || !el.isContentEditable) return;
+            if (el.dataset.campo) {
+                const campo = el.dataset.campo;
+                rascunho[campo] = el.innerText.trim();
+                setCampo(campo, rascunho[campo]);
+                const inp = document.querySelector(`#painelConteudo [data-f="${campo}"]`);
+                if (inp) inp.value = rascunho[campo];
+                marcarSujo();
+            } else if (el.dataset.sf) {
+                const card = el.closest('[data-idx]');
+                const s = rascunho.servicos[card.dataset.idx];
+                s[el.dataset.sf] = el.dataset.sf === 'price' ? precoNum(el.innerText) : el.innerText.trim();
+                renderSelectServico(rascunho.servicos);
+                if (abaPainel === 'servicos' && painelAberto()) renderPainel();
+                marcarSujo();
+            }
+        });
+
+        document.addEventListener('focusout', e => {
+            const el = e.target;
+            if (emEdicaoVisual && el instanceof HTMLElement && el.dataset && el.dataset.sf === 'price') el.innerText = fmtBR(precoNum(el.innerText));
+        });
+
+        // Enter em campo de uma linha = terminar edição; colar = só texto puro
+        document.addEventListener('keydown', e => {
+            if (emEdicaoVisual && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); salvarEdicaoVisualDirecta(); return; }
+            const el = e.target;
+            if (emEdicaoVisual && el.isContentEditable && e.key === 'Enter' && !['sub', 'endereco'].includes(el.dataset.campo)) { e.preventDefault(); el.blur(); }
+        });
+        document.addEventListener('paste', e => {
+            if (!emEdicaoVisual || !e.target.isContentEditable) return;
+            e.preventDefault();
+            document.execCommand('insertText', false, (e.clipboardData || window.clipboardData).getData('text/plain'));
+        });
+
+        // --- Cliques (botões do modo edição e do painel) ---
+        document.addEventListener('click', e => {
+            const aba = e.target.closest('[data-aba]');
+            if (aba) { abrirPainel(aba.dataset.aba); return; }
+            if (emEdicaoVisual) {
+                const abre = e.target.closest('[data-abre]');
+                if (abre) { e.preventDefault(); abrirPainel(abre.dataset.abre); return; }
+            }
+            const b = e.target.closest('[data-acao]');
+            if (!b || !emEdicaoVisual) return;
+            const i = Number(b.dataset.idx);
+            const sv = rascunho.servicos;
+            const n = NICHOS[rascunho.nicho] || NICHOS['Outro'];
+            switch (b.dataset.acao) {
+                case 'toggle-painel': painelAberto() ? fecharPainel() : abrirPainel(abaPainel); return;
+                case 'srv-add': adicionarNovoServicoVisualmente(); return;
+                case 'srv-up': if (i > 0) [sv[i - 1], sv[i]] = [sv[i], sv[i - 1]]; break;
+                case 'srv-down': if (i < sv.length - 1) [sv[i + 1], sv[i]] = [sv[i], sv[i + 1]]; break;
+                case 'srv-dup': sv.splice(i + 1, 0, { ...sv[i], id: String(Date.now()), name: sv[i].name + ' (cópia)' }); break;
+                case 'srv-del': if (!confirm(`Excluir o serviço "${sv[i].name}"?`)) return; sv.splice(i, 1); break;
+                case 'srv-icone': {
+                    const lista = [...new Set([...n.icones, ...Object.values(NICHOS).flatMap(x => x.icones)])];
+                    sv[i].icon = lista[(lista.indexOf(sv[i].icon) + 1) % lista.length];
+                    break;
+                }
+                case 'cor': rascunho.cor = b.dataset.cor; break;
+                case 'fonte': rascunho.fonte = b.dataset.fonte; break;
+                case 'padrao-nicho':
+                    rascunho.cor = n.cor; rascunho.fonte = n.fonte;
+                    rascunho.servicos.forEach((s, k) => { if (!n.icones.includes(s.icon)) s.icon = n.icones[k % n.icones.length]; });
+                    break;
+                case 'img-padrao': rascunho.img = n.img; break;
+                case 'copiar-link': copiarTexto(linkEmpresa(rascunho)); return;
+                case 'copiar-seg': {
+                    const seg = rascunho.agenda.dias[1];
+                    [2, 3, 4, 5].forEach(d => rascunho.agenda.dias[d] = { ...seg });
+                    break;
+                }
+                default: return;
+            }
+            marcarSujo();
+            renderSite(rascunho);
+            if (painelAberto()) renderPainel();
+        });
+
+        // ======================================================
+        // PAINEL LATERAL
+        // ======================================================
+        function painelAberto() { return !document.getElementById('painelEdicao').classList.contains('hidden'); }
+        function abrirPainel(aba) {
+            if (!emEdicaoVisual) return;
+            if (!aba) return;
+            abaPainel = aba;
+            document.getElementById('painelEdicao').classList.remove('hidden');
+            document.body.classList.add('painel-aberto');
+            renderPainel();
+        }
+        function fecharPainel() {
+            document.getElementById('painelEdicao').classList.add('hidden');
+            document.body.classList.remove('painel-aberto');
+        }
+
+        const lbl = (t, html, dica = '') => `<div><label class="block text-xs text-gray-400 mb-1">${t}</label>${html}${dica ? `<p class="text-[11px] text-gray-500 mt-1">${dica}</p>` : ''}</div>`;
+
+        function renderPainel() {
+            const d = rascunho;
+            const c = document.getElementById('painelConteudo');
+            document.querySelectorAll('[data-aba]').forEach(b => b.classList.toggle('aba-ativa', b.dataset.aba === abaPainel));
+
+            if (abaPainel === 'geral') {
+                c.innerHTML = `
+                    ${lbl('Nome do estabelecimento', `<input class="campo-painel" data-f="nome" value="${esc(d.nome)}">`)}
+                    ${lbl('Nicho', `<select class="campo-painel" data-f="nicho">${Object.keys(NICHOS).map(n => `<option ${n === d.nicho ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select>`, 'Pra trocar cor/ícones pelo padrão do nicho, use a aba Visual.')}
+                    ${lbl('WhatsApp que recebe os agendamentos', `<input class="campo-painel" data-f="whatsapp" inputmode="numeric" value="${esc(d.whatsapp)}" placeholder="5549999999999">`, 'Só números: 55 + DDD + número.')}
+                    ${lbl('Link da página', `<div class="flex gap-2"><input class="campo-painel" data-f="slug" value="${esc(d.slug)}"><button type="button" data-acao="copiar-link" class="px-3 rounded-lg bg-gold-500 text-onbrand text-xs font-bold whitespace-nowrap"><i class="fa-solid fa-link"></i> Copiar</button></div>`, `Fica: ...?c=${esc(d.slug)}`)}
+                    ${lbl('Título principal', `<input class="campo-painel" data-f="titulo" value="${esc(d.titulo)}">`)}
+                    ${lbl('Subtítulo', `<textarea class="campo-painel" rows="3" data-f="sub">${esc(d.sub)}</textarea>`)}
+                    ${lbl('Endereço', `<textarea class="campo-painel" rows="2" data-f="endereco">${esc(d.endereco)}</textarea>`)}
+                    ${lbl('Instagram (opcional)', `<input class="campo-painel" data-f="instagram" value="${esc(d.instagram)}" placeholder="@perfil">`)}
+                `;
+            }
+
+            if (abaPainel === 'visual') {
+                c.innerHTML = `
+                    ${lbl('Foto de capa', `
+                        <img id="previewImg" src="${esc(d.img)}" class="w-full h-36 object-cover rounded-lg border border-dark-700 mb-2">
+                        <input class="campo-painel mb-2" data-f="img" value="${d.img.startsWith('data:') ? '' : esc(d.img)}" placeholder="Cole o link (URL) da imagem">
+                        <div class="flex gap-2">
+                            <label class="flex-1 text-center cursor-pointer bg-dark-700 hover:bg-dark-600 text-gray-200 rounded-lg py-2 text-xs font-semibold">
+                                <i class="fa-solid fa-upload mr-1"></i> Enviar do computador
+                                <input type="file" accept="image/*" class="hidden" onchange="enviarImagem(this)">
+                            </label>
+                            <button type="button" data-acao="img-padrao" class="flex-1 bg-dark-700 hover:bg-dark-600 text-gray-200 rounded-lg py-2 text-xs font-semibold">Foto padrão do nicho</button>
+                        </div>`, 'A foto enviada é reduzida automaticamente pra não pesar.')}
+                    ${lbl('Cor de destaque', `
+                        <div class="flex items-center gap-2 flex-wrap">
+                            <input type="color" data-f="cor" value="${esc(d.cor)}" class="w-10 h-10 rounded cursor-pointer bg-transparent">
+                            ${CORES_RAPIDAS.map(cor => `<button type="button" data-acao="cor" data-cor="${cor}" class="w-8 h-8 rounded-full border-2 ${cor === d.cor ? 'border-white' : 'border-transparent'}" style="background:${cor}"></button>`).join('')}
+                        </div>`)}
+                    ${lbl('Estilo dos títulos', `
+                        <div class="grid grid-cols-3 gap-2">
+                            ${Object.entries(FONTES).map(([k, f]) => `<button type="button" data-acao="fonte" data-fonte="${k}" class="rounded-lg py-3 border ${k === d.fonte ? 'border-gold-500 bg-gold-500/10 text-white' : 'border-dark-700 text-gray-300'}" style="font-family:${f.css}"><span class="block text-lg">Aa</span><span class="text-[11px]">${f.nome}</span></button>`).join('')}
+                        </div>`)}
+                    <button type="button" data-acao="padrao-nicho" class="w-full border border-gold-500/40 text-gold-400 hover:bg-gold-500/10 rounded-lg py-2 text-xs font-semibold">
+                        <i class="fa-solid fa-wand-magic-sparkles mr-1"></i> Aplicar visual padrão de ${esc(d.nicho)}
+                    </button>
+                `;
+            }
+
+            if (abaPainel === 'servicos') {
+                c.innerHTML = d.servicos.map((s, i) => `
+                    <div class="bg-dark-800 border border-dark-700 rounded-lg p-3 space-y-2">
+                        <div class="flex gap-2 items-center">
+                            <button type="button" data-acao="srv-icone" data-idx="${i}" class="w-9 h-9 shrink-0 rounded-lg bg-gold-500/10 text-gold-400" title="Trocar ícone"><i class="fa-solid ${esc(s.icon)}"></i></button>
+                            <input class="campo-painel" data-s-idx="${i}" data-s-f="name" value="${esc(s.name)}" placeholder="Nome do serviço">
+                        </div>
+                        <div class="flex gap-2">
+                            <input class="campo-painel" data-s-idx="${i}" data-s-f="price" inputmode="decimal" value="${fmtBR(s.price)}" placeholder="Preço">
+                            <input class="campo-painel" data-s-idx="${i}" data-s-f="time" value="${esc(s.time)}" placeholder="30 min">
+                        </div>
+                        <div class="flex gap-1 justify-end text-xs">
+                            <button type="button" data-acao="srv-up" data-idx="${i}" class="px-2 py-1 rounded bg-dark-700 text-gray-300" title="Subir"><i class="fa-solid fa-arrow-up"></i></button>
+                            <button type="button" data-acao="srv-down" data-idx="${i}" class="px-2 py-1 rounded bg-dark-700 text-gray-300" title="Descer"><i class="fa-solid fa-arrow-down"></i></button>
+                            <button type="button" data-acao="srv-dup" data-idx="${i}" class="px-2 py-1 rounded bg-dark-700 text-gray-300" title="Duplicar"><i class="fa-solid fa-copy"></i></button>
+                            <button type="button" data-acao="srv-del" data-idx="${i}" class="px-2 py-1 rounded bg-red-500/20 text-red-300" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>`).join('') + `
+                    <button type="button" data-acao="srv-add" class="w-full bg-gold-500 text-onbrand font-bold rounded-lg py-2.5 text-sm">+ Adicionar serviço</button>
+                    <p class="text-[11px] text-gray-500">A duração define quais horários aparecem pro cliente (ex: serviço de 60 min não cabe às 19:30 se fecha às 20:00).</p>`;
+            }
+
+            if (abaPainel === 'agenda') {
+                const ag = d.agenda;
+                c.innerHTML = `
+                    ${lbl('Intervalo entre horários', `<select class="campo-painel" data-ag="intervalo">${[15, 20, 30, 40, 45, 60].map(m => `<option value="${m}" ${m == ag.intervalo ? 'selected' : ''}>A cada ${m} min</option>`).join('')}</select>`)}
+                    <div class="space-y-2">
+                        ${[1, 2, 3, 4, 5, 6, 0].map(i => { const dia = ag.dias[i]; return `
+                            <div class="flex items-center gap-2">
+                                <label class="w-24 flex items-center gap-2 text-xs ${dia.aberto ? 'text-white' : 'text-gray-500'}"><input type="checkbox" data-ag="aberto" data-dia="${i}" ${dia.aberto ? 'checked' : ''}> ${DIAS[i]}</label>
+                                <input type="time" class="campo-painel !py-1.5" data-ag="inicio" data-dia="${i}" value="${dia.inicio}" ${dia.aberto ? '' : 'disabled'}>
+                                <span class="text-gray-500 text-xs">às</span>
+                                <input type="time" class="campo-painel !py-1.5" data-ag="fim" data-dia="${i}" value="${dia.fim}" ${dia.aberto ? '' : 'disabled'}>
+                            </div>`; }).join('')}
+                    </div>
+                    <button type="button" data-acao="copiar-seg" class="w-full bg-dark-700 hover:bg-dark-600 text-gray-200 rounded-lg py-2 text-xs font-semibold">Copiar horário de Segunda para Terça a Sexta</button>
+                    ${lbl('Intervalo de almoço', `
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox" data-ag="pausa-ativa" ${ag.pausa.ativa ? 'checked' : ''}>
+                            <input type="time" class="campo-painel !py-1.5" data-ag="pausa-inicio" value="${ag.pausa.inicio}">
+                            <span class="text-gray-500 text-xs">às</span>
+                            <input type="time" class="campo-painel !py-1.5" data-ag="pausa-fim" value="${ag.pausa.fim}">
+                        </div>`)}
+                    <div class="bg-dark-800 rounded-lg p-3 text-xs text-gray-400 whitespace-pre-line"><span class="text-gold-400 font-semibold">Como aparece no site:</span>\n${esc(textoHorarios(ag))}</div>
+                `;
             }
         }
 
-        function renderAdminTabela() {
-            const empresas = getEmpresas();
-            document.getElementById('adminEmpresasTable').innerHTML = empresas.map(e => {
-                let badgeStatus = e.status === 'Ativo' ? '<span class="bg-green-500/10 text-green-400 border border-green-500/30 px-2.5 py-1 rounded-full text-xs font-semibold">● Ativo</span>' :
-                                  '<span class="bg-red-500/10 text-red-400 border border-red-500/30 px-2.5 py-1 rounded-full text-xs font-semibold">● Em Atraso</span>';
-                return `
-                    <tr class="hover:bg-dark-700/40 transition-colors">
-                        <td class="p-4 font-bold text-white">${e.nome} <span class="block text-xs font-normal text-gray-400">ID: #${e.id}</span></td>
-                        <td class="p-4 text-xs text-gold-400">${e.nicho}</td>
-                        <td class="p-4 text-xs">${e.whatsapp}</td>
-                        <td class="p-4 text-xs font-semibold">${e.plano}</td>
-                        <td class="p-4">${badgeStatus}</td>
-                        <td class="p-4 text-center space-x-2">
-                            <button onclick="carregarEmpresaEVer(${e.id})" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Ver Site Público"><i class="fa-solid fa-eye"></i></button>
-                            <button onclick="ativarEdicaoVisualParaEmpresa(${e.id})" class="bg-gold-500 text-black hover:bg-gold-400 px-3 py-1.5 rounded text-xs font-bold" title="Editar Visualmente na Tela"><i class="fa-solid fa-pen"></i> Editar Visualmente</button>
-                            <button onclick="deletarEmpresa(${e.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-2.5 py-1.5 rounded text-xs" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                        </td>
-                    </tr>
-                `;
-            }).join('');
+        function onPainelInput(e) {
+            if (!emEdicaoVisual || !rascunho) return;
+            const t = e.target;
+            const d = rascunho;
+            if (t.dataset.f) {
+                const f = t.dataset.f;
+                let v = t.value;
+                if (f === 'whatsapp') { v = v.replace(/\D/g, ''); if (t.value !== v) t.value = v; }
+                if (f === 'slug' && e.type === 'change') { v = slugify(v); t.value = v; }
+                if (f === 'img' && !v.trim()) return;
+                d[f] = v;
+                renderSite(d);
+                if (f === 'img') document.getElementById('previewImg').src = v;
+                if (f === 'nicho' && e.type === 'change') renderPainel();
+                marcarSujo();
+            } else if (t.dataset.sF) {
+                const s = d.servicos[t.dataset.sIdx];
+                s[t.dataset.sF] = t.dataset.sF === 'price' ? precoNum(t.value) : t.value;
+                if (t.dataset.sF === 'price' && e.type === 'change') t.value = fmtBR(s.price);
+                renderServicosGrid(d.servicos);
+                marcarSujo();
+            } else if (t.dataset.ag) {
+                const ag = d.agenda, i = t.dataset.dia;
+                switch (t.dataset.ag) {
+                    case 'intervalo': ag.intervalo = Number(t.value); break;
+                    case 'aberto': ag.dias[i].aberto = t.checked; break;
+                    case 'inicio': case 'fim': if (!t.value) return; ag.dias[i][t.dataset.ag] = t.value; break;
+                    case 'pausa-ativa': ag.pausa.ativa = t.checked; break;
+                    case 'pausa-inicio': if (t.value) ag.pausa.inicio = t.value; break;
+                    case 'pausa-fim': if (t.value) ag.pausa.fim = t.value; break;
+                }
+                renderSite(d);
+                if (e.type === 'change') renderPainel();
+                marcarSujo();
+            }
+        }
+        document.getElementById('painelConteudo').addEventListener('input', onPainelInput);
+        document.getElementById('painelConteudo').addEventListener('change', onPainelInput);
+
+        // Upload de foto: reduz pra no máx. 1400px e salva como JPEG leve
+        function enviarImagem(input) {
+            const file = input.files[0];
+            if (!file || !rascunho) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                const img = new Image();
+                img.onload = () => {
+                    const escala = Math.min(1, 1400 / Math.max(img.width, img.height));
+                    const cv = document.createElement('canvas');
+                    cv.width = Math.round(img.width * escala); cv.height = Math.round(img.height * escala);
+                    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+                    rascunho.img = cv.toDataURL('image/jpeg', 0.78);
+                    marcarSujo();
+                    renderSite(rascunho);
+                    renderPainel();
+                    toast('📷 Foto trocada. Lembre de Salvar.');
+                };
+                img.src = reader.result;
+            };
+            reader.readAsDataURL(file);
         }
 
-        function carregarEmpresaEVer(id) {
-            empresaAtivaId = id;
-            showView('client');
+        // ======================================================
+        // PAINEL SUPER-ADMIN
+        // ======================================================
+        function openSuperAdminAuth() {
+            if (sessionStorage.getItem('agendify_admin') === 'ok') { showView('superadmin'); return; }
+            document.getElementById('adminPassInput').value = '';
+            document.getElementById('authModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('adminPassInput').focus(), 50);
         }
+
+        function verificarSenhaAdmin() {
+            if (document.getElementById('adminPassInput').value === SENHA_MESTRE) {
+                sessionStorage.setItem('agendify_admin', 'ok');
+                document.getElementById('authModal').classList.add('hidden');
+                showView('superadmin');
+            } else {
+                toast('Senha incorreta!');
+            }
+        }
+
+        function badgeStatus(status) {
+            if (status === 'Ativo') return '<span class="bg-green-500/10 text-green-400 border border-green-500/30 px-2.5 py-1 rounded-full text-xs font-semibold">● Ativo</span>';
+            if (status === 'Atrasado') return '<span class="bg-red-500/10 text-red-400 border border-red-500/30 px-2.5 py-1 rounded-full text-xs font-semibold">● Em Atraso</span>';
+            return '<span class="bg-gray-500/10 text-gray-400 border border-gray-500/30 px-2.5 py-1 rounded-full text-xs font-semibold">● Cancelado</span>';
+        }
+
+        function renderAdminTabela() {
+            const busca = (document.getElementById('buscaEmpresa').value || '').toLowerCase();
+            const empresas = getEmpresas().filter(e => !busca || `${e.nome} ${e.nicho} ${e.whatsapp}`.toLowerCase().includes(busca));
+            document.getElementById('adminEmpresasTable').innerHTML = empresas.map(e => `
+                <tr class="hover:bg-dark-700/40 transition-colors">
+                    <td class="p-4 font-bold text-white"><span class="inline-block w-2.5 h-2.5 rounded-full mr-2" style="background:${esc(e.cor)}"></span>${esc(e.nome)} <span class="block text-xs font-normal text-gray-400">ID: #${esc(e.id)} · ?c=${esc(e.slug)}</span></td>
+                    <td class="p-4 text-xs text-gold-400">${esc(e.nicho)}</td>
+                    <td class="p-4 text-xs">${esc(fmtFone(e.whatsapp))}</td>
+                    <td class="p-4 text-xs font-semibold">${esc(e.plano)}</td>
+                    <td class="p-4">${badgeStatus(e.status)}</td>
+                    <td class="p-4 text-center space-x-1 whitespace-nowrap">
+                        <button onclick="carregarEmpresaEVer(${e.id})" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Ver Site Público"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="copiarLinkEmpresa(${e.id})" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Copiar link do cliente"><i class="fa-solid fa-link"></i></button>
+                        <button onclick="ativarEdicaoVisualParaEmpresa(${e.id})" class="bg-gold-500 text-onbrand hover:bg-gold-400 px-3 py-1.5 rounded text-xs font-bold" title="Editar Visualmente na Tela"><i class="fa-solid fa-pen"></i> Editar Visualmente</button>
+                        <button onclick="openEditarEmpresaModal(${e.id})" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Plano, status e dados"><i class="fa-solid fa-gear"></i></button>
+                        <button onclick="deletarEmpresa(${e.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-2.5 py-1.5 rounded text-xs" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('') || `<tr><td colspan="6" class="p-6 text-center text-gray-500">Nenhuma empresa encontrada.</td></tr>`;
+        }
+
+        function carregarEmpresaEVer(id) { empresaAtivaId = id; showView('client'); }
+        function copiarLinkEmpresa(id) { const e = getEmpresas().find(x => x.id == id); if (e) copiarTexto(linkEmpresa(e)); }
 
         function openNovaEmpresaModal() {
             document.getElementById('modalEmpresaTitulo').innerText = "Cadastrar Nova Empresa";
             document.getElementById('editEmpresaId').value = "";
             document.getElementById('modalNome').value = "";
             document.getElementById('modalWhats').value = "";
-            document.getElementById('modalImg').value = "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&q=80";
+            document.getElementById('modalImg').value = "";
+            document.getElementById('modalNicho').value = "Barbearia";
+            document.getElementById('modalPlano').value = "Setup + Mensal";
+            document.getElementById('modalStatus').value = "Ativo";
+            document.getElementById('wrapModalImg').classList.remove('hidden');
+            document.getElementById('modalDicaNicho').classList.remove('hidden');
             document.getElementById('empresaModal').classList.remove('hidden');
         }
 
-        function salvarEmpresaModal(e) {
-            e.preventDefault();
+        function openEditarEmpresaModal(id) {
+            const e = getEmpresas().find(x => x.id == id);
+            if (!e) return;
+            document.getElementById('modalEmpresaTitulo').innerText = `Configurar: ${e.nome}`;
+            document.getElementById('editEmpresaId').value = e.id;
+            document.getElementById('modalNome').value = e.nome;
+            document.getElementById('modalNicho').value = NICHOS[e.nicho] ? e.nicho : 'Outro';
+            document.getElementById('modalWhats').value = e.whatsapp;
+            document.getElementById('modalPlano').value = e.plano;
+            document.getElementById('modalStatus').value = e.status;
+            document.getElementById('wrapModalImg').classList.add('hidden');
+            document.getElementById('modalDicaNicho').classList.add('hidden');
+            document.getElementById('empresaModal').classList.remove('hidden');
+        }
+
+        function salvarEmpresaModal(ev) {
+            ev.preventDefault();
             let empresas = getEmpresas();
-            const dados = {
-                id: Date.now(),
-                nome: document.getElementById('modalNome').value,
+            const idEdit = document.getElementById('editEmpresaId').value;
+            const base = {
+                nome: document.getElementById('modalNome').value.trim(),
                 nicho: document.getElementById('modalNicho').value,
-                whatsapp: document.getElementById('modalWhats').value,
-                img: document.getElementById('modalImg').value,
+                whatsapp: document.getElementById('modalWhats').value.replace(/\D/g, ''),
                 plano: document.getElementById('modalPlano').value,
-                status: document.getElementById('modalStatus').value,
-                titulo: `AGENDAMENTOS ONLINE EM TEMPO REAL`,
-                sub: `Bem-vindo ao portal de atendimento oficial.`,
-                endereco: "Endereço do estabelecimento",
-                horarios: "Segunda a Sábado: 09:00 - 20:00",
-                servicos: [
-                    { id: 1, name: "Serviço Principal", price: "50.00", time: "40 min", icon: "fa-scissors" },
-                    { id: 2, name: "Combo Especial", price: "80.00", time: "60 min", icon: "fa-crown" }
-                ]
+                status: document.getElementById('modalStatus').value
             };
-            empresas.push(dados);
-            saveEmpresas(empresas);
+            let novaId = null;
+            if (idEdit) {
+                empresas = empresas.map(e => e.id == idEdit ? { ...e, ...base } : e);
+            } else {
+                const img = document.getElementById('modalImg').value.trim();
+                const nova = novaEmpresaDoNicho(base.nicho, { ...base, slug: slugUnico(slugify(base.nome)), ...(img ? { img } : {}) });
+                empresas.push(nova);
+                novaId = nova.id;
+            }
+            if (!saveEmpresas(empresas)) return;
             document.getElementById('empresaModal').classList.add('hidden');
             renderAdminTabela();
+            if (novaId && confirm('Empresa criada com serviços e visual do nicho. Abrir o editor visual agora?')) ativarEdicaoVisualParaEmpresa(novaId);
+            else toast('✅ Empresa salva!');
         }
 
         function deletarEmpresa(id) {
-            if(confirm('Tem certeza que deseja excluir esta empresa?')) {
-                let empresas = getEmpresas().filter(e => e.id != id);
-                saveEmpresas(empresas);
+            if (confirm('Tem certeza que deseja excluir esta empresa?')) {
+                saveEmpresas(getEmpresas().filter(e => e.id != id));
                 renderAdminTabela();
             }
         }
 
-        function handleBooking(e) {
-            e.preventDefault();
-            const servico = document.getElementById('selectServico').value;
-            const data = document.getElementById('selectData').value;
-            const hora = document.getElementById('selectHora').value;
-            const nome = document.getElementById('inputNome').value;
-
-            const emp = getEmpresas().find(e => e.id == empresaAtivaId);
-            const msg = `💈 *AGENDAMENTO - ${emp.nome.toUpperCase()}* 💈\nCliente: ${nome}\nServiço: ${servico}\nData: ${data.split('-').reverse().join('/')}\nHorário: ${hora}`;
-            window.open(`https://wa.me/${emp.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
-            alert('Agendamento efetuado com sucesso!');
+        // Backup: como os dados ainda ficam no navegador, exporte com frequência
+        function exportarBackup() {
+            const blob = new Blob([JSON.stringify({ versao: 2, exportadoEm: new Date().toISOString(), empresas: getEmpresas() }, null, 2)], { type: 'application/json' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `agendify-backup-${hojeISO()}.json`;
+            a.click();
+            URL.revokeObjectURL(a.href);
         }
 
-        function openAgendamentosModal() { document.getElementById('agendamentosModal').classList.remove('hidden'); }
+        function importarBackup(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = () => {
+                try {
+                    const json = JSON.parse(reader.result);
+                    const lista = Array.isArray(json) ? json : json.empresas;
+                    if (!Array.isArray(lista)) throw new Error();
+                    if (!confirm(`Importar ${lista.length} empresa(s)? Isso SUBSTITUI as empresas atuais deste navegador.`)) return;
+                    if (saveEmpresas(lista.map(normalizarEmpresa))) { renderAdminTabela(); toast('✅ Backup importado!'); }
+                } catch { toast('❌ Arquivo inválido.'); }
+                input.value = '';
+            };
+            reader.readAsText(file);
+        }
+
+        // ======================================================
+        // AGENDAMENTO DO CLIENTE FINAL
+        // ======================================================
+        function handleBooking(ev) {
+            ev.preventDefault();
+            const emp = empresaAtual();
+            if (emp.status !== 'Ativo' && !emEdicaoVisual) return;
+            const servico = emp.servicos[document.getElementById('selectServico').value];
+            const data = document.getElementById('selectData').value;
+            const hora = document.getElementById('selectHora').value;
+            const nome = document.getElementById('inputNome').value.trim();
+            const fone = document.getElementById('inputFone').value.replace(/\D/g, '');
+            if (!servico || !hora) { toast('Escolha um serviço e um horário disponível.'); return; }
+            if (fone.length < 10) { toast('Confere o WhatsApp (DDD + número).'); return; }
+
+            const dataBR = data.split('-').reverse().join('/');
+            const diaSemana = DIAS[new Date(data + 'T12:00').getDay()];
+            const emoji = (NICHOS[emp.nicho] || NICHOS['Outro']).emoji;
+            const msg = `${emoji} *AGENDAMENTO - ${emp.nome.toUpperCase()}* ${emoji}\nCliente: ${nome}\nWhatsApp: ${fmtFone(fone)}\nServiço: ${servico.name} (R$ ${fmtBR(servico.price)} · ${servico.time})\nData: ${dataBR} (${diaSemana})\nHorário: ${hora}`;
+
+            const lista = getAgendamentos();
+            lista.push({ id: Date.now(), empresaId: emp.id, nome, fone, servico: servico.name, preco: servico.price, data, hora });
+            saveAgendamentos(lista);
+
+            window.open(`https://wa.me/${emp.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
+            toast('✅ Agendamento enviado! Finalize no WhatsApp.');
+            document.getElementById('inputNome').value = '';
+            document.getElementById('inputFone').value = '';
+            atualizarHorarios();
+            atualizarBadgeAgendamentos();
+        }
+
+        function meusAgendamentos() {
+            const emp = empresaAtual();
+            const hoje = hojeISO();
+            return getAgendamentos().filter(a => a.empresaId == emp.id && a.data >= hoje).sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
+        }
+
+        function atualizarBadgeAgendamentos() {
+            const n = meusAgendamentos().length;
+            const b = document.getElementById('agendamentosBadge');
+            b.innerText = n; b.classList.toggle('hidden', !n);
+        }
+
+        function openAgendamentosModal() {
+            const lista = meusAgendamentos();
+            document.getElementById('listAgendamentosModal').innerHTML = lista.map(a => `
+                <div class="bg-dark-800 border border-dark-700 rounded-lg p-3 flex justify-between items-center">
+                    <div>
+                        <p class="text-white font-semibold text-sm">${esc(a.servico)}</p>
+                        <p class="text-xs text-gray-400">${a.data.split('-').reverse().join('/')} às ${esc(a.hora)} · ${esc(a.nome)}</p>
+                    </div>
+                    <button onclick="cancelarAgendamento(${a.id})" class="text-xs text-red-400 hover:text-red-300">Cancelar</button>
+                </div>`).join('') || '<p class="text-gray-500 text-sm text-center py-6">Nenhum agendamento feito neste aparelho.</p>';
+            document.getElementById('agendamentosModal').classList.remove('hidden');
+        }
+
+        function cancelarAgendamento(id) {
+            if (!confirm('Cancelar este agendamento?')) return;
+            saveAgendamentos(getAgendamentos().filter(a => a.id != id));
+            openAgendamentosModal();
+            atualizarHorarios();
+            atualizarBadgeAgendamentos();
+        }
     </script>
 </body>
 </html>
