@@ -127,7 +127,11 @@
                         <i class="fa-solid fa-calendar-check text-lg"></i>
                         <span id="agendamentosBadge" class="hidden absolute -top-2 -right-3 bg-gold-500 text-onbrand font-bold text-xs w-4 h-4 rounded-full flex items-center justify-center">0</span>
                     </button>
-                    <button onclick="openSuperAdminAuth()" class="bg-dark-800 border border-gold-500/30 text-gold-400 hover:bg-dark-700 px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all">
+                    <button id="btnPainelDono" onclick="abrirPainelDono(empresaPainelId || minhaEmpresaId)" class="hidden bg-dark-800 border border-gold-500/30 text-gold-400 hover:bg-dark-700 px-4 py-2 rounded-lg text-xs font-semibold items-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-store"></i> Meu Painel
+                    </button>
+                    <!-- Só aparece no endereço ?admin (o cliente final nunca vê) -->
+                    <button id="btnSuperAdmin" onclick="openSuperAdminAuth()" class="hidden bg-dark-800 border border-gold-500/30 text-gold-400 hover:bg-dark-700 px-4 py-2 rounded-lg text-xs font-semibold items-center gap-1.5 transition-all">
                         <i class="fa-solid fa-shield-halved"></i> Super-Admin (Dono SaaS)
                     </button>
                 </nav>
@@ -240,7 +244,7 @@
                 </div>
             </div>
             <div class="text-center text-xs text-gray-600 mt-8 pt-4 border-t border-dark-800">
-                Powered by Agendify Cloud SaaS &copy; 2026
+                Powered by Agendify Cloud SaaS &copy; 2026 · <a id="linkAreaDono" href="?painel" class="hover:text-gray-400">Área do estabelecimento</a>
             </div>
         </footer>
     </main>
@@ -297,10 +301,57 @@
         </div>
     </main>
 
+    <!-- ================= PAINEL DO DONO DO ESTABELECIMENTO ================= -->
+    <main id="donoView" class="hidden pt-24 pb-16 min-h-screen bg-dark-900">
+        <div class="max-w-4xl mx-auto px-4 space-y-5">
+            <div class="flex flex-wrap gap-3 justify-between items-center">
+                <div>
+                    <p class="text-xs text-gold-400 uppercase font-semibold tracking-wider">Painel do Estabelecimento</p>
+                    <h1 id="donoNome" class="font-vintage text-3xl font-bold text-white"></h1>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" data-dono="editar" class="bg-gold-500 text-onbrand font-bold px-4 py-2.5 rounded-lg text-sm"><i class="fa-solid fa-pen mr-1"></i> Editar página, horários e preços</button>
+                    <button type="button" data-dono="ver-site" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700"><i class="fa-solid fa-eye mr-1"></i> Ver meu site</button>
+                    <button type="button" data-dono="copiar-link" class="bg-dark-800 text-gray-300 px-3 py-2.5 rounded-lg text-sm border border-dark-700" title="Copiar link pra mandar pros clientes"><i class="fa-solid fa-link"></i></button>
+                    <button type="button" onclick="sairAdmin()" class="bg-dark-800 text-red-400 px-3 py-2.5 rounded-lg text-sm border border-dark-700" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></button>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 bg-dark-800 border border-dark-700 rounded-xl p-2">
+                <button type="button" data-dono="dia-ant" class="w-10 h-10 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-chevron-left"></i></button>
+                <div class="flex-1 text-center">
+                    <input type="date" id="donoData" class="bg-transparent text-white font-semibold outline-none text-center">
+                    <p id="donoDiaSemana" class="text-xs text-gray-400"></p>
+                </div>
+                <button type="button" data-dono="hoje" class="px-3 h-10 rounded-lg text-xs font-semibold text-gold-400 hover:bg-dark-700">Hoje</button>
+                <button type="button" data-dono="dia-prox" class="w-10 h-10 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+
+            <div id="donoResumo" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+            <div id="donoAviso"></div>
+            <div id="donoLista" class="space-y-2"></div>
+            <p class="text-[11px] text-gray-500 text-center">Atualiza sozinho a cada minuto.</p>
+        </div>
+    </main>
+
+    <!-- MODAL AGENDAMENTO MANUAL (dono) -->
+    <div id="manualModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-dark-900 border border-gold-500/40 w-full max-w-sm rounded-2xl p-6 space-y-3">
+            <h3 class="font-vintage text-lg font-bold text-gold-400">Agendar às <span id="manualHora"></span></h3>
+            <input id="manualNome" placeholder="Nome do cliente" class="campo-painel">
+            <input id="manualFone" placeholder="WhatsApp (opcional)" inputmode="tel" class="campo-painel">
+            <select id="manualServico" class="campo-painel"></select>
+            <div class="flex gap-2 pt-2">
+                <button type="button" onclick="document.getElementById('manualModal').classList.add('hidden')" class="w-1/2 bg-dark-800 text-gray-300 py-2.5 rounded-lg text-sm">Cancelar</button>
+                <button type="button" id="btnSalvarManual" onclick="salvarManual()" class="w-1/2 bg-gold-500 text-onbrand font-bold py-2.5 rounded-lg text-sm">Agendar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL SENHA SUPER-ADMIN -->
     <div id="authModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-dark-900 border border-gold-500/45 w-full max-w-sm rounded-2xl p-6 text-center space-y-4">
-            <h3 class="font-vintage text-xl font-bold text-white">Segurança Super-Admin</h3>
+            <h3 id="tituloAuth" class="font-vintage text-xl font-bold text-white">Segurança Super-Admin</h3>
             <input type="email" id="adminEmailInput" placeholder="E-mail do admin" class="w-full bg-dark-800 border border-dark-700 text-white rounded-lg p-3 text-center outline-none">
             <input type="password" id="adminPassInput" placeholder="Senha" onkeydown="if(event.key==='Enter') verificarSenhaAdmin()" class="w-full bg-dark-800 border border-dark-700 text-white rounded-lg p-3 text-center outline-none">
             <div class="flex gap-2">
@@ -354,6 +405,16 @@
                             <option value="Cancelado">⚪ Cancelado</option>
                         </select>
                     </div>
+                </div>
+                <div id="blocoDono" class="hidden border-t border-dark-700 pt-3 space-y-2">
+                    <p class="text-xs text-gold-400 font-semibold"><i class="fa-solid fa-store mr-1"></i> Acesso do dono (Painel do Estabelecimento)</p>
+                    <div id="listaDonos" class="text-xs text-gray-300 space-y-1"></div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <input id="donoEmail" type="email" placeholder="e-mail do dono" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
+                        <input id="donoSenha" type="text" placeholder="senha provisória (6+)" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
+                    </div>
+                    <button type="button" id="btnCriarDono" onclick="criarAcessoDono()" class="w-full bg-dark-700 hover:bg-dark-600 text-gray-200 rounded-lg py-2 text-xs font-semibold">Criar acesso do dono</button>
+                    <p class="text-[11px] text-gray-500">Ele entra pelo rodapé do site ("Área do estabelecimento") ou pelo link <span id="linkPainelTexto" class="text-gray-400"></span></p>
                 </div>
                 <p id="modalDicaNicho" class="text-[11px] text-gray-500">A empresa nova já nasce com serviços, cores e textos do nicho escolhido.</p>
                 <div class="pt-3 flex justify-end gap-2">
@@ -453,6 +514,12 @@
         const COLUNAS = ['slug', 'nome', 'nicho', 'whatsapp', 'img', 'plano', 'status', 'titulo', 'sub', 'endereco', 'instagram', 'cor', 'fonte', 'agenda', 'servicos'];
         let EMPRESAS = [];      // cache do que veio do banco
         let souAdmin = false;
+        let souDono = false, minhaEmpresaId = null;
+        // Modo da página pelo endereço: ?c=slug (site do cliente) | ?painel (dono) | ?admin (você)
+        const PARAMS = new URLSearchParams(location.search);
+        const MODO = PARAMS.has('admin') ? 'admin' : PARAMS.has('painel') ? 'painel' : 'site';
+        // Cliente separado só pra criar login de dono sem derrubar a sessão do admin
+        const sbCadastro = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false, autoRefreshToken: false, storageKey: 'agendify-cadastro' } });
 
         function paraBanco(emp) { const o = {}; COLUNAS.forEach(k => o[k] = emp[k] ?? null); return o; }
         function getEmpresas() { return EMPRESAS; }
@@ -469,7 +536,10 @@
         // Público: carrega só a empresa do link (?c=slug). Admin: carrega todas.
         async function carregarEmpresas(slug) {
             let q = sb.from('empresas').select('*').order('id');
-            if (!souAdmin) q = slug ? q.eq('slug', slug) : q.limit(1);
+            if (!souAdmin) {
+                if (MODO === 'painel' && souDono) q = q.eq('id', minhaEmpresaId);
+                else q = slug ? q.eq('slug', slug) : q.limit(1);
+            }
             const { data, error } = await q;
             if (error) { erroBanco(error); return false; }
             EMPRESAS = data.map(normalizarEmpresa);
@@ -619,6 +689,7 @@
             if (!dataISO) return null;
             const dia = emp.agenda.dias[new Date(dataISO + 'T12:00').getDay()];
             if (!dia) return null;
+            if (ocupados.includes('*')) return 'fechado'; // dia fechado pelo dono
             if (!dia.aberto) return 'fechado';
             const passo = Number(emp.agenda.intervalo) || 30;
             const dur = servico ? duracaoMin(servico.time) : passo;
@@ -655,16 +726,37 @@
             document.getElementById('selectData').min = hojeISO();
             document.getElementById('selectData').addEventListener('change', atualizarHorarios);
             document.getElementById('selectServico').addEventListener('change', atualizarHorarios);
+            document.getElementById('donoData').addEventListener('change', e => { if (e.target.value) { dataPainel = e.target.value; renderPainelDono(); } });
 
             await verificarSessao();
-            // Link próprio por cliente: ?c=nome-da-empresa
-            const slug = new URLSearchParams(location.search).get('c');
-            if (!(await carregarEmpresas(slug))) { mostrarCarregando('Não deu pra conectar no banco.'); return; }
-            const achada = slug ? EMPRESAS.find(e => e.slug === slug) : EMPRESAS[0];
-            if (!achada) {
-                mostrarCarregando(slug ? 'Página não encontrada. Confira o link.' : 'Nenhuma empresa cadastrada ainda. Entre no Super-Admin para cadastrar.');
+            atualizarBotoesTopo();
+            const slug = PARAMS.get('c');
+
+            // ?admin = seu painel Super-Admin
+            if (MODO === 'admin') {
+                if (souAdmin) { showView('superadmin'); return; }
+                mostrarCarregando('Área restrita.');
+                openSuperAdminAuth('admin');
                 return;
             }
+
+            // ?painel = painel do dono do estabelecimento
+            if (MODO === 'painel') {
+                if (souDono) { await carregarEmpresas(); abrirPainelDono(minhaEmpresaId); return; }
+                if (souAdmin && slug) {
+                    await carregarEmpresas();
+                    const emp = EMPRESAS.find(x => x.slug === slug);
+                    if (emp) { abrirPainelDono(emp.id); return; }
+                }
+                mostrarCarregando('Área do estabelecimento.');
+                openSuperAdminAuth('dono');
+                return;
+            }
+
+            // ?c=slug = site público do cliente final (limpo, sem nada de admin)
+            if (!(await carregarEmpresas(slug))) { mostrarCarregando('Não deu pra conectar no banco.'); return; }
+            const achada = slug ? EMPRESAS.find(e => e.slug === slug) : EMPRESAS[0];
+            if (!achada) { mostrarCarregando('Página não encontrada. Confira o link.'); return; }
             empresaAtivaId = achada.id;
             carregarSitePublico();
             esconderCarregando();
@@ -680,22 +772,24 @@
         window.addEventListener('beforeunload', e => { if (emEdicaoVisual && alteracoesPendentes) { e.preventDefault(); e.returnValue = ''; } });
         window.addEventListener('resize', ajustarBarra);
 
+        function mostrarSo(id) {
+            ['clientView', 'superAdminView', 'donoView'].forEach(v => document.getElementById(v).classList.toggle('hidden', v !== id));
+        }
+
         async function showView(view) {
             if (view === 'client') {
-                document.getElementById('superAdminView').classList.add('hidden');
-                document.getElementById('clientView').classList.remove('hidden');
+                mostrarSo('clientView');
                 if (!empresaAtual()) { mostrarCarregando('Nenhuma empresa cadastrada ainda.'); return; }
                 esconderCarregando();
                 carregarSitePublico();
             } else {
-                if (!souAdmin) { openSuperAdminAuth(); return; }
+                if (!souAdmin) { openSuperAdminAuth('admin'); return; }
                 if (emEdicaoVisual && alteracoesPendentes && !confirm('Você tem alterações não salvas. Descartar?')) return;
                 desativarModoEdicao();
                 aplicarTema('#d4af37', 'vintage');
                 esconderCarregando();
-                document.getElementById('clientView').classList.add('hidden');
-                document.getElementById('superAdminView').classList.remove('hidden');
-                history.replaceState(null, '', location.pathname);
+                mostrarSo('superAdminView');
+                history.replaceState(null, '', '?admin');
                 await carregarEmpresas();
                 document.getElementById('btnMigrarLocal').classList.toggle('hidden', !localStorage.getItem('agendify_empresas'));
                 renderAdminTabela();
@@ -706,7 +800,7 @@
             const emp = empresaAtual();
             if (!emp) return;
             empresaAtivaId = emp.id;
-            if (!emEdicaoVisual) history.replaceState(null, '', `?c=${emp.slug}`);
+            if (!emEdicaoVisual && MODO === 'site') history.replaceState(null, '', `?c=${emp.slug}`);
             renderSite(emp);
         }
 
@@ -743,6 +837,7 @@
             aviso.classList.toggle('hidden', !(bloqueada && emEdicaoVisual));
             aviso.innerText = `⚠️ Status "${emp.status}": no site público o agendamento aparece BLOQUEADO para os clientes.`;
 
+            document.getElementById('linkAreaDono').href = `?c=${emp.slug}&painel`;
             renderServicosGrid(emp.servicos);
             atualizarBadgeAgendamentos();
         }
@@ -820,15 +915,17 @@
         // ======================================================
         // MODO DE EDIÇÃO VISUAL
         // ======================================================
-        function ativarEdicaoVisualParaEmpresa(id) {
+        let voltarPara = 'site';
+        function ativarEdicaoVisualParaEmpresa(id, origem = 'site') {
+            voltarPara = origem;
             empresaAtivaId = id;
             const original = getEmpresas().find(e => e.id == id);
             if (!original) return;
             rascunho = structuredClone(original);
             emEdicaoVisual = true;
             alteracoesPendentes = false;
-            document.getElementById('superAdminView').classList.add('hidden');
-            document.getElementById('clientView').classList.remove('hidden');
+            mostrarSo('clientView');
+            esconderCarregando();
             document.getElementById('barraModoEdicao').classList.remove('hidden');
             document.getElementById('hintTrocaFoto').classList.remove('hidden');
             document.body.classList.add('modo-edicao');
@@ -861,7 +958,8 @@
         function sairDaEdicao() {
             if (alteracoesPendentes && !confirm('Sair sem salvar? As alterações feitas desde o último "Salvar" serão perdidas.')) return;
             desativarModoEdicao();
-            carregarSitePublico();
+            if (voltarPara === 'dono') abrirPainelDono(empresaAtivaId);
+            else carregarSitePublico();
         }
 
         function marcarSujo(v = true) {
@@ -1016,7 +1114,7 @@
                     ${lbl('Nome do estabelecimento', `<input class="campo-painel" data-f="nome" value="${esc(d.nome)}">`)}
                     ${lbl('Nicho', `<select class="campo-painel" data-f="nicho">${Object.keys(NICHOS).map(n => `<option ${n === d.nicho ? 'selected' : ''}>${esc(n)}</option>`).join('')}</select>`, 'Pra trocar cor/ícones pelo padrão do nicho, use a aba Visual.')}
                     ${lbl('WhatsApp que recebe os agendamentos', `<input class="campo-painel" data-f="whatsapp" inputmode="numeric" value="${esc(d.whatsapp)}" placeholder="5549999999999">`, 'Só números: 55 + DDD + número.')}
-                    ${lbl('Link da página', `<div class="flex gap-2"><input class="campo-painel" data-f="slug" value="${esc(d.slug)}"><button type="button" data-acao="copiar-link" class="px-3 rounded-lg bg-gold-500 text-onbrand text-xs font-bold whitespace-nowrap"><i class="fa-solid fa-link"></i> Copiar</button></div>`, `Fica: ...?c=${esc(d.slug)}`)}
+                    ${!souAdmin ? '' : lbl('Link da página', `<div class="flex gap-2"><input class="campo-painel" data-f="slug" value="${esc(d.slug)}"><button type="button" data-acao="copiar-link" class="px-3 rounded-lg bg-gold-500 text-onbrand text-xs font-bold whitespace-nowrap"><i class="fa-solid fa-link"></i> Copiar</button></div>`, `Fica: ...?c=${esc(d.slug)}`)}
                     ${lbl('Título principal', `<input class="campo-painel" data-f="titulo" value="${esc(d.titulo)}">`)}
                     ${lbl('Subtítulo', `<textarea class="campo-painel" rows="3" data-f="sub">${esc(d.sub)}</textarea>`)}
                     ${lbl('Endereço', `<textarea class="campo-painel" rows="2" data-f="endereco">${esc(d.endereco)}</textarea>`)}
@@ -1171,14 +1269,29 @@
         // ======================================================
         // Login de admin: usuário criado no Supabase (Authentication) e cadastrado na tabela "admins"
         async function verificarSessao() {
+            souAdmin = false; souDono = false; minhaEmpresaId = null;
             const { data: { session } } = await sb.auth.getSession();
-            if (!session) { souAdmin = false; return; }
-            const { data } = await sb.from('admins').select('user_id').eq('user_id', session.user.id).maybeSingle();
-            souAdmin = !!data;
+            if (!session) return;
+            const [a, d] = await Promise.all([
+                sb.from('admins').select('user_id').eq('user_id', session.user.id).maybeSingle(),
+                sb.from('donos').select('empresa_id').eq('user_id', session.user.id).maybeSingle()
+            ]);
+            souAdmin = !!a.data;
+            if (d.data) { souDono = true; minhaEmpresaId = d.data.empresa_id; }
         }
 
-        function openSuperAdminAuth() {
-            if (souAdmin) { showView('superadmin'); return; }
+        function atualizarBotoesTopo() {
+            const mostra = (id, v) => { const el = document.getElementById(id); el.classList.toggle('hidden', !v); el.classList.toggle('flex', v); };
+            mostra('btnSuperAdmin', MODO === 'admin');
+            mostra('btnPainelDono', MODO === 'painel' && (souDono || souAdmin));
+        }
+
+        let tipoLogin = 'admin';
+        function openSuperAdminAuth(tipo = (MODO === 'painel' ? 'dono' : 'admin')) {
+            tipoLogin = tipo;
+            if (tipo === 'admin' && souAdmin) { showView('superadmin'); return; }
+            if (tipo === 'dono' && souDono) { abrirPainelDono(minhaEmpresaId); return; }
+            document.getElementById('tituloAuth').innerText = tipo === 'dono' ? 'Área do Estabelecimento' : 'Segurança Super-Admin';
             document.getElementById('adminPassInput').value = '';
             document.getElementById('authModal').classList.remove('hidden');
             setTimeout(() => document.getElementById('adminEmailInput').focus(), 50);
@@ -1191,18 +1304,21 @@
             btn.disabled = true; btn.innerText = 'Entrando...';
             const { error } = await sb.auth.signInWithPassword({ email, password });
             btn.disabled = false; btn.innerText = 'Entrar';
-            if (error) { toast('E-mail ou senha incorretos.'); return; }
+            if (error) { toast(/confirm/i.test(error.message) ? 'Esse e-mail ainda não foi confirmado.' : 'E-mail ou senha incorretos.'); return; }
             await verificarSessao();
-            if (!souAdmin) { await sb.auth.signOut(); toast('Essa conta não é admin (falta cadastrar na tabela admins).', 6000); return; }
-            document.getElementById('authModal').classList.add('hidden');
-            showView('superadmin');
+            atualizarBotoesTopo();
+            if (souAdmin && tipoLogin === 'admin') { document.getElementById('authModal').classList.add('hidden'); showView('superadmin'); return; }
+            if (souDono) { document.getElementById('authModal').classList.add('hidden'); await carregarEmpresas(); abrirPainelDono(minhaEmpresaId); return; }
+            if (souAdmin) { document.getElementById('authModal').classList.add('hidden'); showView('superadmin'); return; }
+            await sb.auth.signOut();
+            toast('Essa conta não tem acesso a nenhum painel.', 6000);
         }
 
         async function sairAdmin() {
+            if (emEdicaoVisual && alteracoesPendentes && !confirm('Sair sem salvar as alterações?')) return;
+            const emp = empresaAtual();
             await sb.auth.signOut();
-            souAdmin = false;
-            toast('Você saiu da conta admin.');
-            showView('client');
+            location.href = location.pathname + (emp ? `?c=${emp.slug}` : '');
         }
 
         function badgeStatus(status) {
@@ -1222,7 +1338,8 @@
                     <td class="p-4 text-xs font-semibold">${esc(e.plano)}</td>
                     <td class="p-4">${badgeStatus(e.status)}</td>
                     <td class="p-4 text-center space-x-1 whitespace-nowrap">
-                        <button onclick="carregarEmpresaEVer(${e.id})" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Ver Site Público"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="window.open('?c=${esc(e.slug)}', '_blank')" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Ver como o cliente final (nova aba)"><i class="fa-solid fa-eye"></i></button>
+                        <button onclick="window.open('?c=${esc(e.slug)}&painel', '_blank')" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Ver o painel do dono (nova aba)"><i class="fa-solid fa-store"></i></button>
                         <button onclick="copiarLinkEmpresa(${e.id})" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Copiar link do cliente"><i class="fa-solid fa-link"></i></button>
                         <button onclick="ativarEdicaoVisualParaEmpresa(${e.id})" class="bg-gold-500 text-onbrand hover:bg-gold-400 px-3 py-1.5 rounded text-xs font-bold" title="Editar Visualmente na Tela"><i class="fa-solid fa-pen"></i> Editar Visualmente</button>
                         <button onclick="abrirAgendaAdmin(${e.id})" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Agendamentos recebidos"><i class="fa-solid fa-calendar-days"></i></button>
@@ -1247,6 +1364,7 @@
             document.getElementById('modalStatus').value = "Ativo";
             document.getElementById('wrapModalImg').classList.remove('hidden');
             document.getElementById('modalDicaNicho').classList.remove('hidden');
+            document.getElementById('blocoDono').classList.add('hidden');
             document.getElementById('empresaModal').classList.remove('hidden');
         }
 
@@ -1262,6 +1380,9 @@
             document.getElementById('modalStatus').value = e.status;
             document.getElementById('wrapModalImg').classList.add('hidden');
             document.getElementById('modalDicaNicho').classList.add('hidden');
+            document.getElementById('blocoDono').classList.remove('hidden');
+            document.getElementById('linkPainelTexto').innerText = `${location.origin}${location.pathname}?painel`;
+            carregarDonosModal(e.id);
             document.getElementById('empresaModal').classList.remove('hidden');
         }
 
@@ -1375,6 +1496,239 @@
             Object.keys(cacheOcupados).forEach(k => delete cacheOcupados[k]);
             abrirAgendaAdmin(empId);
         }
+
+        // ======================================================
+        // ACESSO DO DONO (criado pelo Super-Admin)
+        // ======================================================
+        async function carregarDonosModal(empId) {
+            const el = document.getElementById('listaDonos');
+            el.innerHTML = '<span class="text-gray-500">Carregando...</span>';
+            const { data, error } = await sb.from('donos').select('user_id, email').eq('empresa_id', empId);
+            if (error) { el.innerHTML = '<span class="text-red-400">Rode o agendify-supabase-v3.sql pra liberar o painel do dono.</span>'; return; }
+            el.innerHTML = data.map(d => `<div class="flex justify-between items-center bg-dark-800 rounded px-2 py-1.5"><span><i class="fa-solid fa-user mr-1 text-gray-500"></i>${esc(d.email || d.user_id)}</span><button type="button" onclick="removerDono('${d.user_id}', ${empId})" class="text-red-400 hover:text-red-300">remover</button></div>`).join('') || '<span class="text-gray-500">Nenhum dono com acesso ainda.</span>';
+        }
+
+        async function criarAcessoDono() {
+            const empId = Number(document.getElementById('editEmpresaId').value);
+            const email = document.getElementById('donoEmail').value.trim().toLowerCase();
+            const password = document.getElementById('donoSenha').value;
+            if (!email || password.length < 6) { toast('Preencha o e-mail e uma senha com 6+ caracteres.'); return; }
+            const btn = document.getElementById('btnCriarDono');
+            btn.disabled = true; btn.innerText = 'Criando...';
+            const { data, error } = await sbCadastro.auth.signUp({ email, password });
+            btn.disabled = false; btn.innerText = 'Criar acesso do dono';
+            if (error) { toast(`❌ ${/registered|exists/i.test(error.message) ? 'Esse e-mail já tem conta.' : error.message}`, 6000); return; }
+            if (!data.user || (data.user.identities && data.user.identities.length === 0)) { toast('Esse e-mail já tem conta no Supabase. Use outro e-mail.', 6000); return; }
+            const { error: e2 } = await sb.from('donos').insert({ user_id: data.user.id, empresa_id: empId, email });
+            if (e2) { erroBanco(e2.code === '23505' ? { message: 'Esse usuário já é dono de outra empresa.' } : e2, 'Não vinculou'); return; }
+            document.getElementById('donoEmail').value = '';
+            document.getElementById('donoSenha').value = '';
+            carregarDonosModal(empId);
+            toast(data.session ? '✅ Acesso criado! Já pode entrar.' : '✅ Acesso criado. Ele precisa confirmar pelo e-mail antes de entrar.', 6000);
+        }
+
+        async function removerDono(userId, empId) {
+            if (!confirm('Tirar o acesso deste dono ao painel?')) return;
+            const { error } = await sb.from('donos').delete().eq('user_id', userId);
+            if (error) { erroBanco(error); return; }
+            carregarDonosModal(empId);
+        }
+
+        // ======================================================
+        // PAINEL DO DONO: agenda do dia, bloqueios, manual
+        // ======================================================
+        let empresaPainelId = null, dataPainel = null, timerPainel = null, diaPainel = { ags: [], bls: [] };
+
+        function addDias(iso, n) { const d = new Date(iso + 'T12:00'); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); }
+
+        function gradeDoDia(emp, iso) {
+            const dia = emp.agenda.dias[new Date(iso + 'T12:00').getDay()];
+            if (!dia || !dia.aberto) return [];
+            const passo = Number(emp.agenda.intervalo) || 30, p = emp.agenda.pausa, lista = [];
+            for (let t = minutos(dia.inicio); t < minutos(dia.fim); t += passo) {
+                if (p?.ativa && t >= minutos(p.inicio) && t < minutos(p.fim)) continue;
+                lista.push(hhmm(t));
+            }
+            return lista;
+        }
+
+        async function abrirPainelDono(id) {
+            if (!id) return;
+            if (emEdicaoVisual && alteracoesPendentes && !confirm('Sair do editor sem salvar?')) return;
+            if (!EMPRESAS.some(e => e.id == id)) await carregarEmpresas();
+            const emp = EMPRESAS.find(e => e.id == id);
+            if (!emp) { mostrarCarregando('Empresa não encontrada.'); return; }
+            if (emEdicaoVisual) desativarModoEdicao();
+            empresaPainelId = emp.id; empresaAtivaId = emp.id;
+            aplicarTema(emp.cor, emp.fonte);
+            setCampo('nome', emp.nome);
+            document.getElementById('lblTipoNichoBadge').innerText = emp.nicho;
+            document.getElementById('logoIcone').className = `fa-solid ${(NICHOS[emp.nicho] || NICHOS['Outro']).logo} text-lg`;
+            document.getElementById('donoNome').innerText = emp.nome;
+            document.title = `${emp.nome} | Painel`;
+            esconderCarregando();
+            mostrarSo('donoView');
+            atualizarBotoesTopo();
+            dataPainel = dataPainel || hojeISO();
+            await renderPainelDono();
+            clearInterval(timerPainel);
+            timerPainel = setInterval(() => {
+                const aberto = !document.getElementById('donoView').classList.contains('hidden');
+                const modal = !document.getElementById('manualModal').classList.contains('hidden');
+                if (aberto && !modal) renderPainelDono(true);
+            }, 60000);
+        }
+
+        async function renderPainelDono(silencioso = false) {
+            const emp = EMPRESAS.find(e => e.id == empresaPainelId);
+            if (!emp) return;
+            const d = dataPainel, hoje = hojeISO();
+            const dt = new Date(d + 'T12:00');
+            document.getElementById('donoData').value = d;
+            document.getElementById('donoDiaSemana').innerText = DIAS[dt.getDay()] + (d === hoje ? ' · Hoje' : '');
+            const listaEl = document.getElementById('donoLista');
+            if (!silencioso) listaEl.innerHTML = '<p class="text-center text-gray-500 py-8"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Carregando...</p>';
+
+            const [ra, rb] = await Promise.all([
+                sb.from('agendamentos').select('*').eq('empresa_id', emp.id).eq('data', d).order('hora'),
+                sb.from('bloqueios').select('*').eq('empresa_id', emp.id).eq('data', d)
+            ]);
+            if (ra.error || rb.error) {
+                listaEl.innerHTML = '<p class="text-center text-red-400 py-8">Não deu pra carregar. Se for a primeira vez, rode o agendify-supabase-v3.sql no Supabase.</p>';
+                return;
+            }
+            const ags = ra.data, bls = rb.data;
+            diaPainel = { ags, bls };
+            const diaTodo = bls.find(b => !b.hora);
+            const cfg = emp.agenda.dias[dt.getDay()];
+            const grade = diaTodo ? [] : gradeDoDia(emp, d);
+            const bloqueadas = new Set(bls.filter(b => b.hora).map(b => b.hora));
+            const marcadas = new Set(ags.map(a => a.hora));
+            const horas = [...new Set([...grade, ...ags.map(a => a.hora), ...bloqueadas])].sort();
+            const agoraMin = d === hoje ? new Date().getHours() * 60 + new Date().getMinutes() : (d < hoje ? 99999 : -1);
+            const livres = grade.filter(h => !marcadas.has(h) && !bloqueadas.has(h) && minutos(h) > agoraMin).length;
+            const previsto = ags.filter(a => a.situacao !== 'faltou').reduce((s, a) => s + Number(a.preco || 0), 0);
+
+            const card = (titulo, valor, icone) => `<div class="bg-dark-800 border border-dark-700 rounded-xl p-4"><p class="text-xs text-gray-400"><i class="fa-solid ${icone} mr-1 text-gold-400"></i>${titulo}</p><p class="text-2xl font-bold text-white mt-1">${valor}</p></div>`;
+            document.getElementById('donoResumo').innerHTML =
+                card('Agendamentos', ags.length, 'fa-calendar-check') +
+                card('Previsto', 'R$ ' + fmtBR(previsto), 'fa-sack-dollar') +
+                card('Concluídos', ags.filter(a => a.situacao === 'concluido').length, 'fa-circle-check') +
+                card('Horários livres', livres, 'fa-clock');
+
+            const botaoDia = `<button type="button" data-dono="${diaTodo ? 'reabrir-dia' : 'fechar-dia'}" ${diaTodo ? `data-id="${diaTodo.id}"` : ''} class="text-xs font-semibold px-3 py-1.5 rounded-lg ${diaTodo ? 'bg-green-600 text-white' : 'bg-dark-700 text-gray-200 hover:bg-dark-600'}">${diaTodo ? '<i class="fa-solid fa-lock-open mr-1"></i>Reabrir este dia' : '<i class="fa-solid fa-lock mr-1"></i>Fechar o dia inteiro'}</button>`;
+            let aviso = '';
+            if (diaTodo) aviso = `Dia fechado por você${diaTodo.motivo ? ` (${esc(diaTodo.motivo)})` : ''}. Clientes não conseguem agendar.`;
+            else if (!cfg.aberto) aviso = 'Pela sua agenda semanal, você não abre neste dia.';
+            document.getElementById('donoAviso').innerHTML = `<div class="flex flex-wrap gap-2 justify-between items-center text-sm ${aviso ? 'bg-red-500/10 border border-red-500/30 text-red-300' : 'text-gray-400'} rounded-xl ${aviso ? 'p-3' : ''}"><span>${aviso || ''}</span>${cfg.aberto || diaTodo ? botaoDia : ''}</div>`;
+
+            const SIT = { confirmado: ['Confirmado', 'text-gold-400 bg-gold-500/10'], concluido: ['Concluído', 'text-green-400 bg-green-500/10'], faltou: ['Faltou', 'text-red-400 bg-red-500/10'] };
+            listaEl.innerHTML = horas.map(h => {
+                const a = ags.find(x => x.hora === h);
+                const b = bls.find(x => x.hora === h);
+                const passou = d < hoje || (d === hoje && minutos(h) <= agoraMin);
+                if (a) {
+                    const [sitTxt, sitCls] = SIT[a.situacao] || SIT.confirmado;
+                    return `<div class="flex items-center gap-3 bg-dark-800 border border-gold-500/20 rounded-xl p-3">
+                        <div class="w-14 font-bold text-gold-400">${esc(h)}</div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-white font-semibold truncate">${esc(a.nome)} <span class="ml-1 text-[11px] px-2 py-0.5 rounded-full ${sitCls}">${sitTxt}</span>${a.origem === 'manual' ? '<span class="ml-1 text-[11px] text-gray-500">manual</span>' : ''}</p>
+                            <p class="text-xs text-gray-400 truncate">${esc(a.servico)} · R$ ${fmtBR(a.preco || 0)}${a.fone ? ` · <a href="https://wa.me/55${esc(a.fone)}" target="_blank" class="text-gold-400 hover:underline"><i class="fa-brands fa-whatsapp"></i> ${esc(fmtFone(a.fone))}</a>` : ''}</p>
+                        </div>
+                        <div class="flex gap-1 shrink-0">
+                            <button type="button" data-dono="concluido" data-id="${a.id}" class="w-9 h-9 rounded-lg ${a.situacao === 'concluido' ? 'bg-green-600 text-white' : 'bg-dark-700 text-green-400'}" title="Concluído"><i class="fa-solid fa-check"></i></button>
+                            <button type="button" data-dono="faltou" data-id="${a.id}" class="w-9 h-9 rounded-lg ${a.situacao === 'faltou' ? 'bg-red-600 text-white' : 'bg-dark-700 text-red-400'}" title="Faltou"><i class="fa-solid fa-user-xmark"></i></button>
+                            <button type="button" data-dono="cancelar" data-id="${a.id}" class="w-9 h-9 rounded-lg bg-dark-700 text-gray-400 hover:text-red-400" title="Cancelar e liberar horário"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                }
+                if (b) return `<div class="flex items-center gap-3 bg-dark-800/50 border border-dashed border-dark-600 rounded-xl p-3">
+                        <div class="w-14 font-bold text-gray-500">${esc(h)}</div>
+                        <div class="flex-1 text-sm text-gray-500"><i class="fa-solid fa-lock mr-1"></i>Bloqueado${b.motivo ? ` · ${esc(b.motivo)}` : ''}</div>
+                        <button type="button" data-dono="desbloquear" data-id="${b.id}" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-dark-700 text-gray-200 hover:bg-dark-600">Liberar</button>
+                    </div>`;
+                return `<div class="flex items-center gap-3 border border-dark-800 rounded-xl p-3 ${passou ? 'opacity-40' : ''}">
+                        <div class="w-14 font-bold text-gray-300">${esc(h)}</div>
+                        <div class="flex-1 text-sm text-gray-500">Livre</div>
+                        ${passou ? '' : `<button type="button" data-dono="manual" data-hora="${esc(h)}" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-gold-500/10 text-gold-400 hover:bg-gold-500/20">+ Agendar</button>
+                        <button type="button" data-dono="bloquear" data-hora="${esc(h)}" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-dark-700 text-gray-300 hover:bg-dark-600">Bloquear</button>`}
+                    </div>`;
+            }).join('') || `<p class="text-center text-gray-500 py-8">${diaTodo || !cfg.aberto ? 'Nenhum agendamento neste dia.' : 'Sem horários neste dia.'}</p>`;
+        }
+
+        let horaManual = null;
+        async function salvarManual() {
+            const emp = EMPRESAS.find(e => e.id == empresaPainelId);
+            const nome = document.getElementById('manualNome').value.trim();
+            const s = emp.servicos[document.getElementById('manualServico').value];
+            if (!nome || !s) { toast('Coloque o nome do cliente.'); return; }
+            const btn = document.getElementById('btnSalvarManual');
+            btn.disabled = true;
+            const { error } = await sb.from('agendamentos').insert({
+                empresa_id: emp.id, nome, fone: document.getElementById('manualFone').value.replace(/\D/g, '').replace(/^55(?=\d{10,11}$)/, ''),
+                servico: s.name, preco: Number(s.price), data: dataPainel, hora: horaManual, origem: 'manual'
+            });
+            btn.disabled = false;
+            if (error) { erroBanco(error.code === '23505' ? { message: 'Esse horário acabou de ser ocupado.' } : error, 'Não agendou'); return; }
+            document.getElementById('manualModal').classList.add('hidden');
+            limparCacheOcupados();
+            renderPainelDono(true);
+            toast('✅ Agendado!');
+        }
+
+        function limparCacheOcupados() { Object.keys(cacheOcupados).forEach(k => delete cacheOcupados[k]); }
+
+        document.getElementById('donoView').addEventListener('click', async ev => {
+            const b = ev.target.closest('[data-dono]');
+            if (!b) return;
+            const emp = EMPRESAS.find(e => e.id == empresaPainelId);
+            const id = Number(b.dataset.id);
+            const ag = diaPainel.ags.find(a => a.id == id);
+            let r = null;
+            switch (b.dataset.dono) {
+                case 'dia-ant': dataPainel = addDias(dataPainel, -1); renderPainelDono(); return;
+                case 'dia-prox': dataPainel = addDias(dataPainel, 1); renderPainelDono(); return;
+                case 'hoje': dataPainel = hojeISO(); renderPainelDono(); return;
+                case 'editar': ativarEdicaoVisualParaEmpresa(emp.id, 'dono'); return;
+                case 'ver-site': window.open(`?c=${emp.slug}`, '_blank'); return;
+                case 'copiar-link': copiarTexto(linkEmpresa(emp)); return;
+                case 'concluido': case 'faltou':
+                    r = await sb.from('agendamentos').update({ situacao: ag.situacao === b.dataset.dono ? 'confirmado' : b.dataset.dono }).eq('id', id);
+                    break;
+                case 'cancelar': {
+                    if (!confirm(`Cancelar o horário de ${ag.nome} às ${ag.hora}? O horário fica livre de novo.`)) return;
+                    const avisar = ag.fone && confirm('Quer avisar o cliente no WhatsApp?');
+                    const janela = avisar ? window.open('', '_blank') : null;
+                    r = await sb.from('agendamentos').delete().eq('id', id);
+                    if (janela) {
+                        if (r.error) janela.close();
+                        else janela.location.href = `https://wa.me/55${ag.fone}?text=${encodeURIComponent(`Olá ${ag.nome}, aqui é da ${emp.nome}. Precisamos cancelar seu horário de ${ag.data.split('-').reverse().join('/')} às ${ag.hora}. Podemos remarcar?`)}`;
+                    }
+                    break;
+                }
+                case 'bloquear': r = await sb.from('bloqueios').insert({ empresa_id: emp.id, data: dataPainel, hora: b.dataset.hora }); break;
+                case 'desbloquear': case 'reabrir-dia': r = await sb.from('bloqueios').delete().eq('id', id); break;
+                case 'fechar-dia': {
+                    const motivo = prompt('Motivo (opcional, ex: Feriado, Folga):', '');
+                    if (motivo === null) return;
+                    r = await sb.from('bloqueios').insert({ empresa_id: emp.id, data: dataPainel, hora: null, motivo: motivo.trim() || null });
+                    break;
+                }
+                case 'manual':
+                    horaManual = b.dataset.hora;
+                    document.getElementById('manualHora').innerText = `${horaManual} · ${dataPainel.split('-').reverse().join('/')}`;
+                    document.getElementById('manualNome').value = '';
+                    document.getElementById('manualFone').value = '';
+                    document.getElementById('manualServico').innerHTML = emp.servicos.map((s, i) => `<option value="${i}">${esc(s.name)} - R$ ${fmtBR(s.price)}</option>`).join('');
+                    document.getElementById('manualModal').classList.remove('hidden');
+                    setTimeout(() => document.getElementById('manualNome').focus(), 50);
+                    return;
+                default: return;
+            }
+            if (r && r.error) { erroBanco(r.error, 'Não salvou'); return; }
+            limparCacheOcupados();
+            renderPainelDono(true);
+        });
 
         // ======================================================
         // AGENDAMENTO DO CLIENTE FINAL
