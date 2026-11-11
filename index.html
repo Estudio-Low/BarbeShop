@@ -2256,31 +2256,39 @@
             }
             const attr = i => ed ? 'data-abre="fotos"' : `data-foto="${i}"`;
             const leg = f => esc(f.legenda);
+            // Nunca corta a foto: mostra inteira, na proporção original (sem esticar foto pequena)
+            const faixa = 'flex gap-3 sm:gap-4 w-max mx-auto items-start';
             const T = {
-                barbearia: { grade: 'grid grid-cols-2 md:grid-cols-4 gap-2', item: (f, i) => `
-                    <button type="button" ${attr(i)} class="relative aspect-[4/5] overflow-hidden rounded-md group">
-                        <img src="${esc(f.url)}" alt="${leg(f)}" loading="lazy" decoding="async" class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 group-hover:scale-105 transition duration-500">
-                        ${f.legenda ? `<span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent pt-8 pb-2.5 px-3 text-left text-[11px] sm:text-xs font-bold uppercase tracking-wider text-white">${leg(f)}</span>` : ''}
+                barbearia: { grade: faixa, item: (f, i) => `
+                    <button type="button" ${attr(i)} class="snap-start shrink-0 text-left group">
+                        <span class="block overflow-hidden rounded-md border border-gold-500/25 bg-black">
+                            <img src="${esc(f.url)}" alt="${leg(f)}" loading="lazy" decoding="async" class="block h-auto w-auto max-h-[300px] md:max-h-[380px] max-w-[78vw] grayscale-[35%] group-hover:grayscale-0 transition duration-500">
+                        </span>
+                        ${f.legenda ? `<span class="flex items-center gap-2 mt-2.5 text-[11px] sm:text-xs font-bold uppercase tracking-wider text-white"><span class="w-4 h-0.5 bg-gold-500"></span>${leg(f)}</span>` : ''}
                     </button>` },
                 salao: { grade: 'columns-2 md:columns-3 gap-4', item: (f, i) => `
                     <button type="button" ${attr(i)} class="block w-full mb-4 break-inside-avoid text-left group">
                         <img src="${esc(f.url)}" alt="${leg(f)}" loading="lazy" decoding="async" class="w-full rounded-sm group-hover:opacity-90 transition">
                         ${f.legenda ? `<span class="block font-vintage italic text-sm sm:text-base text-gray-300 mt-2">${leg(f)}</span>` : ''}
                     </button>` },
-                manicure: { grade: 'grid grid-cols-2 md:grid-cols-3 gap-3', item: (f, i) => `
-                    <button type="button" ${attr(i)} class="relative aspect-square overflow-hidden rounded-[1.75rem] group">
-                        <img src="${esc(f.url)}" alt="${leg(f)}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        ${f.legenda ? `<span class="absolute left-2.5 bottom-2.5 max-w-[85%] truncate bg-white/90 text-[#33213f] text-[11px] sm:text-xs font-semibold px-3 py-1 rounded-full">${leg(f)}</span>` : ''}
+                manicure: { grade: faixa, item: (f, i) => `
+                    <button type="button" ${attr(i)} class="snap-start shrink-0 text-center group">
+                        <span class="block overflow-hidden rounded-[1.75rem] shadow-lg">
+                            <img src="${esc(f.url)}" alt="${leg(f)}" loading="lazy" decoding="async" class="block h-auto w-auto max-h-[300px] md:max-h-[360px] max-w-[78vw] group-hover:scale-105 transition duration-500">
+                        </span>
+                        ${f.legenda ? `<span class="inline-block mt-2.5 bg-gold-500/15 text-gold-400 text-[11px] sm:text-xs font-semibold px-3 py-1 rounded-full">${leg(f)}</span>` : ''}
                     </button>` },
-                padrao: { grade: 'grid grid-cols-2 md:grid-cols-3 gap-3', item: (f, i) => `
-                    <button type="button" ${attr(i)} class="text-left group">
-                        <span class="block aspect-square overflow-hidden rounded-xl"><img src="${esc(f.url)}" alt="${leg(f)}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500"></span>
+                padrao: { grade: 'columns-2 md:columns-3 gap-4', item: (f, i) => `
+                    <button type="button" ${attr(i)} class="block w-full mb-4 break-inside-avoid text-left group">
+                        <img src="${esc(f.url)}" alt="${leg(f)}" loading="lazy" decoding="async" class="w-full rounded-xl group-hover:opacity-90 transition">
                         ${f.legenda ? `<span class="block text-sm text-gray-300 mt-2">${leg(f)}</span>` : ''}
                     </button>` }
             };
             const t = T[emp.tema] || T.padrao;
-            g.className = t.grade;
-            g.innerHTML = fotos.map(t.item).join('');
+            // barbearia e manicure: faixa que rola de lado no celular (e centraliza quando cabe)
+            const rola = t.grade === faixa;
+            g.className = rola ? 'overflow-x-auto snap-x snap-mandatory pb-3 -mx-4 px-4' : '';
+            g.innerHTML = `<div class="${t.grade}">${fotos.map(t.item).join('')}</div>`;
         }
 
         // ---------- foto ampliada ----------
