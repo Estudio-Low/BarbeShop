@@ -6,6 +6,8 @@
     <title>Agendify - Cloud SaaS & Edição Visual</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase (banco de dados, login e fotos) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts: Cinzel (clássica), Playfair (elegante), Poppins (moderna) & Inter (interface) -->
@@ -133,6 +135,12 @@
         </div>
     </header>
 
+    <!-- CARREGANDO / SEM EMPRESA -->
+    <div id="carregando" class="fixed inset-0 z-30 bg-dark-900 flex flex-col items-center justify-center gap-3 text-gray-400">
+        <i class="fa-solid fa-circle-notch fa-spin text-3xl text-gold-500"></i>
+        <p id="carregandoTexto" class="text-sm">Carregando...</p>
+    </div>
+
     <!-- ================= VISÃO DO CLIENTE FINAL ================= -->
     <main id="clientView" class="pt-20">
         <!-- Hero Section -->
@@ -256,7 +264,11 @@
                         <i class="fa-solid fa-upload mr-1"></i> Importar
                         <input type="file" accept=".json,application/json" class="hidden" onchange="importarBackup(this)">
                     </label>
+                    <button id="btnMigrarLocal" onclick="migrarDadosLocais()" class="hidden bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm" title="Envia as empresas que estavam salvas só neste navegador">
+                        <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Enviar dados antigos pro Supabase
+                    </button>
                     <button onclick="showView('client')" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700">Ver Site</button>
+                    <button onclick="sairAdmin()" class="bg-dark-800 text-red-400 px-4 py-2.5 rounded-lg text-sm border border-dark-700" title="Sair da conta admin"><i class="fa-solid fa-right-from-bracket"></i></button>
                 </div>
             </div>
 
@@ -289,10 +301,11 @@
     <div id="authModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-dark-900 border border-gold-500/45 w-full max-w-sm rounded-2xl p-6 text-center space-y-4">
             <h3 class="font-vintage text-xl font-bold text-white">Segurança Super-Admin</h3>
-            <input type="password" id="adminPassInput" placeholder="Senha mestre" onkeydown="if(event.key==='Enter') verificarSenhaAdmin()" class="w-full bg-dark-800 border border-dark-700 text-white rounded-lg p-3 text-center outline-none">
+            <input type="email" id="adminEmailInput" placeholder="E-mail do admin" class="w-full bg-dark-800 border border-dark-700 text-white rounded-lg p-3 text-center outline-none">
+            <input type="password" id="adminPassInput" placeholder="Senha" onkeydown="if(event.key==='Enter') verificarSenhaAdmin()" class="w-full bg-dark-800 border border-dark-700 text-white rounded-lg p-3 text-center outline-none">
             <div class="flex gap-2">
                 <button onclick="document.getElementById('authModal').classList.add('hidden')" class="w-1/2 bg-dark-800 text-gray-300 py-2.5 rounded-lg text-sm">Cancelar</button>
-                <button onclick="verificarSenhaAdmin()" class="w-1/2 bg-gold-500 text-onbrand font-bold py-2.5 rounded-lg text-sm">Entrar</button>
+                <button id="btnEntrarAdmin" onclick="verificarSenhaAdmin()" class="w-1/2 bg-gold-500 text-onbrand font-bold py-2.5 rounded-lg text-sm">Entrar</button>
             </div>
         </div>
     </div>
@@ -355,7 +368,7 @@
     <div id="agendamentosModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-dark-900 border border-gold-500/30 w-full max-w-lg rounded-2xl p-6 relative">
             <div class="flex justify-between items-center border-b border-dark-700 pb-4 mb-4">
-                <h3 class="font-vintage text-xl font-bold text-gold-400">Meus Agendamentos</h3>
+                <h3 id="tituloAgendamentosModal" class="font-vintage text-xl font-bold text-gold-400">Meus Agendamentos</h3>
                 <button onclick="document.getElementById('agendamentosModal').classList.add('hidden')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div id="listAgendamentosModal" class="space-y-3 max-h-80 overflow-y-auto"></div>
@@ -428,56 +441,69 @@
             }
         };
         const CORES_RAPIDAS = ['#d4af37', '#f472b6', '#fb7185', '#a78bfa', '#38bdf8', '#34d399', '#f97316', '#ef4444', '#e5e7eb'];
-        const SENHA_MESTRE = '1234'; // ATENÇÃO: senha no front-end é só pra demo (ver Supabase Auth)
-
-        const empresasIniciais = [
-            {
-                id: 1, nome: "BarberPro Classic", nicho: "Barbearia", whatsapp: "5511999998888",
-                img: NICHOS['Barbearia'].img, plano: "Setup + Mensal", status: "Ativo",
-                titulo: "AGENDAMENTOS ONLINE EM TEMPO REAL",
-                sub: "Bem-vindo ao portal de atendimento oficial de BarberPro Classic. Escolha seu serviço abaixo.",
-                endereco: "Rua das Flores, 123 - Centro, São Paulo - SP",
-                servicos: [
-                    { id: 101, name: "Corte Social / Fade", price: "45.00", time: "35 min", icon: "fa-scissors" },
-                    { id: 102, name: "Barba Tradicional", price: "35.00", time: "30 min", icon: "fa-user-ninja" },
-                    { id: 103, name: "Combo Corte + Barba", price: "75.00", time: "60 min", icon: "fa-crown" }
-                ]
-            },
-            {
-                id: 2, nome: "PetShop Amigo Fiel", nicho: "PetShop", whatsapp: "5511988887777",
-                img: NICHOS['PetShop'].img, plano: "Anual", status: "Ativo",
-                titulo: "O MELHOR CUIDADO PARA O SEU PET",
-                sub: "Agende banho, tosa e tratamentos especiais para seu companheiro.",
-                endereco: "Av. dos Animais, 450 - Bairro Jardim",
-                agenda: agendaPadrao([1, 2, 3, 4, 5], '08:30', '18:30'),
-                servicos: [
-                    { id: 201, name: "Banho & Tosa Completa", price: "60.00", time: "50 min", icon: "fa-paw" },
-                    { id: 202, name: "Hidratação de Pelos", price: "40.00", time: "30 min", icon: "fa-dog" }
-                ]
-            }
-        ];
-
         // ======================================================
-        // CAMADA DE DADOS: único lugar pra trocar por Supabase
+        // SUPABASE: conexão
         // ======================================================
-        function getEmpresas() {
-            const data = localStorage.getItem('agendify_empresas');
-            const lista = data ? JSON.parse(data) : empresasIniciais;
-            return lista.map(normalizarEmpresa);
+        const SUPABASE_URL = 'https://ymmjrrhnqrponnowdlbp.supabase.co';
+        // Chave PUBLICÁVEL: pode ficar no site. NUNCA coloque a sb_secret_ aqui.
+        const SUPABASE_KEY = 'sb_publishable_TXiAYK5FYeN2dmPRpmxKrA_Snj0K_qU';
+        const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Colunas da tabela "empresas" (mesmos nomes do objeto JS)
+        const COLUNAS = ['slug', 'nome', 'nicho', 'whatsapp', 'img', 'plano', 'status', 'titulo', 'sub', 'endereco', 'instagram', 'cor', 'fonte', 'agenda', 'servicos'];
+        let EMPRESAS = [];      // cache do que veio do banco
+        let souAdmin = false;
+
+        function paraBanco(emp) { const o = {}; COLUNAS.forEach(k => o[k] = emp[k] ?? null); return o; }
+        function getEmpresas() { return EMPRESAS; }
+
+        function erroBanco(error, prefixo = 'Erro no banco') {
+            console.error(error);
+            let msg = error?.message || String(error);
+            if (/does not exist|schema cache/i.test(msg)) msg = 'Tabelas não encontradas. Rode o arquivo agendify-supabase.sql no SQL Editor do Supabase.';
+            if (error?.code === '23505') msg = 'Esse link (slug) já está em uso por outra empresa.';
+            if (error?.code === '42501' || /row-level security/i.test(msg)) msg = 'Sem permissão. Entre como admin.';
+            toast(`❌ ${prefixo}: ${msg}`, 6000);
         }
 
-        function saveEmpresas(lista) {
-            try {
-                localStorage.setItem('agendify_empresas', JSON.stringify(lista));
-                return true;
-            } catch (err) {
-                toast('❌ Não deu pra salvar: o navegador ficou sem espaço (provavelmente a foto é pesada). Use um link de imagem.', 6000);
-                return false;
-            }
+        // Público: carrega só a empresa do link (?c=slug). Admin: carrega todas.
+        async function carregarEmpresas(slug) {
+            let q = sb.from('empresas').select('*').order('id');
+            if (!souAdmin) q = slug ? q.eq('slug', slug) : q.limit(1);
+            const { data, error } = await q;
+            if (error) { erroBanco(error); return false; }
+            EMPRESAS = data.map(normalizarEmpresa);
+            return true;
         }
 
-        function getAgendamentos() { return JSON.parse(localStorage.getItem('agendify_agendamentos') || '[]'); }
-        function saveAgendamentos(lista) { localStorage.setItem('agendify_agendamentos', JSON.stringify(lista)); }
+        // Cria (sem id) ou atualiza (com id) e devolve a empresa salva
+        async function salvarEmpresaBanco(emp) {
+            const existe = emp.id && EMPRESAS.some(e => e.id == emp.id);
+            const q = existe
+                ? sb.from('empresas').update({ ...paraBanco(emp), atualizado_em: new Date().toISOString() }).eq('id', emp.id).select().single()
+                : sb.from('empresas').insert(paraBanco(emp)).select().single();
+            const { data, error } = await q;
+            if (error) { erroBanco(error, 'Não salvou'); return null; }
+            const salva = normalizarEmpresa(data);
+            EMPRESAS = existe ? EMPRESAS.map(e => e.id == salva.id ? salva : e) : [...EMPRESAS, salva];
+            return salva;
+        }
+
+        // "Meus agendamentos" do cliente final ficam neste aparelho (id + código pra cancelar)
+        function getMeus() { return JSON.parse(localStorage.getItem('agendify_meus') || '[]'); }
+        function saveMeus(lista) { localStorage.setItem('agendify_meus', JSON.stringify(lista)); }
+
+        // Horários já ocupados (o banco devolve só a hora, sem nome/telefone de ninguém)
+        const cacheOcupados = {};
+        async function buscarOcupados(empId, dataISO) {
+            const k = `${empId}|${dataISO}`;
+            if (cacheOcupados[k]) return cacheOcupados[k];
+            const { data, error } = await sb.rpc('horarios_ocupados', { p_empresa: empId, p_data: dataISO });
+            if (error) { console.error(error); return []; }
+            const lista = (data || []).map(r => typeof r === 'string' ? r : Object.values(r)[0]);
+            cacheOcupados[k] = lista;
+            return lista;
+        }
 
         // Completa campos novos em empresas antigas (compatível com os dados que você já tem salvos)
         function normalizarEmpresa(e) {
@@ -507,7 +533,7 @@
         function novaEmpresaDoNicho(nicho, dados) {
             const n = NICHOS[nicho] || NICHOS['Outro'];
             return normalizarEmpresa({
-                id: Date.now(), nicho, cor: n.cor, fonte: n.fonte, img: n.img,
+                id: null, nicho, cor: n.cor, fonte: n.fonte, img: n.img,
                 titulo: n.titulo, sub: n.sub, endereco: 'Endereço do estabelecimento',
                 agenda: agendaPadrao(),
                 servicos: n.servicos.map((s, i) => ({ id: Date.now() + i, name: s[0], price: s[1], time: s[2], icon: s[3] })),
@@ -589,7 +615,7 @@
         }
 
         // Horários livres de um dia (respeita agenda, almoço, duração do serviço e horários já marcados)
-        function horariosDisponiveis(emp, dataISO, servico) {
+        function horariosDisponiveis(emp, dataISO, servico, ocupados = []) {
             if (!dataISO) return null;
             const dia = emp.agenda.dias[new Date(dataISO + 'T12:00').getDay()];
             if (!dia) return null;
@@ -598,7 +624,6 @@
             const dur = servico ? duracaoMin(servico.time) : passo;
             const ini = minutos(dia.inicio), fim = minutos(dia.fim);
             const p = emp.agenda.pausa;
-            const ocupados = getAgendamentos().filter(a => a.empresaId == emp.id && a.data === dataISO).map(a => a.hora);
             const agoraMin = dataISO === hojeISO() ? new Date().getHours() * 60 + new Date().getMinutes() : -1;
             const lista = [];
             for (let t = ini; t + dur <= fim; t += passo) {
@@ -625,33 +650,54 @@
             return empresas.find(e => e.id == empresaAtivaId) || empresas[0];
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // Link próprio por cliente: ?c=nome-da-empresa
-            const slug = new URLSearchParams(location.search).get('c');
-            const achada = slug && getEmpresas().find(e => e.slug === slug);
-            if (achada) empresaAtivaId = achada.id;
+        document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('modalNicho').innerHTML = Object.keys(NICHOS).map(n => `<option value="${esc(n)}">${esc(n)}</option>`).join('');
             document.getElementById('selectData').min = hojeISO();
             document.getElementById('selectData').addEventListener('change', atualizarHorarios);
             document.getElementById('selectServico').addEventListener('change', atualizarHorarios);
+
+            await verificarSessao();
+            // Link próprio por cliente: ?c=nome-da-empresa
+            const slug = new URLSearchParams(location.search).get('c');
+            if (!(await carregarEmpresas(slug))) { mostrarCarregando('Não deu pra conectar no banco.'); return; }
+            const achada = slug ? EMPRESAS.find(e => e.slug === slug) : EMPRESAS[0];
+            if (!achada) {
+                mostrarCarregando(slug ? 'Página não encontrada. Confira o link.' : 'Nenhuma empresa cadastrada ainda. Entre no Super-Admin para cadastrar.');
+                return;
+            }
+            empresaAtivaId = achada.id;
             carregarSitePublico();
+            esconderCarregando();
         });
+
+        function mostrarCarregando(texto) {
+            document.getElementById('carregando').classList.remove('hidden');
+            document.getElementById('carregandoTexto').innerText = texto;
+            document.querySelector('#carregando i').classList.toggle('hidden', texto !== 'Carregando...');
+        }
+        function esconderCarregando() { document.getElementById('carregando').classList.add('hidden'); }
 
         window.addEventListener('beforeunload', e => { if (emEdicaoVisual && alteracoesPendentes) { e.preventDefault(); e.returnValue = ''; } });
         window.addEventListener('resize', ajustarBarra);
 
-        function showView(view) {
+        async function showView(view) {
             if (view === 'client') {
                 document.getElementById('superAdminView').classList.add('hidden');
                 document.getElementById('clientView').classList.remove('hidden');
+                if (!empresaAtual()) { mostrarCarregando('Nenhuma empresa cadastrada ainda.'); return; }
+                esconderCarregando();
                 carregarSitePublico();
             } else {
+                if (!souAdmin) { openSuperAdminAuth(); return; }
                 if (emEdicaoVisual && alteracoesPendentes && !confirm('Você tem alterações não salvas. Descartar?')) return;
                 desativarModoEdicao();
                 aplicarTema('#d4af37', 'vintage');
+                esconderCarregando();
                 document.getElementById('clientView').classList.add('hidden');
                 document.getElementById('superAdminView').classList.remove('hidden');
                 history.replaceState(null, '', location.pathname);
+                await carregarEmpresas();
+                document.getElementById('btnMigrarLocal').classList.toggle('hidden', !localStorage.getItem('agendify_empresas'));
                 renderAdminTabela();
             }
         }
@@ -739,13 +785,22 @@
 
         function escolherServico(i) { document.getElementById('selectServico').value = i; atualizarHorarios(); }
 
-        function atualizarHorarios() {
+        let seqHorarios = 0;
+        async function atualizarHorarios() {
             const emp = empresaAtual();
+            if (!emp) return;
             const dataEl = document.getElementById('selectData');
             if (!dataEl.value) dataEl.value = proximoDiaAberto(emp);
             const servico = emp.servicos[document.getElementById('selectServico').value];
-            const r = horariosDisponiveis(emp, dataEl.value, servico);
             const sel = document.getElementById('selectHora');
+            const minha = ++seqHorarios;
+            let ocupados = [];
+            if (emp.id && dataEl.value) {
+                sel.innerHTML = `<option value="">Carregando...</option>`;
+                ocupados = await buscarOcupados(emp.id, dataEl.value);
+                if (minha !== seqHorarios) return; // chegou resposta velha, ignora
+            }
+            const r = horariosDisponiveis(emp, dataEl.value, servico, ocupados);
             if (r === 'fechado') sel.innerHTML = `<option value="">Fechado neste dia</option>`;
             else if (!r || !r.length) sel.innerHTML = `<option value="">Sem horários livres</option>`;
             else sel.innerHTML = r.map(h => `<option value="${h}">${h}</option>`).join('');
@@ -815,15 +870,20 @@
             if (rascunho) document.getElementById('barraNomeEmpresa').innerText = rascunho.nome;
         }
 
-        function salvarEdicaoVisualDirecta() {
-            if (!emEdicaoVisual || !rascunho) return;
+        let salvando = false;
+        async function salvarEdicaoVisualDirecta() {
+            if (!emEdicaoVisual || !rascunho || salvando) return;
             if (document.activeElement && document.activeElement.isContentEditable) document.activeElement.blur();
             rascunho.slug = slugUnico(slugify(rascunho.slug || rascunho.nome), rascunho.id);
-            const empresas = getEmpresas().map(e => e.id == rascunho.id ? normalizarEmpresa(structuredClone(rascunho)) : e);
-            if (!saveEmpresas(empresas)) return;
+            salvando = true;
+            toast('Salvando...');
+            const salva = await salvarEmpresaBanco(normalizarEmpresa(structuredClone(rascunho)));
+            salvando = false;
+            if (!salva) return;
+            rascunho.slug = salva.slug;
             marcarSujo(false);
             if (abaPainel === 'geral') renderPainel();
-            toast('✅ Alterações salvas! Você continua no modo edição.');
+            toast('✅ Salvo no Supabase! Já está no ar pro cliente.');
         }
 
         function trocarImagemVisualmente() {
@@ -1079,46 +1139,70 @@
         document.getElementById('painelConteudo').addEventListener('change', onPainelInput);
 
         // Upload de foto: reduz pra no máx. 1400px e salva como JPEG leve
+        // Upload de foto: reduz pra no máx. 1400px e envia pro Storage do Supabase (bucket "capas")
         function enviarImagem(input) {
             const file = input.files[0];
             if (!file || !rascunho) return;
-            const reader = new FileReader();
-            reader.onload = () => {
-                const img = new Image();
-                img.onload = () => {
-                    const escala = Math.min(1, 1400 / Math.max(img.width, img.height));
-                    const cv = document.createElement('canvas');
-                    cv.width = Math.round(img.width * escala); cv.height = Math.round(img.height * escala);
-                    cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
-                    rascunho.img = cv.toDataURL('image/jpeg', 0.78);
+            toast('📤 Enviando foto...', 10000);
+            const img = new Image();
+            img.onload = () => {
+                const escala = Math.min(1, 1400 / Math.max(img.width, img.height));
+                const cv = document.createElement('canvas');
+                cv.width = Math.round(img.width * escala); cv.height = Math.round(img.height * escala);
+                cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
+                cv.toBlob(async blob => {
+                    const caminho = `${rascunho.slug || 'empresa'}/${Date.now()}.jpg`;
+                    const { error } = await sb.storage.from('capas').upload(caminho, blob, { contentType: 'image/jpeg', upsert: true });
+                    URL.revokeObjectURL(img.src);
+                    if (error) { erroBanco(error, 'Foto não enviada'); return; }
+                    rascunho.img = sb.storage.from('capas').getPublicUrl(caminho).data.publicUrl;
                     marcarSujo();
                     renderSite(rascunho);
                     renderPainel();
                     toast('📷 Foto trocada. Lembre de Salvar.');
-                };
-                img.src = reader.result;
+                }, 'image/jpeg', 0.8);
             };
-            reader.readAsDataURL(file);
+            img.src = URL.createObjectURL(file);
+            input.value = '';
         }
 
         // ======================================================
         // PAINEL SUPER-ADMIN
         // ======================================================
-        function openSuperAdminAuth() {
-            if (sessionStorage.getItem('agendify_admin') === 'ok') { showView('superadmin'); return; }
-            document.getElementById('adminPassInput').value = '';
-            document.getElementById('authModal').classList.remove('hidden');
-            setTimeout(() => document.getElementById('adminPassInput').focus(), 50);
+        // Login de admin: usuário criado no Supabase (Authentication) e cadastrado na tabela "admins"
+        async function verificarSessao() {
+            const { data: { session } } = await sb.auth.getSession();
+            if (!session) { souAdmin = false; return; }
+            const { data } = await sb.from('admins').select('user_id').eq('user_id', session.user.id).maybeSingle();
+            souAdmin = !!data;
         }
 
-        function verificarSenhaAdmin() {
-            if (document.getElementById('adminPassInput').value === SENHA_MESTRE) {
-                sessionStorage.setItem('agendify_admin', 'ok');
-                document.getElementById('authModal').classList.add('hidden');
-                showView('superadmin');
-            } else {
-                toast('Senha incorreta!');
-            }
+        function openSuperAdminAuth() {
+            if (souAdmin) { showView('superadmin'); return; }
+            document.getElementById('adminPassInput').value = '';
+            document.getElementById('authModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('adminEmailInput').focus(), 50);
+        }
+
+        async function verificarSenhaAdmin() {
+            const email = document.getElementById('adminEmailInput').value.trim();
+            const password = document.getElementById('adminPassInput').value;
+            const btn = document.getElementById('btnEntrarAdmin');
+            btn.disabled = true; btn.innerText = 'Entrando...';
+            const { error } = await sb.auth.signInWithPassword({ email, password });
+            btn.disabled = false; btn.innerText = 'Entrar';
+            if (error) { toast('E-mail ou senha incorretos.'); return; }
+            await verificarSessao();
+            if (!souAdmin) { await sb.auth.signOut(); toast('Essa conta não é admin (falta cadastrar na tabela admins).', 6000); return; }
+            document.getElementById('authModal').classList.add('hidden');
+            showView('superadmin');
+        }
+
+        async function sairAdmin() {
+            await sb.auth.signOut();
+            souAdmin = false;
+            toast('Você saiu da conta admin.');
+            showView('client');
         }
 
         function badgeStatus(status) {
@@ -1141,6 +1225,7 @@
                         <button onclick="carregarEmpresaEVer(${e.id})" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Ver Site Público"><i class="fa-solid fa-eye"></i></button>
                         <button onclick="copiarLinkEmpresa(${e.id})" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Copiar link do cliente"><i class="fa-solid fa-link"></i></button>
                         <button onclick="ativarEdicaoVisualParaEmpresa(${e.id})" class="bg-gold-500 text-onbrand hover:bg-gold-400 px-3 py-1.5 rounded text-xs font-bold" title="Editar Visualmente na Tela"><i class="fa-solid fa-pen"></i> Editar Visualmente</button>
+                        <button onclick="abrirAgendaAdmin(${e.id})" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Agendamentos recebidos"><i class="fa-solid fa-calendar-days"></i></button>
                         <button onclick="openEditarEmpresaModal(${e.id})" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Plano, status e dados"><i class="fa-solid fa-gear"></i></button>
                         <button onclick="deletarEmpresa(${e.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-2.5 py-1.5 rounded text-xs" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                     </td>
@@ -1180,9 +1265,8 @@
             document.getElementById('empresaModal').classList.remove('hidden');
         }
 
-        function salvarEmpresaModal(ev) {
+        async function salvarEmpresaModal(ev) {
             ev.preventDefault();
-            let empresas = getEmpresas();
             const idEdit = document.getElementById('editEmpresaId').value;
             const base = {
                 nome: document.getElementById('modalNome').value.trim(),
@@ -1191,27 +1275,29 @@
                 plano: document.getElementById('modalPlano').value,
                 status: document.getElementById('modalStatus').value
             };
-            let novaId = null;
+            let emp;
             if (idEdit) {
-                empresas = empresas.map(e => e.id == idEdit ? { ...e, ...base } : e);
+                emp = { ...EMPRESAS.find(e => e.id == idEdit), ...base };
             } else {
                 const img = document.getElementById('modalImg').value.trim();
-                const nova = novaEmpresaDoNicho(base.nicho, { ...base, slug: slugUnico(slugify(base.nome)), ...(img ? { img } : {}) });
-                empresas.push(nova);
-                novaId = nova.id;
+                emp = novaEmpresaDoNicho(base.nicho, { ...base, id: null, slug: slugUnico(slugify(base.nome)), ...(img ? { img } : {}) });
             }
-            if (!saveEmpresas(empresas)) return;
+            const salva = await salvarEmpresaBanco(emp);
+            if (!salva) return;
             document.getElementById('empresaModal').classList.add('hidden');
             renderAdminTabela();
-            if (novaId && confirm('Empresa criada com serviços e visual do nicho. Abrir o editor visual agora?')) ativarEdicaoVisualParaEmpresa(novaId);
+            if (!idEdit && confirm('Empresa criada com serviços e visual do nicho. Abrir o editor visual agora?')) ativarEdicaoVisualParaEmpresa(salva.id);
             else toast('✅ Empresa salva!');
         }
 
-        function deletarEmpresa(id) {
-            if (confirm('Tem certeza que deseja excluir esta empresa?')) {
-                saveEmpresas(getEmpresas().filter(e => e.id != id));
-                renderAdminTabela();
-            }
+        async function deletarEmpresa(id) {
+            const e = EMPRESAS.find(x => x.id == id);
+            if (!e || !confirm(`Excluir "${e.nome}"? Isso apaga também os agendamentos dela.`)) return;
+            const { error } = await sb.from('empresas').delete().eq('id', id);
+            if (error) { erroBanco(error, 'Não excluiu'); return; }
+            EMPRESAS = EMPRESAS.filter(x => x.id != id);
+            renderAdminTabela();
+            toast('Empresa excluída.');
         }
 
         // Backup: como os dados ainda ficam no navegador, exporte com frequência
@@ -1224,27 +1310,76 @@
             URL.revokeObjectURL(a.href);
         }
 
+        // Importa empresas (atualiza as que têm o mesmo link/slug, cria as novas)
+        async function enviarListaProBanco(lista) {
+            const linhas = lista.map(e => paraBanco(normalizarEmpresa(e)));
+            const { error } = await sb.from('empresas').upsert(linhas, { onConflict: 'slug' });
+            if (error) { erroBanco(error, 'Importação falhou'); return false; }
+            await carregarEmpresas();
+            renderAdminTabela();
+            return true;
+        }
+
         function importarBackup(input) {
             const file = input.files[0];
             if (!file) return;
             const reader = new FileReader();
-            reader.onload = () => {
+            reader.onload = async () => {
+                input.value = '';
+                let lista;
                 try {
                     const json = JSON.parse(reader.result);
-                    const lista = Array.isArray(json) ? json : json.empresas;
+                    lista = Array.isArray(json) ? json : json.empresas;
                     if (!Array.isArray(lista)) throw new Error();
-                    if (!confirm(`Importar ${lista.length} empresa(s)? Isso SUBSTITUI as empresas atuais deste navegador.`)) return;
-                    if (saveEmpresas(lista.map(normalizarEmpresa))) { renderAdminTabela(); toast('✅ Backup importado!'); }
-                } catch { toast('❌ Arquivo inválido.'); }
-                input.value = '';
+                } catch { toast('❌ Arquivo inválido.'); return; }
+                if (!confirm(`Importar ${lista.length} empresa(s)? Empresas com o mesmo link serão atualizadas.`)) return;
+                if (await enviarListaProBanco(lista)) toast('✅ Backup importado!');
             };
             reader.readAsText(file);
+        }
+
+        // Uma vez só: sobe as empresas que estavam salvas no navegador (versão antiga)
+        async function migrarDadosLocais() {
+            const lista = JSON.parse(localStorage.getItem('agendify_empresas') || '[]');
+            if (!lista.length) return;
+            if (!confirm(`Enviar ${lista.length} empresa(s) salvas neste navegador para o Supabase?`)) return;
+            if (await enviarListaProBanco(lista)) {
+                localStorage.setItem('agendify_empresas_migrado', localStorage.getItem('agendify_empresas'));
+                localStorage.removeItem('agendify_empresas');
+                document.getElementById('btnMigrarLocal').classList.add('hidden');
+                toast('✅ Dados antigos enviados pro Supabase!');
+            }
+        }
+
+        // Admin: agendamentos recebidos de uma empresa
+        async function abrirAgendaAdmin(id) {
+            const emp = EMPRESAS.find(e => e.id == id);
+            const { data, error } = await sb.from('agendamentos').select('*').eq('empresa_id', id).gte('data', hojeISO()).order('data').order('hora');
+            if (error) { erroBanco(error); return; }
+            document.getElementById('tituloAgendamentosModal').innerText = `Agenda: ${emp?.nome || ''}`;
+            document.getElementById('listAgendamentosModal').innerHTML = data.map(a => `
+                <div class="bg-dark-800 border border-dark-700 rounded-lg p-3 flex justify-between items-center gap-3">
+                    <div>
+                        <p class="text-white font-semibold text-sm">${a.data.split('-').reverse().join('/')} às ${esc(a.hora)} · ${esc(a.servico)}</p>
+                        <p class="text-xs text-gray-400">${esc(a.nome)} · <a href="https://wa.me/55${esc(a.fone)}" target="_blank" class="text-gold-400">${esc(fmtFone(a.fone))}</a></p>
+                    </div>
+                    <button onclick="excluirAgendamentoAdmin(${a.id}, ${id})" class="text-xs text-red-400 hover:text-red-300">Excluir</button>
+                </div>`).join('') || '<p class="text-gray-500 text-sm text-center py-6">Nenhum agendamento futuro.</p>';
+            document.getElementById('agendamentosModal').classList.remove('hidden');
+        }
+
+        async function excluirAgendamentoAdmin(id, empId) {
+            if (!confirm('Excluir este agendamento?')) return;
+            const { error } = await sb.from('agendamentos').delete().eq('id', id);
+            if (error) { erroBanco(error); return; }
+            Object.keys(cacheOcupados).forEach(k => delete cacheOcupados[k]);
+            abrirAgendaAdmin(empId);
         }
 
         // ======================================================
         // AGENDAMENTO DO CLIENTE FINAL
         // ======================================================
-        function handleBooking(ev) {
+        async function handleBooking(ev) {
             ev.preventDefault();
             const emp = empresaAtual();
             if (emp.status !== 'Ativo' && !emEdicaoVisual) return;
@@ -1260,13 +1395,37 @@
             const diaSemana = DIAS[new Date(data + 'T12:00').getDay()];
             const emoji = (NICHOS[emp.nicho] || NICHOS['Outro']).emoji;
             const msg = `${emoji} *AGENDAMENTO - ${emp.nome.toUpperCase()}* ${emoji}\nCliente: ${nome}\nWhatsApp: ${fmtFone(fone)}\nServiço: ${servico.name} (R$ ${fmtBR(servico.price)} · ${servico.time})\nData: ${dataBR} (${diaSemana})\nHorário: ${hora}`;
+            const urlWhats = `https://wa.me/${emp.whatsapp}?text=${encodeURIComponent(msg)}`;
 
-            const lista = getAgendamentos();
-            lista.push({ id: Date.now(), empresaId: emp.id, nome, fone, servico: servico.name, preco: servico.price, data, hora });
-            saveAgendamentos(lista);
+            // Modo edição = só simulação (não grava no banco)
+            if (emEdicaoVisual) { window.open(urlWhats, '_blank'); toast('Simulação: no modo edição o agendamento não é gravado.'); return; }
 
-            window.open(`https://wa.me/${emp.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
-            toast('✅ Agendamento enviado! Finalize no WhatsApp.');
+            // Abre a aba já no clique (senão o navegador bloqueia o pop-up) e só depois manda pro WhatsApp
+            const janela = window.open('', '_blank');
+            const btn = ev.submitter || document.querySelector('#bookingForm button[type=submit]');
+            btn.disabled = true;
+            const { data: res, error } = await sb.rpc('agendar', {
+                p_empresa: emp.id, p_nome: nome, p_fone: fone, p_servico: servico.name,
+                p_preco: Number(servico.price), p_data: data, p_hora: hora
+            });
+            btn.disabled = false;
+            delete cacheOcupados[`${emp.id}|${data}`];
+            if (error) {
+                if (janela) janela.close();
+                const m = error.message || '';
+                if (m.includes('HORARIO_OCUPADO')) toast('Esse horário acabou de ser reservado. Escolhe outro.', 5000);
+                else if (m.includes('EMPRESA_BLOQUEADA')) toast('Agendamento online indisponível no momento.', 5000);
+                else toast('❌ Não deu pra agendar agora. Tenta de novo.', 5000);
+                atualizarHorarios();
+                return;
+            }
+            const linha = Array.isArray(res) ? res[0] : res;
+            const meus = getMeus();
+            meus.push({ id: linha.id, token: linha.token, empresaId: emp.id, nome, servico: servico.name, data, hora });
+            saveMeus(meus);
+
+            if (janela) janela.location.href = urlWhats; else location.href = urlWhats;
+            toast('✅ Horário reservado! Finalize no WhatsApp.');
             document.getElementById('inputNome').value = '';
             document.getElementById('inputFone').value = '';
             atualizarHorarios();
@@ -1275,8 +1434,9 @@
 
         function meusAgendamentos() {
             const emp = empresaAtual();
+            if (!emp) return [];
             const hoje = hojeISO();
-            return getAgendamentos().filter(a => a.empresaId == emp.id && a.data >= hoje).sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
+            return getMeus().filter(a => a.empresaId == emp.id && a.data >= hoje).sort((a, b) => (a.data + a.hora).localeCompare(b.data + b.hora));
         }
 
         function atualizarBadgeAgendamentos() {
@@ -1286,6 +1446,7 @@
         }
 
         function openAgendamentosModal() {
+            document.getElementById('tituloAgendamentosModal').innerText = 'Meus Agendamentos';
             const lista = meusAgendamentos();
             document.getElementById('listAgendamentosModal').innerHTML = lista.map(a => `
                 <div class="bg-dark-800 border border-dark-700 rounded-lg p-3 flex justify-between items-center">
@@ -1298,12 +1459,17 @@
             document.getElementById('agendamentosModal').classList.remove('hidden');
         }
 
-        function cancelarAgendamento(id) {
-            if (!confirm('Cancelar este agendamento?')) return;
-            saveAgendamentos(getAgendamentos().filter(a => a.id != id));
+        async function cancelarAgendamento(id) {
+            const a = getMeus().find(x => x.id == id);
+            if (!a || !confirm('Cancelar este agendamento?')) return;
+            const { error } = await sb.rpc('cancelar_agendamento', { p_id: a.id, p_token: a.token });
+            if (error) { toast('❌ Não deu pra cancelar agora.'); return; }
+            saveMeus(getMeus().filter(x => x.id != id));
+            delete cacheOcupados[`${a.empresaId}|${a.data}`];
             openAgendamentosModal();
             atualizarHorarios();
             atualizarBadgeAgendamentos();
+            toast('Agendamento cancelado. Avise o estabelecimento pelo WhatsApp.');
         }
     </script>
 </body>
