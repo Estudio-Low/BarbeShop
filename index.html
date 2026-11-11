@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agendify - Cloud SaaS Multi-Nicho</title>
+    <title>Agendify - Cloud SaaS Multi-Nicho & Super-Admin</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
@@ -19,23 +19,10 @@
             theme: {
                 extend: {
                     colors: {
-                        gold: {
-                            400: '#f1c40f',
-                            500: '#d4af37',
-                            600: '#aa8c2c',
-                            700: '#856d20'
-                        },
-                        dark: {
-                            900: '#0f0f11',
-                            800: '#17171a',
-                            700: '#222226',
-                            600: '#2d2d33'
-                        }
+                        gold: { 400: '#f1c40f', 500: '#d4af37', 600: '#aa8c2c', 700: '#856d20' },
+                        dark: { 900: '#0f0f11', 800: '#17171a', 700: '#222226', 600: '#2d2d33' }
                     },
-                    fontFamily: {
-                        cinzel: ['Cinzel', 'serif'],
-                        sans: ['Inter', 'sans-serif']
-                    }
+                    fontFamily: { vintage: ['Cinzel', 'serif'], sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
@@ -43,243 +30,211 @@
     <style>
         body { background-color: #0f0f11; color: #e5e7eb; font-family: 'Inter', sans-serif; }
         .font-vintage { font-family: 'Cinzel', serif; }
-        .gold-gradient-text {
-            background: linear-gradient(135deg, #fce8ad 0%, #d4af37 50%, #aa8c2c 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .gold-gradient-text { background: linear-gradient(135deg, #fce8ad 0%, #d4af37 50%, #aa8c2c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .gold-border-glow { box-shadow: 0 0 15px rgba(212, 175, 55, 0.15); }
-        .gold-border-glow:hover { box-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #0f0f11; }
-        ::-webkit-scrollbar-thumb { background: #2d2d33; border-radius: 4px; }
     </style>
 </head>
 <body class="antialiased selection:bg-gold-500 selection:text-black">
 
     <!-- Header / Navbar -->
-    <header class="fixed w-full top-0 z-50 bg-dark-900/90 backdrop-blur-md border-b border-gold-500/20 transition-all duration-300">
+    <header class="fixed w-full top-0 z-50 bg-dark-900/90 backdrop-blur-md border-b border-gold-500/20">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-20">
-                <!-- Logo -->
                 <a href="#" onclick="showView('client')" class="flex items-center space-x-3 group">
-                    <div class="w-10 h-10 rounded-full border border-gold-500 flex items-center justify-center bg-dark-800 text-gold-500 group-hover:scale-105 transition-transform">
-                        <i class="fa-solid fa-calendar-days text-lg"></i>
+                    <div class="w-10 h-10 rounded-full border border-gold-500 flex items-center justify-center bg-dark-800 text-gold-500">
+                        <i class="fa-solid fa-crown text-lg"></i>
                     </div>
-                    <span class="font-vintage text-xl sm:text-2xl font-bold tracking-wider gold-gradient-text">AGENDIFY <span class="text-xs bg-gold-500/10 text-gold-400 border border-gold-500/30 px-2 py-0.5 rounded-full">SaaS</span></span>
+                    <span id="logoNomeEmpresa" class="font-vintage text-xl sm:text-2xl font-bold tracking-wider gold-gradient-text">AGENDIFY <span class="text-xs bg-gold-500/10 text-gold-400 border border-gold-500/30 px-2 py-0.5 rounded-full">SaaS</span></span>
                 </a>
 
-                <!-- Desktop Menu -->
-                <nav id="clientNav" class="hidden md:flex items-center space-x-8">
-                    <a href="#home" class="text-sm font-medium hover:text-gold-500 transition-colors">Início</a>
-                    <a href="#servicos" class="text-sm font-medium hover:text-gold-500 transition-colors">Serviços & Preços</a>
-                    <a href="#equipe" class="text-sm font-medium hover:text-gold-500 transition-colors">Profissionais</a>
+                <nav class="flex items-center space-x-4">
                     <button onclick="openAgendamentosModal()" class="relative text-gold-500 hover:text-white text-sm font-medium transition-colors">
                         <i class="fa-solid fa-calendar-check text-lg"></i>
                         <span id="agendamentosBadge" class="hidden absolute -top-2 -right-3 bg-gold-500 text-black font-bold text-xs w-4 h-4 rounded-full flex items-center justify-center">0</span>
                     </button>
-                    <a href="#agendar" class="bg-gradient-to-r from-gold-600 to-gold-500 hover:from-gold-500 hover:to-gold-400 text-black font-semibold px-5 py-2.5 rounded-lg shadow-lg text-sm">
-                        Agendar Horário
-                    </a>
-                    <button onclick="openAdminAuthModal()" class="text-gray-400 hover:text-gold-400 text-xs flex items-center space-x-1 border border-dark-700 px-3 py-1.5 rounded-lg">
-                        <i class="fa-solid fa-user-gear"></i>
-                        <span>Painel Gestor</span>
+                    <button onclick="openSuperAdminAuth()" class="bg-dark-800 border border-gold-500/30 text-gold-400 hover:bg-dark-700 px-4 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-shield-halved"></i> Super-Admin (Dono SaaS)
                     </button>
                 </nav>
-
-                <!-- Admin Top Bar Indicator -->
-                <div id="adminNav" class="hidden flex items-center space-x-4">
-                    <span class="text-xs bg-gold-500/20 text-gold-400 border border-gold-500/40 px-3 py-1 rounded-full font-semibold">
-                        <i class="fa-solid fa-shield-halved mr-1"></i> Painel Administrativo
-                    </span>
-                    <button onclick="showView('client')" class="bg-dark-700 hover:bg-dark-600 text-gray-200 text-xs px-4 py-2 rounded-lg font-medium transition-all">
-                        <i class="fa-solid fa-arrow-left mr-1"></i> Voltar ao Site
-                    </button>
-                </div>
             </div>
         </div>
     </header>
 
-    <!-- =================================================================== -->
-    <!-- VISÃO 1: SITE PÚBLICO -->
-    <!-- =================================================================== -->
-    <main id="clientView">
-        <!-- Hero Section com Seletor Multi-Nicho -->
-        <section id="home" class="relative min-h-screen flex items-center pt-24 pb-12 overflow-hidden">
-            <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-dark-700 via-dark-900 to-black opacity-80"></div>
-            
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-                <!-- Seletor de Nichos Rápido -->
-                <div class="bg-dark-900/90 border border-gold-500/30 rounded-2xl p-4 mb-8 backdrop-blur-md max-w-3xl mx-auto text-center">
-                    <p class="text-xs font-semibold text-gold-400 uppercase tracking-widest mb-3"><i class="fa-solid fa-layer-group mr-1"></i> Selecione o Nicho do Estabelecimento:</p>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        <button onclick="mudarNicho('barbearia', event)" class="nicho-btn active-nicho bg-gold-500 text-black font-bold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5"><i class="fa-solid fa-scissors"></i> Barbearia</button>
-                        <button onclick="mudarNicho('petshop', event)" class="nicho-btn bg-dark-800 text-gray-300 hover:bg-dark-700 font-medium py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5"><i class="fa-solid fa-paw"></i> PetShop</button>
-                        <button onclick="mudarNicho('salao', event)" class="nicho-btn bg-dark-800 text-gray-300 hover:bg-dark-700 font-medium py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5"><i class="fa-solid fa-wand-magic-sparkles"></i> Salão</button>
-                        <button onclick="mudarNicho('estetica', event)" class="nicho-btn bg-dark-800 text-gray-300 hover:bg-dark-700 font-medium py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5"><i class="fa-solid fa-spa"></i> Estética</button>
+    <!-- ================= VISÃO DO CLIENTE FINAL ================= -->
+    <main id="clientView" class="pt-20">
+        <section class="relative min-h-[80vh] flex items-center py-16 overflow-hidden">
+            <div class="absolute inset-0 z-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-dark-700 via-dark-900 to-black opacity-90"></div>
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="md:w-1/2 space-y-6 text-center md:text-left">
+                    <div class="inline-flex items-center space-x-2 bg-dark-800 border border-gold-500/30 px-3 py-1.5 rounded-full text-gold-400 text-xs font-semibold uppercase">
+                        <i class="fa-solid fa-store"></i> <span id="lblTipoNicho">Plataforma Exclusiva</span>
                     </div>
+                    <h1 id="pubTitulo" class="font-vintage text-4xl sm:text-5xl font-extrabold leading-tight">Carregando Estabelecimento...</h1>
+                    <p id="pubSub" class="text-gray-400 text-base max-w-xl">Aguarde as configurações do sistema.</p>
                 </div>
-
-                <div class="flex flex-col md:flex-row items-center justify-between gap-8">
-                    <div class="md:w-1/2 space-y-6 text-center md:text-left">
-                        <div class="inline-flex items-center space-x-2 bg-dark-800 border border-gold-500/30 px-3 py-1.5 rounded-full text-gold-400 text-xs font-semibold uppercase tracking-wider">
-                            <i class="fa-solid fa-crown"></i>
-                            <span id="badgeNichoTexto">Gestão Inteligente Cloud SaaS</span>
-                        </div>
-                        <h1 id="heroTitulo" class="font-vintage text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight">
-                            Agendamentos <br>em <span class="gold-gradient-text">Tempo Real</span>.
-                        </h1>
-                        <p id="heroSub" class="text-gray-400 text-base sm:text-lg max-w-xl">
-                            Automatize o atendimento do seu negócio com painel de controle administrativo e confirmação via WhatsApp.
-                        </p>
-                        <div class="flex flex-col sm:flex-row items-center space-y-3 sm:space-y-0 sm:space-x-4 pt-4">
-                            <a href="#agendar" class="w-full sm:w-auto text-center bg-gradient-to-r from-gold-600 to-gold-500 text-black font-bold px-8 py-4 rounded-xl shadow-lg hover:scale-105 transition-all text-base">
-                                <i class="fa-solid fa-calendar-plus mr-2"></i> Agendar Agora
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="md:w-5/12 relative">
-                        <div class="relative mx-auto w-full max-w-md rounded-2xl overflow-hidden border-2 border-gold-500/30 gold-border-glow shadow-2xl">
-                            <img id="heroImg" src="https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80" alt="Estabelecimento" class="w-full h-[400px] object-cover">
-                            <div class="absolute inset-0 bg-gradient-to-t from-dark-900 via-transparent to-transparent"></div>
-                            <div class="absolute bottom-6 left-6 right-6 p-4 bg-dark-800/90 backdrop-blur-md rounded-xl border border-gold-500/20 flex items-center justify-between">
-                                <div>
-                                    <p class="text-xs text-gold-400 font-semibold">FUNCIONAMENTO</p>
-                                    <p class="text-sm font-medium text-white">Seg à Sáb: 09:00 - 20:00</p>
-                                </div>
-                                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-500/10 text-green-400 border border-green-500/30">
-                                    ● Aberto
-                                </span>
-                            </div>
-                        </div>
+                <div class="md:w-5/12">
+                    <div class="rounded-2xl overflow-hidden border-2 border-gold-500/30 gold-border-glow shadow-2xl">
+                        <img id="pubImg" src="" alt="Capa" class="w-full h-[380px] object-cover">
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Tabela de Serviços e Preços -->
-        <section id="servicos" class="py-20 bg-dark-800 relative">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <h2 class="text-gold-400 text-sm font-semibold uppercase tracking-wider mb-2">Tabela de Valores</h2>
-                    <p class="font-vintage text-3xl sm:text-4xl font-bold text-white mb-4">Serviços Disponíveis</p>
-                </div>
-                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6" id="servicesGrid"></div>
+        <!-- Serviços -->
+        <section class="py-16 bg-dark-800">
+            <div class="max-w-7xl mx-auto px-4">
+                <h2 class="text-center font-vintage text-3xl font-bold text-white mb-12">Serviços Disponíveis</h2>
+                <div class="grid md:grid-cols-3 gap-6" id="pubServicesGrid"></div>
             </div>
         </section>
 
-        <!-- Profissionais / Equipe -->
-        <section id="equipe" class="py-20 bg-dark-900 border-t border-dark-700">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center max-w-3xl mx-auto mb-16">
-                    <h2 class="text-gold-400 text-sm font-semibold uppercase tracking-wider mb-2">Especialistas</h2>
-                    <p class="font-vintage text-3xl sm:text-4xl font-bold text-white mb-4">Nossa Equipe</p>
-                </div>
-                <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-8" id="barbersGrid"></div>
-            </div>
-        </section>
-
-        <!-- Formulário de Agendamento -->
-        <section id="agendar" class="py-20 bg-dark-800 relative border-t border-gold-500/10">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                <div class="bg-dark-900 border border-gold-500/30 rounded-2xl p-6 sm:p-10 shadow-2xl gold-border-glow">
-                    <div class="text-center mb-8">
-                        <span class="inline-block p-3 rounded-full bg-gold-500/10 text-gold-400 mb-3">
-                            <i class="fa-regular fa-calendar-check text-2xl"></i>
-                        </span>
-                        <h2 class="font-vintage text-3xl font-bold text-white">Agendamento Online</h2>
-                        <p class="text-gray-400 text-sm mt-1">Selecione o serviço e escolha o horário desejado.</p>
+        <!-- Agendamento -->
+        <section class="py-16 bg-dark-900">
+            <div class="max-w-3xl mx-auto px-4 bg-dark-800 border border-gold-500/30 rounded-2xl p-6 sm:p-10 shadow-xl">
+                <h2 class="font-vintage text-2xl font-bold text-white text-center mb-6">Agende seu Horário Online</h2>
+                <form id="bookingForm" onsubmit="handleBooking(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs text-gold-400 mb-1">Serviço:</label>
+                        <select id="selectServico" required class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none"></select>
                     </div>
-
-                    <form id="bookingForm" onsubmit="handleClientFormSubmit(event)">
-                        <div class="space-y-4">
-                            <label class="block text-sm font-medium text-gold-400 mb-2">1. Escolha o Serviço:</label>
-                            <div class="grid gap-3" id="bookingServicesList"></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-gold-400 mb-1">Data:</label>
+                            <input type="date" id="selectData" required class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none">
                         </div>
-
-                        <div class="space-y-6 mt-6">
-                            <label class="block text-sm font-medium text-gold-400 mb-2">2. Profissional:</label>
-                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3" id="bookingBarberList"></div>
+                        <div>
+                            <label class="block text-xs text-gold-400 mb-1">Horário:</label>
+                            <select id="selectHora" required class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none">
+                                <option value="09:00">09:00</option><option value="10:00">10:00</option><option value="11:00">11:00</option>
+                                <option value="14:00">14:00</option><option value="15:00">15:00</option><option value="16:00">16:00</option><option value="17:00">17:00</option>
+                            </select>
                         </div>
-
-                        <div class="grid sm:grid-cols-2 gap-4 mt-6">
-                            <div>
-                                <label for="bookingDate" class="block text-sm font-medium text-gold-400 mb-2">3. Selecione a Data:</label>
-                                <input type="date" id="bookingDate" required onchange="renderTimeSlots()" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-3 outline-none focus:border-gold-500">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gold-400 mb-2">4. Horários Disponíveis:</label>
-                                <div id="timeSlotsGrid" class="grid grid-cols-3 gap-2 max-h-48 overflow-y-auto p-1 bg-dark-800 rounded-lg border border-dark-600">
-                                    <p class="col-span-3 text-xs text-gray-500 text-center py-4">Selecione uma data</p>
-                                </div>
-                            </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs text-gold-400 mb-1">Seu Nome:</label>
+                            <input type="text" id="inputNome" required placeholder="Nome completo" class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none">
                         </div>
-
-                        <div class="grid sm:grid-cols-2 gap-4 mt-6">
-                            <div>
-                                <label for="clientName" class="block text-sm font-medium text-gold-400 mb-1">Seu Nome *</label>
-                                <input type="text" id="clientName" required placeholder="Nome completo" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-3 outline-none">
-                            </div>
-                            <div>
-                                <label for="clientPhone" class="block text-sm font-medium text-gold-400 mb-1">WhatsApp *</label>
-                                <input type="tel" id="clientPhone" required placeholder="(11) 99999-9999" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-3 outline-none">
-                            </div>
+                        <div>
+                            <label class="block text-xs text-gold-400 mb-1">WhatsApp:</label>
+                            <input type="tel" id="inputFone" required placeholder="(11) 99999-9999" class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none">
                         </div>
-
-                        <button type="submit" class="w-full mt-8 bg-gradient-to-r from-gold-600 to-gold-500 text-black font-bold py-4 rounded-xl shadow-lg text-base">
-                            <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Confirmar Agendamento via WhatsApp
-                        </button>
-                    </form>
-                </div>
+                    </div>
+                    <button type="submit" class="w-full mt-4 bg-gradient-to-r from-gold-600 to-gold-500 text-black font-bold py-3.5 rounded-xl shadow-lg">
+                        <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Confirmar via WhatsApp
+                    </button>
+                </form>
             </div>
         </section>
     </main>
 
-    <!-- =================================================================== -->
-    <!-- VISÃO 2: PAINEL ADMINISTRADOR -->
-    <!-- =================================================================== -->
-    <main id="adminView" class="hidden pt-24 pb-16 min-h-screen bg-dark-900">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-dark-700 mb-8 gap-4">
+    <!-- ================= SUPER-ADMIN (PAINEL DO DONO DO SAAS) ================= -->
+    <main id="superAdminView" class="hidden pt-24 pb-16 min-h-screen bg-dark-900">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between items-center pb-6 border-b border-dark-700 mb-8">
                 <div>
-                    <h1 class="font-vintage text-3xl font-bold text-white">Painel Gestor do Estabelecimento</h1>
-                    <p class="text-gray-400 text-sm">Gerencie agendamentos e horários.</p>
+                    <h1 class="font-vintage text-3xl font-bold text-white">Painel Super-Admin (Gestão de Clientes SaaS)</h1>
+                    <p class="text-gray-400 text-sm">Controle assinaturas, mensalidades e cadastre novas empresas na plataforma.</p>
                 </div>
-                <button onclick="openManageServicesModal()" class="bg-dark-800 border border-gold-500/30 text-gold-400 px-4 py-2.5 rounded-lg text-sm font-semibold">
-                    <i class="fa-solid fa-tags mr-1"></i> Gerenciar Serviços
-                </button>
+                <div class="flex gap-3">
+                    <button onclick="openNovaEmpresaModal()" class="bg-gold-500 hover:bg-gold-400 text-black font-bold px-4 py-2.5 rounded-lg text-sm">
+                        <i class="fa-solid fa-plus-circle mr-1"></i> Cadastrar Nova Empresa
+                    </button>
+                    <button onclick="showView('client')" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700">Ver Site</button>
+                </div>
             </div>
 
+            <!-- Tabela de Empresas Clientes do SaaS -->
             <div class="bg-dark-800 rounded-xl border border-dark-700 overflow-hidden shadow-xl">
-                <div class="p-4 border-b border-dark-700"><h3 class="font-vintage font-bold text-lg text-white">Agendamentos Registrados</h3></div>
+                <div class="p-4 border-b border-dark-700 flex justify-between items-center">
+                    <h3 class="font-vintage font-bold text-lg text-white">Empresas Cadastradas na Plataforma</h3>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm text-gray-300">
                         <thead class="bg-dark-900 text-gold-400 uppercase text-xs font-semibold border-b border-dark-700">
                             <tr>
-                                <th class="p-4">Horário / Data</th>
-                                <th class="p-4">Cliente</th>
-                                <th class="p-4">Serviço</th>
-                                <th class="p-4">Valor</th>
-                                <th class="p-4 text-center">Ações</th>
+                                <th class="p-4">Empresa / Slug</th>
+                                <th class="p-4">Nicho</th>
+                                <th class="p-4">WhatsApp</th>
+                                <th class="p-4">Plano / Valor</th>
+                                <th class="p-4">Status Mensalidade</th>
+                                <th class="p-4 text-center">Ações & Controle</th>
                             </tr>
                         </thead>
-                        <tbody id="adminBookingsTable" class="divide-y divide-dark-700"></tbody>
+                        <tbody id="adminEmpresasTable" class="divide-y divide-dark-700"></tbody>
                     </table>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- MODAL ADMIN LOGIN -->
-    <div id="adminAuthModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-dark-900 border border-gold-500/40 w-full max-w-sm rounded-2xl p-6 text-center space-y-4">
-            <h3 class="font-vintage text-xl font-bold text-white">Acesso Gestor</h3>
-            <input type="password" id="adminPasswordInput" placeholder="Senha (1234)" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-3 text-center outline-none">
+    <!-- MODAL SENHA SUPER-ADMIN -->
+    <div id="authModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-dark-900 border border-gold-500/45 w-full max-w-sm rounded-2xl p-6 text-center space-y-4">
+            <h3 class="font-vintage text-xl font-bold text-white">Segurança Super-Admin</h3>
+            <input type="password" id="adminPassInput" placeholder="Senha mestre (1234)" class="w-full bg-dark-800 border border-dark-700 text-white rounded-lg p-3 text-center outline-none">
             <div class="flex gap-2">
-                <button onclick="closeAdminAuthModal()" class="w-1/2 bg-dark-800 text-gray-300 py-2.5 rounded-lg text-sm">Cancelar</button>
-                <button onclick="verifyAdminPassword()" class="w-1/2 bg-gold-500 text-black font-bold py-2.5 rounded-lg text-sm">Entrar</button>
+                <button onclick="document.getElementById('authModal').classList.add('hidden')" class="w-1/2 bg-dark-800 text-gray-300 py-2.5 rounded-lg text-sm">Cancelar</button>
+                <button onclick="verificarSenhaAdmin()" class="w-1/2 bg-gold-500 text-black font-bold py-2.5 rounded-lg text-sm">Entrar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL CADASTRO / EDIÇÃO DE EMPRESA -->
+    <div id="empresaModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-dark-900 border border-gold-500/40 w-full max-w-lg rounded-2xl p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-dark-700 pb-3">
+                <h3 id="modalEmpresaTitulo" class="font-vintage text-lg font-bold text-gold-400">Configurar Empresa</h3>
+                <button onclick="document.getElementById('empresaModal').classList.add('hidden')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="salvarEmpresa(event)" class="space-y-3">
+                <input type="hidden" id="editEmpresaId">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Nome do Estabelecimento:</label>
+                    <input type="text" id="modalNome" required class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Nicho:</label>
+                        <select id="modalNicho" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
+                            <option value="Barbearia">Barbearia</option>
+                            <option value="PetShop">PetShop</option>
+                            <option value="Salão de Beleza">Salão de Beleza</option>
+                            <option value="Estética">Estética</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">WhatsApp de Contato:</label>
+                        <input type="text" id="modalWhats" required placeholder="5511999999999" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Link da Imagem de Capa (URL):</label>
+                    <input type="text" id="modalImg" required class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Plano Comercial:</label>
+                        <select id="modalPlano" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
+                            <option value="Setup + Mensal">R$ 599,90 Setup + R$ 79,90/mês</option>
+                            <option value="Trimestral">Trimestral (5% desc)</option>
+                            <option value="Anual">Anual (10% desc)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Status da Mensalidade:</label>
+                        <select id="modalStatus" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
+                            <option value="Ativo">🟢 Ativo (Em dia)</option>
+                            <option value="Atrasado">🔴 Em Atraso (Bloquear)</option>
+                            <option value="Cancelado">⚪ Cancelado</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="pt-3 flex justify-end gap-2">
+                    <button type="button" onclick="document.getElementById('empresaModal').classList.add('hidden')" class="bg-dark-800 text-gray-300 px-4 py-2 rounded-lg text-sm">Cancelar</button>
+                    <button type="submit" class="bg-gold-500 text-black font-bold px-5 py-2 rounded-lg text-sm">Salvar Empresa</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -287,238 +242,246 @@
     <div id="agendamentosModal" class="fixed inset-0 z-50 hidden bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="bg-dark-900 border border-gold-500/30 w-full max-w-lg rounded-2xl p-6 relative">
             <div class="flex justify-between items-center border-b border-dark-700 pb-4 mb-4">
-                <h3 class="font-vintage text-xl font-bold text-gold-400">Agendamentos</h3>
-                <button onclick="closeAgendamentosModal()" class="text-gray-400 hover:text-white text-xl"><i class="fa-solid fa-xmark"></i></button>
+                <h3 class="font-vintage text-xl font-bold text-gold-400">Meus Agendamentos</h3>
+                <button onclick="document.getElementById('agendamentosModal').classList.add('hidden')" class="text-gray-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div id="agendamentosListModal" class="space-y-3 max-h-80 overflow-y-auto"></div>
+            <div id="listAgendamentosModal" class="space-y-3 max-h-80 overflow-y-auto"></div>
         </div>
     </div>
 
-    <!-- SCRIPT DE CONFIGURAÇÃO DE NICHOS E DADOS -->
+    <!-- SCRIPT DE GESTÃO DO SAAS -->
     <script>
-        const ADMIN_PASS = "1234";
-
-        // Perfis de Nichos prontos para o Agendify
-        const nichosData = {
-            barbearia: {
-                titulo: "Mais que um corte, <br>uma <span class='gold-gradient-text'>Experiência</span>.",
-                sub: "Agende seu horário online com nossos barbeiros especializados.",
+        // Banco de Dados Inicial na memória (LocalStorage) para testes completos
+        const empresasIniciais = [
+            {
+                id: 1,
+                nome: "BarberPro Classic",
+                nicho: "Barbearia",
+                whatsapp: "5511999998888",
                 img: "https://images.unsplash.com/photo-1503951914875-452162b0f3f1?auto=format&fit=crop&q=80",
+                plano: "Setup + Mensal",
+                status: "Ativo",
                 servicos: [
-                    { id: 1, name: 'Corte Social / Fade', price: 45, time: '35 min', desc: 'Corte moderno com acabamento perfeito.', icon: 'fa-scissors' },
-                    { id: 2, name: 'Barba Tradicional', price: 35, time: '30 min', desc: 'Modelagem com alinhamento na lâmina.', icon: 'fa-user-ninja' },
-                    { id: 3, name: 'Combo: Corte + Barba', price: 75, time: '60 min', desc: 'Estilo completo.', icon: 'fa-crown' }
-                ],
-                equipe: [
-                    { id: 'carlos', name: 'Carlos Master', role: 'Especialista Fade', img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80' },
-                    { id: 'rodrigo', name: 'Rodrigo Barbeiro', role: 'Mestre Barboterapia', img: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80' }
+                    { name: "Corte Social/Fade", price: 45, time: "35 min", icon: "fa-scissors" },
+                    { name: "Barba Tradicional", price: 35, time: "30 min", icon: "fa-user-ninja" },
+                    { name: "Combo Corte + Barba", price: 75, time: "60 min", icon: "fa-crown" }
                 ]
             },
-            petshop: {
-                titulo: "O melhor cuidado <br>para o seu <span class='gold-gradient-text'>Pet</span>.",
-                sub: "Agende banho, tosa e serviços veterinários com facilidade.",
+            {
+                id: 2,
+                nome: "PetShop Amigo Fiel",
+                nicho: "PetShop",
+                whatsapp: "5511988887777",
                 img: "https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&q=80",
+                plano: "Anual",
+                status: "Atrasado",
                 servicos: [
-                    { id: 10, name: 'Banho & Tosa Completa', price: 60, time: '50 min', desc: 'Banho relaxante, tosa higiênica e corte de unhas.', icon: 'fa-paw' },
-                    { id: 11, name: 'Hidratação de Pelos', price: 40, time: '30 min', desc: 'Tratamento especial para brilho e maciez.', icon: 'fa-dog' },
-                    { id: 12, name: 'Consulta Veterinária', price: 120, time: '40 min', desc: 'Avaliação clínica completa.', icon: 'fa-notes-medical' }
-                ],
-                equipe: [
-                    { id: 'ana', name: 'Dra. Ana Paula', role: 'Veterinária e Groomer', img: 'https://images.unsplash.com/photo-1594824813541-61a8ef1c8413?auto=format&fit=crop&q=80' }
-                ]
-            },
-            salao: {
-                titulo: "Realce sua beleza <br>com <span class='gold-gradient-text'>Profissionais</span>.",
-                sub: "Cabelos, escovas, manicures e tratamentos exclusivos.",
-                img: "https://images.unsplash.com/photo-1560066984-138dadb4c035?auto=format&fit=crop&q=80",
-                servicos: [
-                    { id: 20, name: 'Escova Modelada', price: 50, time: '40 min', desc: 'Escova com modelagem profissional.', icon: 'fa-wand-magic-sparkles' },
-                    { id: 21, name: 'Manicure & Pedicure', price: 45, time: '50 min', desc: 'Cuidado completo para mãos e pés.', icon: 'fa-hand-sparkles' },
-                    { id: 22, name: 'Hidratação Capilar', price: 90, time: '60 min', desc: 'Reconstrução profunda dos fios.', icon: 'fa-spray-can-sparkles' }
-                ],
-                equipe: [
-                    { id: 'juliana', name: 'Juliana Style', role: 'Hair Stylist', img: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80' }
-                ]
-            },
-            estetica: {
-                titulo: "Procedimentos avançados <br>para sua <span class='gold-gradient-text'>Estética</span>.",
-                sub: "Limpeza de pele, massagens relaxantes e tratamentos faciais.",
-                img: "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&q=80",
-                servicos: [
-                    { id: 30, name: 'Limpeza de Pele Profunda', price: 130, time: '90 min', desc: 'Remoção de cravos e hidratação facial.', icon: 'fa-spa' },
-                    { id: 31, name: 'Massagem Relaxante', price: 100, time: '60 min', desc: 'Alívio de tensões e relaxamento total.', icon: 'fa-hands-bubbles' }
-                ],
-                equipe: [
-                    { id: 'camila', name: 'Camila Esteta', role: 'Biomédica Esteta', img: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&q=80' }
+                    { name: "Banho & Tosa", price: 60, time: "50 min", icon: "fa-paw" },
+                    { name: "Hidratação de Pelos", price: 40, time: "30 min", icon: "fa-dog" }
                 ]
             }
-        };
+        ];
 
-        let nichoAtual = 'barbearia';
-        let bookingState = { service: null, barber: null, date: '', time: '', name: '', phone: '' };
-        const availableHours = ['09:00', '10:00', '11:00', '14:00', '15:00', '16:00', '17:00', '18:00'];
-
-        function mudarNicho(nicho, evt) {
-            nichoAtual = nicho;
-            const dados = nichosData[nicho];
-
-            // Altera textos visuais do Hero
-            document.getElementById('heroTitulo').innerHTML = dados.titulo;
-            document.getElementById('heroSub').innerText = dados.sub;
-            document.getElementById('heroImg').src = dados.img;
-
-            // Atualiza botões do seletor
-            document.querySelectorAll('.nicho-btn').forEach(btn => {
-                btn.className = "nicho-btn bg-dark-800 text-gray-300 hover:bg-dark-700 font-medium py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5";
-            });
-            if(evt && evt.currentTarget) {
-                evt.currentTarget.className = "nicho-btn bg-gold-500 text-black font-bold py-2.5 px-4 rounded-xl text-xs transition-all flex items-center justify-center gap-1.5";
-            }
-
-            // Recarrega serviços e profissionais do nicho
-            renderServicos(dados.servicos);
-            renderEquipe(dados.equipe);
-            renderBookingServices(dados.servicos);
-            renderBookingBarbers(dados.equipe);
+        function getEmpresas() {
+            const data = localStorage.getItem('agendify_empresas');
+            return data ? JSON.parse(data) : empresasIniciais;
         }
+
+        function saveEmpresas(lista) {
+            localStorage.setItem('agendify_empresas', JSON.stringify(lista));
+        }
+
+        // Seleciona a primeira empresa por padrão para exibir no site público
+        let empresaAtivaId = 1;
 
         document.addEventListener('DOMContentLoaded', () => {
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('bookingDate').min = today;
-            mudarNicho('barbearia');
-            updateBadgeCount();
+            carregarSitePublico();
+            document.getElementById('selectData').min = new Date().toISOString().split('T')[0];
         });
 
-        function renderServicos(lista) {
-            document.getElementById('servicesGrid').innerHTML = lista.map(s => `
+        function showView(view) {
+            if(view === 'client') {
+                document.getElementById('superAdminView').classList.add('hidden');
+                document.getElementById('clientView').classList.remove('hidden');
+                carregarSitePublico();
+            } else {
+                document.getElementById('clientView').classList.add('hidden');
+                document.getElementById('superAdminView').classList.remove('hidden');
+                renderAdminTabela();
+            }
+        }
+
+        function carregarSitePublico() {
+            const empresas = getEmpresas();
+            const emp = empresas.find(e => e.id == empresaAtivaId) || empresas[0];
+            
+            // Verifica se está com mensalidade atrasada
+            if(emp.status === 'Atrasado' || emp.status === 'Cancelado') {
+                document.getElementById('clientView').innerHTML = `
+                    <div class="min-h-screen flex items-center justify-center text-center p-6 bg-dark-900">
+                        <div class="bg-dark-800 border border-red-500/40 p-8 rounded-2xl max-w-md space-y-4">
+                            <div class="w-16 h-16 bg-red-500/10 text-red-400 rounded-full flex items-center justify-center mx-auto text-2xl"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                            <h2 class="font-vintage text-2xl font-bold text-white">Acesso Suspenso</h2>
+                            <p class="text-gray-400 text-sm">O sistema de agendamento desta empresa está temporariamente indisponível devido a pendências na mensalidade.</p>
+                        </div>
+                    </div>`;
+                return;
+            }
+
+            document.getElementById('logoNomeEmpresa').innerHTML = `${emp.nome} <span class="text-xs bg-gold-500/10 text-gold-400 border border-gold-500/30 px-2 py-0.5 rounded-full">${emp.nicho}</span>`;
+            document.getElementById('lblTipoNicho').innerText = emp.nicho;
+            document.getElementById('pubTitulo').innerHTML = `Agendamentos online em <span class='gold-gradient-text'>Tempo Real</span>`;
+            document.getElementById('pubSub').innerText = `Bem-vindo ao portal de atendimento oficial de ${emp.nome}. Escolha seu serviço abaixo.`;
+            document.getElementById('pubImg').src = emp.img;
+
+            // Carrega serviços
+            document.getElementById('pubServicesGrid').innerHTML = emp.servicos.map(s => `
                 <div class="bg-dark-900 border border-dark-700 rounded-xl p-6 flex flex-col justify-between">
                     <div>
-                        <div class="w-10 h-10 rounded-lg bg-gold-500/10 text-gold-400 flex items-center justify-center text-lg mb-4">
-                            <i class="fa-solid ${s.icon}"></i>
-                        </div>
+                        <div class="w-10 h-10 rounded-lg bg-gold-500/10 text-gold-400 flex items-center justify-center text-lg mb-4"><i class="fa-solid ${s.icon || 'fa-scissors'}"></i></div>
                         <h3 class="font-vintage text-xl font-bold text-white mb-2">${s.name}</h3>
-                        <p class="text-gray-400 text-sm mb-4">${s.desc}</p>
+                        <p class="text-gray-400 text-xs">Duração estimada: ${s.time}</p>
                     </div>
-                    <div class="pt-4 border-t border-dark-800 flex items-center justify-between">
-                        <span class="font-vintage text-2xl font-bold text-gold-400">R$ ${s.price.toFixed(2)}</span>
-                        <a href="#agendar" class="text-xs font-semibold text-white hover:text-gold-400">Agendar →</a>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function renderEquipe(lista) {
-            document.getElementById('barbersGrid').innerHTML = lista.map(b => `
-                <div class="bg-dark-800 rounded-xl overflow-hidden border border-dark-700 text-center">
-                    <img src="${b.img}" class="w-full h-56 object-cover">
-                    <div class="p-4">
-                        <h4 class="font-vintage font-bold text-white">${b.name}</h4>
-                        <p class="text-gold-400 text-xs">${b.role}</p>
+                    <div class="pt-4 border-t border-dark-800 flex items-center justify-between mt-4">
+                        <span class="font-vintage text-2xl font-bold text-gold-400">R$ ${parseFloat(s.price).toFixed(2)}</span>
                     </div>
                 </div>
             `).join('');
+
+            document.getElementById('selectServico').innerHTML = emp.servicos.map(s => `<option value="${s.name}" data-price="${s.price}">${s.name} - R$ ${s.price}</option>`).join('');
         }
 
-        function renderBookingServices(lista) {
-            document.getElementById('bookingServicesList').innerHTML = lista.map(s => `
-                <label class="flex items-center justify-between p-3.5 rounded-xl bg-dark-800 border border-dark-700 cursor-pointer hover:border-gold-500/40">
-                    <div class="flex items-center space-x-3">
-                        <input type="radio" name="serviceOption" value="${s.id}" onchange="bookingState.service = ${JSON.stringify(s).replace(/"/g, '&quot;')}" class="accent-gold-500">
-                        <span class="font-bold text-white text-sm">${s.name} (${s.time})</span>
-                    </div>
-                    <span class="font-vintage text-gold-400 font-bold">R$ ${s.price.toFixed(2)}</span>
-                </label>
-            `).join('');
+        // Gestão Super-Admin
+        function openSuperAdminAuth() {
+            document.getElementById('adminPassInput').value = '';
+            document.getElementById('authModal').classList.remove('hidden');
         }
 
-        function renderBookingBarbers(lista) {
-            document.getElementById('bookingBarberList').innerHTML = lista.map((b, idx) => `
-                <label class="block cursor-pointer text-center">
-                    <input type="radio" name="barberOption" value="${b.id}" ${idx===0 ? 'checked' : ''} onchange="bookingState.barber = ${JSON.stringify(b).replace(/"/g, '&quot;')}" class="peer hidden">
-                    <div class="p-3 bg-dark-800 border border-dark-700 rounded-xl peer-checked:border-gold-500 peer-checked:bg-gold-500/10">
-                        <img src="${b.img}" class="w-10 h-10 rounded-full mx-auto mb-1 object-cover">
-                        <p class="text-xs font-bold text-white truncate">${b.name}</p>
-                    </div>
-                </label>
-            `).join('');
-            if(lista.length > 0) bookingState.barber = lista[0];
+        function verificarSenhaAdmin() {
+            if(document.getElementById('adminPassInput').value === '1234') {
+                document.getElementById('authModal').classList.add('hidden');
+                showView('superadmin');
+            } else {
+                alert('Senha incorreta!');
+            }
         }
 
-        function renderTimeSlots() {
-            const dataSel = document.getElementById('bookingDate').value;
-            bookingState.date = dataSel;
-            const grid = document.getElementById('timeSlotsGrid');
-            const all = JSON.parse(localStorage.getItem('agendify_bookings') || '[]');
-            const ocupados = all.filter(b => b.date === dataSel).map(b => b.time);
-
-            grid.innerHTML = availableHours.map(h => {
-                const ocupado = ocupados.includes(h);
-                if(ocupado) return `<button type="button" disabled class="py-2 text-xs bg-red-950/40 border border-red-500/30 text-red-400 rounded-lg opacity-60">🔒 ${h}</button>`;
-                return `<button type="button" onclick="bookingState.time='${h}'; document.querySelectorAll('.time-btn').forEach(b=>b.className='time-btn py-2 text-xs bg-dark-900 border border-dark-700 text-gray-300 rounded-lg'); this.className='time-btn py-2 text-xs bg-gold-500 text-black font-bold rounded-lg';" class="time-btn py-2 text-xs bg-dark-900 border border-dark-700 text-gray-300 rounded-lg">${h}</button>`;
+        function renderAdminTabela() {
+            const empresas = getEmpresas();
+            document.getElementById('adminEmpresasTable').innerHTML = empresas.map(e => {
+                let badgeStatus = e.status === 'Ativo' ? '<span class="bg-green-500/10 text-green-400 border border-green-500/30 px-2.5 py-1 rounded-full text-xs font-semibold">● Ativo</span>' :
+                                  e.status === 'Atrasado' ? '<span class="bg-red-500/10 text-red-400 border border-red-500/30 px-2.5 py-1 rounded-full text-xs font-semibold">● Em Atraso</span>' :
+                                  '<span class="bg-gray-500/10 text-gray-400 border border-gray-500/30 px-2.5 py-1 rounded-full text-xs font-semibold">● Cancelado</span>';
+                return `
+                    <tr class="hover:bg-dark-700/40 transition-colors">
+                        <td class="p-4 font-bold text-white">${e.nome} <span class="block text-xs font-normal text-gray-400">ID: #${e.id}</span></td>
+                        <td class="p-4 text-xs text-gold-400">${e.nicho}</td>
+                        <td class="p-4 text-xs">${e.whatsapp}</td>
+                        <td class="p-4 text-xs font-semibold">${e.plano}</td>
+                        <td class="p-4">${badgeStatus}</td>
+                        <td class="p-4 text-center space-x-2">
+                            <button onclick="visualizarEmpresaSite(${e.id})" class="bg-dark-700 hover:bg-dark-600 text-gray-200 px-2.5 py-1.5 rounded text-xs" title="Ver Site"><i class="fa-solid fa-eye"></i></button>
+                            <button onclick="abrirEditarEmpresa(${e.id})" class="bg-gold-500/20 text-gold-400 hover:bg-gold-500 hover:text-black px-2.5 py-1.5 rounded text-xs" title="Editar"><i class="fa-solid fa-pen"></i></button>
+                            <button onclick="deletarEmpresa(${e.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-2.5 py-1.5 rounded text-xs" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `;
             }).join('');
         }
 
-        function handleClientFormSubmit(e) {
+        function visualizarEmpresaSite(id) {
+            empresaAtivaId = id;
+            showView('client');
+        }
+
+        function openNovaEmpresaModal() {
+            document.getElementById('modalEmpresaTitulo').innerText = "Cadastrar Nova Empresa";
+            document.getElementById('editEmpresaId').value = "";
+            document.getElementById('modalNome').value = "";
+            document.getElementById('modalWhats').value = "";
+            document.getElementById('modalImg').value = "https://images.unsplash.com/photo-1521590832167-7bcbfaa6381f?auto=format&fit=crop&q=80";
+            document.getElementById('empresaModal').classList.remove('hidden');
+        }
+
+        function abrirEditarEmpresa(id) {
+            const emp = getEmpresas().find(e => e.id == id);
+            if(!emp) return;
+            document.getElementById('modalEmpresaTitulo').innerText = "Editar Empresa / Mensalidade";
+            document.getElementById('editEmpresaId').value = emp.id;
+            document.getElementById('modalNome').value = emp.nome;
+            document.getElementById('modalNicho').value = emp.nicho;
+            document.getElementById('modalWhats').value = emp.whatsapp;
+            document.getElementById('modalImg').value = emp.img;
+            document.getElementById('modalPlano').value = emp.plano;
+            document.getElementById('modalStatus').value = emp.status;
+            document.getElementById('empresaModal').classList.remove('hidden');
+        }
+
+        function salvarEmpresa(e) {
             e.preventDefault();
-            if(!bookingState.service || !bookingState.date || !bookingState.time) {
-                alert('Por favor, selecione o serviço, data e horário.');
-                return;
+            const id = document.getElementById('editEmpresaId').value;
+            let empresas = getEmpresas();
+
+            const dados = {
+                nome: document.getElementById('modalNome').value,
+                nicho: document.getElementById('modalNicho').value,
+                whatsapp: document.getElementById('modalWhats').value,
+                img: document.getElementById('modalImg').value,
+                plano: document.getElementById('modalPlano').value,
+                status: document.getElementById('modalStatus').value,
+                servicos: [
+                    { name: "Serviço Principal", price: 50, time: "40 min", icon: "fa-scissors" },
+                    { name: "Serviço Secundário", price: 80, time: "60 min", icon: "fa-crown" }
+                ]
+            };
+
+            if(id) {
+                empresas = empresas.map(emp => emp.id == id ? { ...emp, ...dados } : emp);
+            } else {
+                dados.id = Date.now();
+                empresas.push(dados);
             }
-            bookingState.name = document.getElementById('clientName').value;
-            bookingState.phone = document.getElementById('clientPhone').value;
 
-            const all = JSON.parse(localStorage.getItem('agendify_bookings') || '[]');
-            const novo = { id: Date.now(), ...bookingState, status: 'confirmado' };
-            all.push(novo);
-            localStorage.setItem('agendify_bookings', JSON.stringify(all));
+            saveEmpresas(empresas);
+            document.getElementById('empresaModal').classList.add('hidden');
+            renderAdminTabela();
+        }
 
-            const msg = `*NOVO AGENDAMENTO (${nichoAtual.toUpperCase()})* \nCliente: ${bookingState.name}\nServiço: ${bookingState.service.name}\nData: ${bookingState.date.split('-').reverse().join('/')}\nHorário: ${bookingState.time}`;
-            window.open(`https://wa.me/5511999998888?text=${encodeURIComponent(msg)}`, '_blank');
-            alert('Agendamento salvo com sucesso!');
+        function deletarEmpresa(id) {
+            if(confirm('Tem certeza que deseja excluir esta empresa da plataforma?')) {
+                let empresas = getEmpresas().filter(e => e.id != id);
+                saveEmpresas(empresas);
+                renderAdminTabela();
+            }
+        }
+
+        // Agendamento do Cliente
+        function handleBooking(e) {
+            e.preventDefault();
+            const servico = document.getElementById('selectServico').value;
+            const data = document.getElementById('selectData').value;
+            const hora = document.getElementById('selectHora').value;
+            const nome = document.getElementById('inputNome').value;
+
+            const empresas = getEmpresas();
+            const emp = empresas.find(e => e.id == empresaAtivaId);
+
+            const agendamentos = JSON.parse(localStorage.getItem('agendify_agendamentos') || '[]');
+            agendamentos.push({ id: Date.now(), empresaId: emp.id, servico, data, hora, nome });
+            localStorage.setItem('agendify_agendamentos', JSON.stringify(agendamentos));
+
+            const msg = `💈 *AGENDAMENTO - ${emp.nome.toUpperCase()}* 💈\nCliente: ${nome}\nServiço: ${servico}\nData: ${data.split('-').reverse().join('/')}\nHorário: ${hora}`;
+            window.open(`https://wa.me/${emp.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
+            alert('Agendamento efetuado com sucesso!');
             location.reload();
         }
 
-        function updateBadgeCount() {
-            const count = JSON.parse(localStorage.getItem('agendify_bookings') || '[]').length;
-            if(count > 0) {
-                const b = document.getElementById('agendamentosBadge');
-                b.innerText = count;
-                b.classList.remove('hidden');
-            }
-        }
-
-        function openAdminAuthModal() { document.getElementById('adminAuthModal').classList.remove('hidden'); }
-        function closeAdminAuthModal() { document.getElementById('adminAuthModal').classList.add('hidden'); }
-        function verifyAdminPassword() {
-            if(document.getElementById('adminPasswordInput').value === ADMIN_PASS) {
-                closeAdminAuthModal();
-                document.getElementById('clientView').classList.add('hidden');
-                document.getElementById('adminView').classList.remove('hidden');
-                renderAdminTable();
-            } else { alert('Senha incorreta!'); }
-        }
-
-        function renderAdminTable() {
-            const all = JSON.parse(localStorage.getItem('agendify_bookings') || '[]');
-            document.getElementById('adminBookingsTable').innerHTML = all.length === 0 ? 
-                `<tr><td colspan="5" class="p-4 text-center text-gray-500">Nenhum agendamento.</td></tr>` :
-                all.map(b => `<tr><td class="p-4">${b.time} (${b.date})</td><td class="p-4">${b.name}</td><td class="p-4">${b.service.name}</td><td class="p-4">R$ ${b.service.price.toFixed(2)}</td><td class="p-4 text-center"><button onclick="deletar(${b.id})" class="text-red-400">Excluir</button></td></tr>`).join('');
-        }
-
-        function deletar(id) {
-            let all = JSON.parse(localStorage.getItem('agendify_bookings') || '[]');
-            all = all.filter(b => b.id !== id);
-            localStorage.setItem('agendify_bookings', JSON.stringify(all));
-            renderAdminTable();
-        }
-
         function openAgendamentosModal() {
-            const all = JSON.parse(localStorage.getItem('agendify_bookings') || '[]');
-            document.getElementById('agendamentosListModal').innerHTML = all.length === 0 ? '<p class="text-gray-400 text-center">Nenhum agendamento.</p>' :
-                all.map(b => `<div class="bg-dark-800 p-3 rounded-xl border border-dark-700 flex justify-between"><div><p class="font-bold text-white">${b.service.name}</p><p class="text-xs text-gold-400">${b.date} às ${b.time}</p></div></div>`).join('');
+            const ags = JSON.parse(localStorage.getItem('agendify_agendamentos') || '[]').filter(a => a.empresaId == empresaAtivaId);
+            document.getElementById('listAgendamentosModal').innerHTML = ags.length === 0 ? '<p class="text-gray-400 text-center py-4">Nenhum agendamento ativo.</p>' :
+                ags.map(a => `<div class="bg-dark-800 p-3 rounded-xl border border-dark-700 flex justify-between"><div><p class="font-bold text-white">${a.servico} (${a.nome})</p><p class="text-xs text-gold-400">${a.data.split('-').reverse().join('/')} às ${a.hora}</p></div></div>`).join('');
             document.getElementById('agendamentosModal').classList.remove('hidden');
         }
-        function closeAgendamentosModal() { document.getElementById('agendamentosModal').classList.add('hidden'); }
     </script>
 </body>
 </html>
