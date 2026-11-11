@@ -241,11 +241,12 @@
 
     <!-- PAINEL LATERAL DE EDIÇÃO -->
     <aside id="painelEdicao" class="hidden fixed right-0 z-[45] w-full lg:w-[380px] bg-dark-900 border-l border-gold-500/30 shadow-2xl flex flex-col">
-        <div class="flex gap-1 p-2 border-b border-dark-700 text-xs font-semibold">
-            <button type="button" data-aba="geral" class="flex-1 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-store mr-1"></i>Geral</button>
-            <button type="button" data-aba="visual" class="flex-1 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-palette mr-1"></i>Visual</button>
-            <button type="button" data-aba="servicos" class="flex-1 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-list mr-1"></i>Serviços</button>
-            <button type="button" data-aba="agenda" class="flex-1 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-clock mr-1"></i>Agenda</button>
+        <div class="flex gap-1 p-2 border-b border-dark-700 text-[11px] font-semibold">
+            <button type="button" data-aba="geral" class="flex-1 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-store block mb-1"></i>Geral</button>
+            <button type="button" data-aba="visual" class="flex-1 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-palette block mb-1"></i>Visual</button>
+            <button type="button" data-aba="servicos" class="flex-1 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-list block mb-1"></i>Serviços</button>
+            <button type="button" data-aba="agenda" class="flex-1 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-clock block mb-1"></i>Agenda</button>
+            <button type="button" data-aba="fotos" class="flex-1 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-images block mb-1"></i>Fotos</button>
             <button type="button" data-acao="toggle-painel" class="px-2 text-gray-400 hover:text-white" title="Fechar painel"><i class="fa-solid fa-xmark"></i></button>
         </div>
         <div id="painelConteudo" class="flex-1 overflow-y-auto p-4 space-y-4 text-sm"></div>
@@ -387,6 +388,7 @@
                         <li class="flex gap-4"><i class="fa-solid fa-calendar-day text-gold-400 text-xl w-6 mt-1"></i><div><p class="text-white font-semibold">Agenda do dia na mão</p><p class="text-gray-400 text-sm">Quem vem, que horas e quanto vai entrar. Marca concluído ou faltou.</p></div></li>
                         <li class="flex gap-4"><i class="fa-solid fa-lock text-gold-400 text-xl w-6 mt-1"></i><div><p class="text-white font-semibold">Bloqueia horário ou fecha o dia</p><p class="text-gray-400 text-sm">Feriado, folga ou imprevisto: um toque e o site para de oferecer.</p></div></li>
                         <li class="flex gap-4"><i class="fa-solid fa-phone text-gold-400 text-xl w-6 mt-1"></i><div><p class="text-white font-semibold">Encaixa quem ligou</p><p class="text-gray-400 text-sm">Agenda manual pra cliente que chamou ou chegou na hora.</p></div></li>
+                        <li class="flex gap-4"><i class="fa-solid fa-images text-gold-400 text-xl w-6 mt-1"></i><div><p class="text-white font-semibold">Galeria dos seus trabalhos</p><p class="text-gray-400 text-sm">Fotos dos cortes, unhas e penteados com legenda. O cliente escolhe e já agenda.</p></div></li>
                         <li class="flex gap-4"><i class="fa-solid fa-pen-to-square text-gold-400 text-xl w-6 mt-1"></i><div><p class="text-white font-semibold">Muda tudo sozinho</p><p class="text-gray-400 text-sm">Preços, serviços, fotos e horários, editando direto na tela.</p></div></li>
                     </ul>
                 </div>
@@ -480,6 +482,17 @@
             </div>
         </section>
 
+        <!-- Galeria de trabalhos (o dono coloca as fotos) -->
+        <section id="secaoGaleria" class="hidden py-12 md:py-20 bg-dark-900">
+            <div class="max-w-7xl mx-auto px-4">
+                <div class="text-center mb-8 md:mb-12">
+                    <h2 id="tituloGaleria" class="titulo-secao font-vintage text-2xl md:text-4xl font-bold text-white"></h2>
+                    <p id="subGaleria" class="text-gray-400 text-sm mt-2"></p>
+                </div>
+                <div id="pubGaleria"></div>
+            </div>
+        </section>
+
         <!-- Formulário de Agendamento -->
         <section id="agendar" class="py-12 md:py-20 bg-dark-900 scroll-mt-20">
             <div id="cardAgendar" class="card-agendar max-w-3xl mx-4 sm:mx-auto bg-dark-800 border border-gold-500/30 p-5 sm:p-10 shadow-xl">
@@ -518,6 +531,10 @@
                             <label class="block text-xs text-gold-400 mb-1">WhatsApp</label>
                             <input type="tel" id="inputFone" required placeholder="(11) 99999-9999" autocomplete="tel" class="w-full bg-dark-900 border border-dark-700 text-white rounded-lg p-3 outline-none">
                         </div>
+                    </div>
+                    <div id="estiloEscolhidoBox" class="hidden items-center justify-between gap-2 text-xs bg-gold-500/10 border border-gold-500/30 rounded-lg px-3 py-2">
+                        <span class="text-gray-300 min-w-0 truncate"><i class="fa-solid fa-image text-gold-400 mr-1.5"></i>Referência: <b id="estiloEscolhidoTxt" class="text-white"></b></span>
+                        <button type="button" onclick="escolherEstilo(null)" class="text-gray-400 hover:text-white shrink-0" title="Tirar"><i class="fa-solid fa-xmark"></i></button>
                     </div>
                     <button type="submit" class="btn-tema w-full mt-2 bg-gradient-to-r from-gold-600 to-gold-500 text-onbrand font-bold py-3.5 shadow-lg">
                         <i class="fa-brands fa-whatsapp text-lg mr-2"></i> Confirmar via WhatsApp
@@ -621,6 +638,7 @@
                     </div>
                     <div class="flex flex-wrap gap-2">
                         <button type="button" data-dono="editar" class="bg-gold-500 text-onbrand font-bold px-4 py-2.5 rounded-lg text-sm"><i class="fa-solid fa-pen mr-1"></i> <span class="sm:hidden">Editar página</span><span class="hidden sm:inline">Editar página, horários e preços</span></button>
+                        <button type="button" data-dono="fotos" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700"><i class="fa-solid fa-images mr-1"></i> Fotos dos trabalhos</button>
                         <button type="button" data-dono="ver-site" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700"><i class="fa-solid fa-eye mr-1"></i> Ver meu site</button>
                         <button type="button" data-dono="copiar-link" class="bg-dark-800 text-gray-300 px-3 py-2.5 rounded-lg text-sm border border-dark-700" title="Copiar link pra mandar pros clientes"><i class="fa-solid fa-link"></i></button>
                         <button type="button" onclick="sairAdmin()" class="bg-dark-800 text-red-400 px-3 py-2.5 rounded-lg text-sm border border-dark-700" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></button>
@@ -767,6 +785,17 @@
         </div>
     </div>
 
+    <!-- FOTO AMPLIADA DA GALERIA -->
+    <div id="lightbox" class="fixed inset-0 z-[60] hidden bg-black/90 flex-col items-center justify-center p-4" onclick="if(event.target===this) fecharLightbox()">
+        <button type="button" onclick="fecharLightbox()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 text-white text-xl" title="Fechar"><i class="fa-solid fa-xmark"></i></button>
+        <button type="button" onclick="navLightbox(-1)" class="absolute left-2 md:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 text-white" title="Anterior"><i class="fa-solid fa-chevron-left"></i></button>
+        <button type="button" onclick="navLightbox(1)" class="absolute right-2 md:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/10 text-white" title="Próxima"><i class="fa-solid fa-chevron-right"></i></button>
+        <img id="lightboxImg" alt="" class="max-h-[72vh] max-w-full rounded-lg object-contain shadow-2xl">
+        <p id="lightboxLegenda" class="text-white text-center mt-4 font-semibold max-w-lg"></p>
+        <p id="lightboxContador" class="text-white/50 text-xs mt-1"></p>
+        <button type="button" onclick="quererEsseEstilo()" class="mt-4 bg-gold-500 text-onbrand font-bold px-5 py-2.5 rounded-xl text-sm"><i class="fa-solid fa-calendar-plus mr-1.5"></i>Quero esse estilo</button>
+    </div>
+
     <!-- MODAL INSTALAR (iPhone) -->
     <div id="iosModal" class="fixed inset-0 z-[60] hidden bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center p-4" onclick="if(event.target===this) this.classList.add('hidden')">
         <div class="bg-dark-900 border border-gold-500/40 w-full max-w-sm rounded-2xl p-6 space-y-4">
@@ -885,7 +914,7 @@
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // Colunas da tabela "empresas" (mesmos nomes do objeto JS)
-        const COLUNAS = ['slug', 'nome', 'nicho', 'whatsapp', 'img', 'plano', 'status', 'titulo', 'sub', 'endereco', 'instagram', 'cor', 'fonte', 'agenda', 'servicos', 'vitrine', 'tema', 'fundo'];
+        const COLUNAS = ['slug', 'nome', 'nicho', 'whatsapp', 'img', 'plano', 'status', 'titulo', 'sub', 'endereco', 'instagram', 'cor', 'fonte', 'agenda', 'servicos', 'vitrine', 'tema', 'fundo', 'galeria'];
         let EMPRESAS = [];      // cache do que veio do banco
         let souAdmin = false;
         let souDono = false, minhaEmpresaId = null;
@@ -959,6 +988,8 @@
             emp.fonte = FONTES[emp.fonte] ? emp.fonte : n.fonte;
             emp.tema = TEMAS[emp.tema] ? emp.tema : n.tema;
             emp.fundo = emp.fundo === 'claro' ? 'claro' : 'escuro';
+            emp.galeria = (Array.isArray(emp.galeria) ? emp.galeria : []).filter(f => f && f.url)
+                .map((f, i) => ({ id: String(f.id || Date.now() + i), url: f.url, path: f.path || caminhoDoStorage(f.url), legenda: f.legenda || '' }));
             emp.instagram = emp.instagram || '';
             emp.vitrine = !!emp.vitrine;
             emp.img = emp.img || n.img;
@@ -1237,6 +1268,7 @@
 
             document.getElementById('linkAreaDono').href = `?c=${emp.slug}&painel`;
             renderServicosGrid(emp.servicos);
+            renderGaleria(emp);
             atualizarBadgeAgendamentos();
         }
 
@@ -1436,6 +1468,8 @@
         }
 
         function desativarModoEdicao() {
+            if (uploadsPendentes.length) apagarDoStorage(uploadsPendentes);
+            uploadsPendentes = []; arquivosParaApagar = [];
             emEdicaoVisual = false;
             rascunho = null;
             alteracoesPendentes = false;
@@ -1473,6 +1507,9 @@
             salvando = false;
             if (!salva) return;
             rascunho.slug = salva.slug;
+            apagarDoStorage(arquivosParaApagar);
+            arquivosParaApagar = [];
+            uploadsPendentes = [];
             marcarSujo(false);
             if (abaPainel === 'geral') renderPainel();
             toast('✅ Salvo no Supabase! Já está no ar pro cliente.');
@@ -1569,6 +1606,14 @@
                     break;
                 case 'img-padrao': rascunho.img = n.img; break;
                 case 'copiar-link': copiarTexto(linkEmpresa(rascunho)); return;
+                case 'foto-up': { const g = rascunho.galeria; if (i > 0) [g[i - 1], g[i]] = [g[i], g[i - 1]]; break; }
+                case 'foto-down': { const g = rascunho.galeria; if (i < g.length - 1) [g[i + 1], g[i]] = [g[i], g[i + 1]]; break; }
+                case 'foto-del': {
+                    if (!confirm('Excluir esta foto?')) return;
+                    const [f] = rascunho.galeria.splice(i, 1);
+                    if (f?.path) arquivosParaApagar.push(f.path);
+                    break;
+                }
                 case 'copiar-seg': {
                     const seg = rascunho.agenda.dias[1];
                     [2, 3, 4, 5].forEach(d => rascunho.agenda.dias[d] = { ...seg });
@@ -1676,6 +1721,31 @@
                     <p class="text-[11px] text-gray-500">A duração define quais horários aparecem pro cliente (ex: serviço de 60 min não cabe às 19:30 se fecha às 20:00).</p>`;
             }
 
+            if (abaPainel === 'fotos') {
+                const g = d.galeria;
+                c.innerHTML = `
+                    <div class="flex items-center justify-between"><p class="text-white font-semibold">Fotos dos trabalhos</p><span class="text-xs ${g.length >= MAX_FOTOS ? 'text-red-400' : 'text-gray-400'}">${g.length}/${MAX_FOTOS}</span></div>
+                    <label class="block text-center cursor-pointer bg-gold-500 text-onbrand font-bold rounded-lg py-2.5 text-sm ${g.length >= MAX_FOTOS || textoProgressoFotos ? 'opacity-50 pointer-events-none' : ''}">
+                        <i class="fa-solid fa-upload mr-1"></i> Adicionar fotos
+                        <input type="file" accept="image/*" multiple class="hidden" onchange="adicionarFotosGaleria(this)">
+                    </label>
+                    ${textoProgressoFotos ? `<p class="text-xs text-gold-400"><i class="fa-solid fa-circle-notch fa-spin mr-1"></i>${textoProgressoFotos}</p>` : ''}
+                    <p class="text-[11px] text-gray-500">Pode escolher várias de uma vez. Cada foto é reduzida e comprimida no aparelho antes de enviar (fica em torno de 100 a 200 KB).</p>
+                    ${g.map((f, i) => `
+                        <div class="flex gap-3 bg-dark-800 border border-dark-700 rounded-lg p-2">
+                            <img src="${esc(f.url)}" alt="" class="w-16 h-16 rounded object-cover shrink-0">
+                            <div class="flex-1 min-w-0 space-y-1.5">
+                                <input class="campo-painel !py-1.5" data-g-idx="${i}" data-g-f="legenda" value="${esc(f.legenda)}" placeholder="Legenda (ex: Degradê navalhado)" maxlength="60">
+                                <div class="flex gap-1 justify-end text-xs">
+                                    <button type="button" data-acao="foto-up" data-idx="${i}" class="px-2 py-1 rounded bg-dark-700 text-gray-300" title="Subir"><i class="fa-solid fa-arrow-up"></i></button>
+                                    <button type="button" data-acao="foto-down" data-idx="${i}" class="px-2 py-1 rounded bg-dark-700 text-gray-300" title="Descer"><i class="fa-solid fa-arrow-down"></i></button>
+                                    <button type="button" data-acao="foto-del" data-idx="${i}" class="px-2 py-1 rounded bg-red-500/20 text-red-300" title="Excluir"><i class="fa-solid fa-trash"></i></button>
+                                </div>
+                            </div>
+                        </div>`).join('')}
+                `;
+            }
+
             if (abaPainel === 'agenda') {
                 const ag = d.agenda;
                 c.innerHTML = `
@@ -1723,6 +1793,10 @@
                 if (t.dataset.sF === 'price' && e.type === 'change') t.value = fmtBR(s.price);
                 renderServicosGrid(d.servicos);
                 marcarSujo();
+            } else if (t.dataset.gF) {
+                d.galeria[t.dataset.gIdx][t.dataset.gF] = t.value;
+                renderGaleria(d);
+                marcarSujo();
             } else if (t.dataset.ag) {
                 const ag = d.agenda, i = t.dataset.dia;
                 switch (t.dataset.ag) {
@@ -1743,30 +1817,24 @@
 
         // Upload de foto: reduz pra no máx. 1400px e salva como JPEG leve
         // Upload de foto: reduz pra no máx. 1400px e envia pro Storage do Supabase (bucket "capas")
-        function enviarImagem(input) {
+        // Foto de capa: reduz/comprime no aparelho e envia pro Storage (pasta da empresa)
+        async function enviarImagem(input) {
             const file = input.files[0];
-            if (!file || !rascunho) return;
-            toast('📤 Enviando foto...', 10000);
-            const img = new Image();
-            img.onload = () => {
-                const escala = Math.min(1, 1400 / Math.max(img.width, img.height));
-                const cv = document.createElement('canvas');
-                cv.width = Math.round(img.width * escala); cv.height = Math.round(img.height * escala);
-                cv.getContext('2d').drawImage(img, 0, 0, cv.width, cv.height);
-                cv.toBlob(async blob => {
-                    const caminho = `${rascunho.slug || 'empresa'}/${Date.now()}.jpg`;
-                    const { error } = await sb.storage.from('capas').upload(caminho, blob, { contentType: 'image/jpeg', upsert: true });
-                    URL.revokeObjectURL(img.src);
-                    if (error) { erroBanco(error, 'Foto não enviada'); return; }
-                    rascunho.img = sb.storage.from('capas').getPublicUrl(caminho).data.publicUrl;
-                    marcarSujo();
-                    renderSite(rascunho);
-                    renderPainel();
-                    toast('📷 Foto trocada. Lembre de Salvar.');
-                }, 'image/jpeg', 0.8);
-            };
-            img.src = URL.createObjectURL(file);
             input.value = '';
+            if (!file || !rascunho) return;
+            toast('📤 Otimizando e enviando a foto...', 10000);
+            try {
+                const blob = await otimizarImagem(file, 1600, 0.75);
+                const ext = blob.type === 'image/webp' ? 'webp' : 'jpg';
+                const url = await enviarParaStorage(blob, `empresa-${rascunho.id}/capa-${Date.now()}.${ext}`);
+                const antiga = caminhoDoStorage(rascunho.img);
+                if (antiga) arquivosParaApagar.push(antiga);
+                rascunho.img = url;
+                marcarSujo();
+                renderSite(rascunho);
+                renderPainel();
+                toast(`📷 Foto trocada (${Math.round(blob.size / 1024)} KB). Lembre de Salvar.`);
+            } catch (err) { erroBanco(err, 'Foto não enviada'); }
         }
 
         // ======================================================
@@ -1926,6 +1994,7 @@
             if (error) { erroBanco(error, 'Não excluiu'); return; }
             EMPRESAS = EMPRESAS.filter(x => x.id != id);
             renderAdminTabela();
+            apagarPastaEmpresa(id);
             toast('Empresa excluída.');
         }
 
@@ -2074,6 +2143,185 @@
             const naTela = !document.getElementById('clientView').classList.contains('hidden');
             const bloqueada = emp && emp.status !== 'Ativo';
             document.getElementById('barraAgendarMobile').classList.toggle('hidden', !naTela || emEdicaoVisual || formularioVisivel || !!bloqueada);
+        }
+
+        // ======================================================
+        // FOTOS: otimização + galeria de trabalhos
+        // ======================================================
+        const MAX_FOTOS = 12;
+        const GALERIA = {
+            barbearia: ['Cortes da casa', 'Estilos feitos aqui na cadeira'],
+            salao: ['Nossos trabalhos', 'Cortes, cores e penteados'],
+            manicure: ['Inspirações', 'Nail arts feitas aqui'],
+            petshop: ['Clientes de 4 patas', 'Depois do banho e tosa'],
+            estetica: ['Resultados', 'Tratamentos feitos aqui'],
+            moderno: ['Galeria', 'Nossos trabalhos']
+        };
+        let uploadsPendentes = [];   // enviados nesta edição e ainda não salvos (apaga se sair sem salvar)
+        let arquivosParaApagar = []; // trocados/excluídos (apaga do Storage só depois de Salvar)
+        let textoProgressoFotos = '';
+
+        function caminhoDoStorage(url) {
+            const marca = '/storage/v1/object/public/capas/';
+            const i = String(url || '').indexOf(marca);
+            return i >= 0 ? decodeURIComponent(url.slice(i + marca.length).split('?')[0]) : '';
+        }
+
+        // Reduz e comprime no aparelho antes de enviar: WebP (ou JPEG), lado maior até "max" px
+        function otimizarImagem(file, max = 1080, qualidade = 0.72) {
+            return new Promise((resolve, reject) => {
+                if (!file.type.startsWith('image/')) return reject(new Error('Esse arquivo não é uma imagem.'));
+                const url = URL.createObjectURL(file);
+                const img = new Image();
+                img.onload = () => {
+                    const escala = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+                    const cv = document.createElement('canvas');
+                    cv.width = Math.round(img.naturalWidth * escala); cv.height = Math.round(img.naturalHeight * escala);
+                    const ctx = cv.getContext('2d');
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, cv.width, cv.height);
+                    URL.revokeObjectURL(url);
+                    const pronto = b => {
+                        if (!b) return reject(new Error('Não deu pra comprimir a imagem.'));
+                        if (b.size > 450000 && qualidade > 0.5) return otimizarImagem(file, Math.round(max * 0.85), qualidade - 0.1).then(resolve, reject);
+                        resolve(b);
+                    };
+                    cv.toBlob(b => (b && b.type === 'image/webp') ? pronto(b) : cv.toBlob(pronto, 'image/jpeg', qualidade + 0.06), 'image/webp', qualidade);
+                };
+                img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Não deu pra ler essa imagem (formato não suportado).')); };
+                img.src = url;
+            });
+        }
+
+        async function enviarParaStorage(blob, caminho) {
+            const { error } = await sb.storage.from('capas').upload(caminho, blob, { contentType: blob.type, cacheControl: '31536000', upsert: false });
+            if (error) throw error;
+            uploadsPendentes.push(caminho);
+            return sb.storage.from('capas').getPublicUrl(caminho).data.publicUrl;
+        }
+
+        async function apagarDoStorage(caminhos) {
+            const lista = [...new Set(caminhos.filter(Boolean))];
+            if (lista.length) await sb.storage.from('capas').remove(lista).catch(() => {});
+        }
+
+        async function apagarPastaEmpresa(id) {
+            for (const pasta of [`empresa-${id}/galeria`, `empresa-${id}`]) {
+                const { data } = await sb.storage.from('capas').list(pasta, { limit: 100 });
+                await apagarDoStorage((data || []).filter(f => f.id).map(f => `${pasta}/${f.name}`));
+            }
+        }
+
+        async function adicionarFotosGaleria(input) {
+            const arquivos = [...input.files];
+            input.value = '';
+            if (!rascunho || !arquivos.length) return;
+            const vagas = MAX_FOTOS - rascunho.galeria.length;
+            if (vagas <= 0) { toast(`Limite de ${MAX_FOTOS} fotos. Exclua alguma pra adicionar outra.`); return; }
+            const lista = arquivos.slice(0, vagas);
+            if (arquivos.length > vagas) toast(`Só cabem mais ${vagas} foto(s); as outras foram ignoradas.`, 5000);
+            let ok = 0, kb = 0;
+            for (const [k, file] of lista.entries()) {
+                textoProgressoFotos = `Otimizando e enviando ${k + 1} de ${lista.length}...`;
+                if (abaPainel === 'fotos') renderPainel();
+                try {
+                    const blob = await otimizarImagem(file);
+                    const ext = blob.type === 'image/webp' ? 'webp' : 'jpg';
+                    const caminho = `empresa-${rascunho.id}/galeria/${Date.now()}-${k}.${ext}`;
+                    const url = await enviarParaStorage(blob, caminho);
+                    rascunho.galeria.push({ id: String(Date.now()) + k, url, path: caminho, legenda: '' });
+                    ok++; kb += blob.size / 1024;
+                    renderGaleria(rascunho);
+                } catch (err) { erroBanco(err, 'Foto não enviada'); break; }
+            }
+            textoProgressoFotos = '';
+            if (abaPainel === 'fotos') renderPainel();
+            if (ok) { marcarSujo(); toast(`📷 ${ok} foto(s) adicionada(s), média de ${Math.round(kb / ok)} KB cada. Coloque as legendas e clique em Salvar.`, 6000); }
+        }
+
+        function renderGaleria(emp) {
+            const sec = document.getElementById('secaoGaleria');
+            const fotos = emp.galeria || [];
+            const ed = emEdicaoVisual;
+            sec.classList.toggle('hidden', !fotos.length && !ed);
+            const [tit, sub] = GALERIA[emp.tema] || GALERIA.moderno;
+            document.getElementById('tituloGaleria').innerText = tit;
+            document.getElementById('subGaleria').innerText = sub;
+            const g = document.getElementById('pubGaleria');
+            if (!fotos.length) {
+                g.className = '';
+                g.innerHTML = `<button type="button" data-abre="fotos" class="abre-painel w-full border-2 border-dashed border-gold-500/40 rounded-2xl py-12 text-center text-gray-400 hover:text-white">
+                    <i class="fa-solid fa-images text-3xl text-gold-400 mb-3 block"></i>Adicione fotos dos seus trabalhos<span class="block text-xs text-gray-500 mt-1">Só aparece pro cliente quando tiver foto</span></button>`;
+                return;
+            }
+            const attr = i => ed ? 'data-abre="fotos"' : `data-foto="${i}"`;
+            const leg = f => esc(f.legenda);
+            const T = {
+                barbearia: { grade: 'grid grid-cols-2 md:grid-cols-4 gap-2', item: (f, i) => `
+                    <button type="button" ${attr(i)} class="relative aspect-[4/5] overflow-hidden rounded-md group">
+                        <img src="${esc(f.url)}" alt="${leg(f)}" loading="lazy" decoding="async" class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 group-hover:scale-105 transition duration-500">
+                        ${f.legenda ? `<span class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 to-transparent pt-8 pb-2.5 px-3 text-left text-[11px] sm:text-xs font-bold uppercase tracking-wider text-white">${leg(f)}</span>` : ''}
+                    </button>` },
+                salao: { grade: 'columns-2 md:columns-3 gap-4', item: (f, i) => `
+                    <button type="button" ${attr(i)} class="block w-full mb-4 break-inside-avoid text-left group">
+                        <img src="${esc(f.url)}" alt="${leg(f)}" loading="lazy" decoding="async" class="w-full rounded-sm group-hover:opacity-90 transition">
+                        ${f.legenda ? `<span class="block font-vintage italic text-sm sm:text-base text-gray-300 mt-2">${leg(f)}</span>` : ''}
+                    </button>` },
+                manicure: { grade: 'grid grid-cols-2 md:grid-cols-3 gap-3', item: (f, i) => `
+                    <button type="button" ${attr(i)} class="relative aspect-square overflow-hidden rounded-[1.75rem] group">
+                        <img src="${esc(f.url)}" alt="${leg(f)}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        ${f.legenda ? `<span class="absolute left-2.5 bottom-2.5 max-w-[85%] truncate bg-white/90 text-[#33213f] text-[11px] sm:text-xs font-semibold px-3 py-1 rounded-full">${leg(f)}</span>` : ''}
+                    </button>` },
+                padrao: { grade: 'grid grid-cols-2 md:grid-cols-3 gap-3', item: (f, i) => `
+                    <button type="button" ${attr(i)} class="text-left group">
+                        <span class="block aspect-square overflow-hidden rounded-xl"><img src="${esc(f.url)}" alt="${leg(f)}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500"></span>
+                        ${f.legenda ? `<span class="block text-sm text-gray-300 mt-2">${leg(f)}</span>` : ''}
+                    </button>` }
+            };
+            const t = T[emp.tema] || T.padrao;
+            g.className = t.grade;
+            g.innerHTML = fotos.map(t.item).join('');
+        }
+
+        // ---------- foto ampliada ----------
+        let lightboxIdx = 0;
+        function abrirLightbox(i) {
+            const fotos = empresaAtual()?.galeria || [];
+            if (!fotos.length) return;
+            lightboxIdx = (i + fotos.length) % fotos.length;
+            const f = fotos[lightboxIdx];
+            document.getElementById('lightboxImg').src = f.url;
+            document.getElementById('lightboxLegenda').innerText = f.legenda || '';
+            document.getElementById('lightboxContador').innerText = `${lightboxIdx + 1} / ${fotos.length}`;
+            const lb = document.getElementById('lightbox');
+            lb.classList.remove('hidden'); lb.classList.add('flex');
+        }
+        function navLightbox(d) { abrirLightbox(lightboxIdx + d); }
+        function fecharLightbox() { const lb = document.getElementById('lightbox'); lb.classList.add('hidden'); lb.classList.remove('flex'); }
+        document.addEventListener('keydown', e => {
+            if (document.getElementById('lightbox').classList.contains('hidden')) return;
+            if (e.key === 'Escape') fecharLightbox();
+            if (e.key === 'ArrowLeft') navLightbox(-1);
+            if (e.key === 'ArrowRight') navLightbox(1);
+        });
+        document.getElementById('pubGaleria').addEventListener('click', e => {
+            const b = e.target.closest('[data-foto]');
+            if (b && !emEdicaoVisual) abrirLightbox(Number(b.dataset.foto));
+        });
+
+        // "Quero esse estilo": vai junto na mensagem do WhatsApp
+        let estiloEscolhido = null;
+        function escolherEstilo(txt) {
+            estiloEscolhido = txt || null;
+            const box = document.getElementById('estiloEscolhidoBox');
+            box.classList.toggle('hidden', !estiloEscolhido); box.classList.toggle('flex', !!estiloEscolhido);
+            document.getElementById('estiloEscolhidoTxt').innerText = estiloEscolhido || '';
+        }
+        function quererEsseEstilo() {
+            const f = (empresaAtual()?.galeria || [])[lightboxIdx];
+            fecharLightbox();
+            escolherEstilo(f ? (f.legenda || `foto ${lightboxIdx + 1} da galeria`) : null);
+            document.getElementById('agendar').scrollIntoView({ behavior: 'smooth' });
         }
 
         // ======================================================
@@ -2478,6 +2726,7 @@
                 case 'dia-prox': dataPainel = addDias(dataPainel, 1); renderPainelDono(); return;
                 case 'hoje': dataPainel = hojeISO(); renderPainelDono(); return;
                 case 'editar': ativarEdicaoVisualParaEmpresa(emp.id, 'dono'); return;
+                case 'fotos': ativarEdicaoVisualParaEmpresa(emp.id, 'dono'); abrirPainel('fotos'); document.getElementById('secaoGaleria').scrollIntoView({ behavior: 'smooth' }); return;
                 case 'ver-site': window.open(`?c=${emp.slug}`, '_blank'); return;
                 case 'copiar-link': copiarTexto(linkEmpresa(emp)); return;
                 case 'concluido': case 'faltou':
@@ -2537,7 +2786,8 @@
             const diaSemana = DIAS[new Date(data + 'T12:00').getDay()];
             const emoji = (NICHOS[emp.nicho] || NICHOS['Outro']).emoji;
             const msg = `${emoji} *AGENDAMENTO - ${emp.nome.toUpperCase()}* ${emoji}\nCliente: ${nome}\nWhatsApp: ${fmtFone(fone)}\nServiço: ${servico.name} (R$ ${fmtBR(servico.price)} · ${servico.time})\nData: ${dataBR} (${diaSemana})\nHorário: ${hora}`;
-            const urlWhats = `https://wa.me/${emp.whatsapp}?text=${encodeURIComponent(msg)}`;
+            const msgFinal = estiloEscolhido ? `${msg}\nReferência: ${estiloEscolhido}` : msg;
+            const urlWhats = `https://wa.me/${emp.whatsapp}?text=${encodeURIComponent(msgFinal)}`;
 
             // Modo edição = só simulação (não grava no banco)
             if (emEdicaoVisual) { window.open(urlWhats, '_blank'); toast('Simulação: no modo edição o agendamento não é gravado.'); return; }
@@ -2568,6 +2818,7 @@
 
             if (janela) janela.location.href = urlWhats; else location.href = urlWhats;
             toast('✅ Horário reservado! Finalize no WhatsApp.');
+            escolherEstilo(null);
             document.getElementById('inputNome').value = '';
             document.getElementById('inputFone').value = '';
             atualizarHorarios();
