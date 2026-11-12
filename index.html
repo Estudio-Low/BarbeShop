@@ -655,7 +655,6 @@
                     <p class="px-3 pt-1 pb-2 text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Ferramentas</p>
                     <button onclick="exportarBackup()" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-dark-700" title="Baixa um .json com todas as empresas"><i class="fa-solid fa-download w-4 text-gray-500"></i>Backup</button>
                     <label class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-dark-700 cursor-pointer" title="Restaura empresas de um .json"><i class="fa-solid fa-upload w-4 text-gray-500"></i>Importar<input type="file" accept=".json,application/json" class="hidden" onchange="importarBackup(this)"></label>
-                    <button id="btnMigrarLocal" onclick="migrarDadosLocais()" class="hidden w-full items-center gap-3 px-3 py-2 rounded-lg text-blue-300 hover:bg-dark-700"><i class="fa-solid fa-cloud-arrow-up w-4"></i>Enviar dados antigos</button>
                     <button onclick="window.open(location.pathname, '_blank')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-bullhorn w-4 text-gray-500"></i>Página de vendas</button>
                     <button onclick="sairAdmin()" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:bg-dark-700"><i class="fa-solid fa-right-from-bracket w-4"></i>Sair</button>
                 </div>
@@ -1415,7 +1414,6 @@
                 history.replaceState(null, '', '?admin');
                 await carregarEmpresas();
                 await carregarCobrancas();
-                { const m = document.getElementById('btnMigrarLocal'), tem = !!localStorage.getItem('agendify_empresas'); m.classList.toggle('hidden', !tem); m.classList.toggle('flex', tem); }
                 abrirAbaAdmin(admAba);
             }
         }
@@ -2416,19 +2414,6 @@
                 if (await enviarListaProBanco(lista)) toast('✅ Backup importado!');
             };
             reader.readAsText(file);
-        }
-
-        // Uma vez só: sobe as empresas que estavam salvas no navegador (versão antiga)
-        async function migrarDadosLocais() {
-            const lista = JSON.parse(localStorage.getItem('agendify_empresas') || '[]');
-            if (!lista.length) return;
-            if (!confirm(`Enviar ${lista.length} empresa(s) salvas neste navegador para o Supabase?`)) return;
-            if (await enviarListaProBanco(lista)) {
-                localStorage.setItem('agendify_empresas_migrado', localStorage.getItem('agendify_empresas'));
-                localStorage.removeItem('agendify_empresas');
-                document.getElementById('btnMigrarLocal').classList.add('hidden');
-                toast('✅ Dados antigos enviados pro Supabase!');
-            }
         }
 
         // Admin: agendamentos recebidos de uma empresa
