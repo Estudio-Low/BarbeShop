@@ -1,5 +1,5 @@
-// Agendify: service worker simples (permite instalar como app e abrir sem internet o que já foi visto)
-const CACHE = 'agendify-v1';
+// Agendaço: service worker simples (permite instalar como app e abrir sem internet o que já foi visto)
+const CACHE = 'agendaco-v2';
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(self.clients.claim()));
 self.addEventListener('fetch', e => {

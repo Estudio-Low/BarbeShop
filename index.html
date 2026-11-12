@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agendify - Cloud SaaS & Edição Visual</title>
+    <title>Agendaço | Agendamento online</title>
     <!-- App instalável (PWA) -->
     <meta name="theme-color" content="#0f0f11">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Agendify">
+    <meta name="apple-mobile-web-app-title" content="Agendaço">
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="icon" type="image/png" href="icon-192.png">
     <!-- Tailwind CSS -->
@@ -276,7 +276,7 @@
                     <div class="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-full border border-gold-500 flex items-center justify-center bg-dark-800 text-gold-500">
                         <i id="logoIcone" class="fa-solid fa-calendar-check md:text-lg"></i>
                     </div>
-                    <span id="logoNomeEmpresa" data-campo="nome" class="font-vintage text-base sm:text-2xl font-bold tracking-wider gold-gradient-text truncate" contenteditable="false">AGENDIFY</span>
+                    <span id="logoNomeEmpresa" data-campo="nome" class="font-vintage text-base sm:text-2xl font-bold tracking-wider gold-gradient-text truncate" contenteditable="false">AGENDAÇO</span>
                     <span id="lblTipoNichoBadge" class="hidden lg:inline empty:hidden shrink-0 text-xs bg-gold-500/10 text-gold-400 border border-gold-500/30 px-2 py-0.5 rounded-full"></span>
                 </a>
 
@@ -332,7 +332,7 @@
             <div class="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
                 <a href="#topo" class="flex items-center gap-2">
                     <span class="w-9 h-9 rounded-full border border-gold-500 flex items-center justify-center text-gold-500"><i class="fa-solid fa-calendar-check"></i></span>
-                    <span class="font-vintage text-xl font-bold tracking-wide gold-gradient-text">AGENDIFY</span>
+                    <span class="font-vintage text-xl font-bold tracking-wide gold-gradient-text">AGENDAÇO</span>
                 </a>
                 <div class="hidden md:flex items-center gap-6 text-sm text-gray-300">
                     <a href="#exemplos" class="hover:text-gold-400">Exemplos</a>
@@ -445,7 +445,7 @@
                     <div class="rounded-2xl overflow-hidden border border-dark-600 shadow-2xl bg-dark-900">
                         <div class="flex items-center gap-3 px-4 py-2.5 bg-[#1d1d22] border-b border-dark-700">
                             <span class="flex gap-1.5"><i class="w-3 h-3 rounded-full bg-[#ff5f57]"></i><i class="w-3 h-3 rounded-full bg-[#febc2e]"></i><i class="w-3 h-3 rounded-full bg-[#28c840]"></i></span>
-                            <span class="flex-1 text-center text-[11px] text-gray-400 bg-dark-900 rounded-md py-1 truncate"><i class="fa-solid fa-lock text-[9px] mr-1"></i>agendfy-ten.vercel.app/?painel</span>
+                            <span class="flex-1 text-center text-[11px] text-gray-400 bg-dark-900 rounded-md py-1 truncate"><i class="fa-solid fa-lock text-[9px] mr-1"></i>agendaco.com.br/?painel</span>
                         </div>
                         <div class="relative select-none">
                             <div id="demoPainel" class="pointer-events-none p-4 md:p-6 min-h-[420px]" aria-hidden="true"></div>
@@ -503,7 +503,7 @@
 
         <footer class="bg-black text-gray-500 border-t border-dark-800 py-8 text-center text-xs">
             <p class="text-gray-400 mb-2"><i class="fa-solid fa-location-dot text-gold-400 mr-1"></i>Caçador - SC · <a href="https://wa.me/5549984031114" target="_blank" class="hover:text-gray-200"><i class="fa-brands fa-whatsapp mr-1"></i>(49) 98403-1114</a></p>
-            Agendify &copy; 2026 · <a href="?painel" class="hover:text-gray-300">Área do estabelecimento</a>
+            Agendaço &copy; 2026 · <a href="?painel" class="hover:text-gray-300">Área do estabelecimento</a>
         </footer>
     </main>
 
@@ -629,7 +629,7 @@
                 </div>
             </div>
             <div class="text-center text-xs text-gray-600 mt-8 pt-4 border-t border-dark-800">
-                Powered by Agendify &copy; 2026 · <a id="linkAreaDono" href="?painel" class="hover:text-gray-400">Área do estabelecimento</a>
+                Powered by Agendaço &copy; 2026 · <a id="linkAreaDono" href="?painel" class="hover:text-gray-400">Área do estabelecimento</a>
             </div>
         </footer>
 
@@ -1357,7 +1357,7 @@
                 return;
             }
 
-            // Sem ?c= = página de vendas do Agendify
+            // Sem ?c= = página de vendas do Agendaço
             if (!slug) { abrirVendas(); return; }
 
             // ?c=slug = site público do cliente final (limpo, sem nada de admin)
@@ -2185,7 +2185,7 @@
                 <p class="text-[11px] text-gray-400 break-all mb-2">${esc(url)}</p>
                 <div class="flex gap-2">
                     <button type="button" onclick="copiarTexto('${esc(url)}')" class="text-[11px] bg-dark-700 text-gray-200 px-2.5 py-1 rounded">Copiar</button>
-                    <a href="https://wa.me/${esc(emp?.whatsapp || '')}?text=${encodeURIComponent(`Olá! Segue o link pra ${titulo.toLowerCase()} do Agendify (${emp?.nome || ''}): ${url}`)}" target="_blank" class="text-[11px] bg-green-600 text-white px-2.5 py-1 rounded"><i class="fa-brands fa-whatsapp mr-1"></i>Enviar pro cliente</a>
+                    <a href="https://wa.me/${esc(emp?.whatsapp || '')}?text=${encodeURIComponent(`Olá! Segue o link pra ${titulo.toLowerCase()} do Agendaço (${emp?.nome || ''}): ${url}`)}" target="_blank" class="text-[11px] bg-green-600 text-white px-2.5 py-1 rounded"><i class="fa-brands fa-whatsapp mr-1"></i>Enviar pro cliente</a>
                 </div></div>`;
             document.getElementById('cobLinks').innerHTML = linha('Assinar a mensalidade', data.link_assinatura) + linha('Pagar a implantação', data.link_setup);
             toast('✅ Links gerados! Mande pro cliente.');
@@ -2906,7 +2906,7 @@
 
         async function abrirVendas() {
             aplicarTema('#d4af37', 'moderna');
-            document.title = 'Agendify | Agendamento online para barbearias, pet shops e salões';
+            document.title = 'Agendaço | Agendamento online para barbearias, pet shops e salões';
             mostrarSo('vendasView');
             esconderCarregando();
             renderPlanos();
@@ -2970,7 +2970,7 @@
             const w = e.target.closest('[data-vendas="whats"]');
             if (w) {
                 const plano = w.dataset.plano;
-                const msg = `Olá! Vi o Agendify e quero um site de agendamento pro meu negócio${plano ? ` (plano ${plano})` : ''}.`;
+                const msg = `Olá! Vi o Agendaço e quero um site de agendamento pro meu negócio${plano ? ` (plano ${plano})` : ''}.`;
                 window.open(`https://wa.me/${WHATS_VENDAS}?text=${encodeURIComponent(msg)}`, '_blank');
             }
         });
