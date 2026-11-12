@@ -273,8 +273,9 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between gap-3 h-16 md:h-20">
                 <a href="#" onclick="event.preventDefault(); if(!emEdicaoVisual) window.scrollTo({ top: 0, behavior: 'smooth' })" class="flex items-center gap-2 sm:gap-3 min-w-0 group">
-                    <div class="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-full border border-gold-500 flex items-center justify-center bg-dark-800 text-gold-500">
+                    <div id="logoCaixa" class="w-9 h-9 md:w-10 md:h-10 shrink-0 rounded-full border border-gold-500 flex items-center justify-center bg-dark-800 text-gold-500 overflow-hidden">
                         <i id="logoIcone" class="fa-solid fa-calendar-check md:text-lg"></i>
+                        <img id="logoImg" alt="" class="hidden w-full h-full object-contain">
                     </div>
                     <span id="logoNomeEmpresa" data-campo="nome" class="font-vintage text-base sm:text-2xl font-bold tracking-wider gold-gradient-text truncate" contenteditable="false">AGENDAÇO</span>
                     <span id="lblTipoNichoBadge" class="hidden lg:inline empty:hidden shrink-0 text-xs bg-gold-500/10 text-gold-400 border border-gold-500/30 px-2 py-0.5 rounded-full"></span>
@@ -781,7 +782,7 @@
                                 <div id="donoBotaoDia"></div>
                             </div>
                             <div class="relative z-10 p-4 md:p-5 pt-0 space-y-3">
-                                <h1 id="donoNome" class="font-vintage text-3xl md:text-5xl font-bold text-white drop-shadow-lg"></h1>
+                                <div class="flex items-center gap-3 min-w-0"><img id="donoLogo" alt="" class="hidden w-12 h-12 md:w-16 md:h-16 shrink-0 rounded-full object-contain bg-dark-900/80 border border-white/20 shadow-lg"><h1 id="donoNome" class="font-vintage text-3xl md:text-5xl font-bold text-white drop-shadow-lg min-w-0"></h1></div>
                                 <div class="flex items-center gap-2 bg-black/50 backdrop-blur border border-white/10 rounded-xl p-2">
                                     <button type="button" data-dono="dia-ant" class="w-10 h-10 shrink-0 rounded-lg text-white/80 hover:bg-white/10" title="Dia anterior"><i class="fa-solid fa-chevron-left"></i></button>
                                     <div class="flex-1 text-center min-w-0">
@@ -1129,7 +1130,7 @@
         const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         // Colunas da tabela "empresas" (mesmos nomes do objeto JS)
-        const COLUNAS = ['slug', 'nome', 'nicho', 'whatsapp', 'img', 'plano', 'status', 'titulo', 'sub', 'endereco', 'instagram', 'cor', 'fonte', 'agenda', 'servicos', 'vitrine', 'tema', 'fundo', 'galeria'];
+        const COLUNAS = ['slug', 'nome', 'nicho', 'whatsapp', 'img', 'plano', 'status', 'titulo', 'sub', 'endereco', 'instagram', 'cor', 'fonte', 'agenda', 'servicos', 'vitrine', 'tema', 'fundo', 'galeria', 'logo'];
         let EMPRESAS = [];      // cache do que veio do banco
         let souAdmin = false;
         let souDono = false, minhaEmpresaId = null;
@@ -1206,6 +1207,7 @@
             emp.galeria = (Array.isArray(emp.galeria) ? emp.galeria : []).filter(f => f && f.url)
                 .map((f, i) => ({ id: String(f.id || Date.now() + i), url: f.url, path: f.path || caminhoDoStorage(f.url), legenda: f.legenda || '' }));
             emp.instagram = emp.instagram || '';
+            emp.logo = emp.logo || '';
             emp.vitrine = !!emp.vitrine;
             emp.img = emp.img || n.img;
             emp.agenda = emp.agenda || agendaPadrao();
@@ -1339,6 +1341,16 @@
         let alteracoesPendentes = false;
         let abaPainel = 'geral';
 
+        // Logo da empresa no topo (se não tiver, usa o ícone do nicho)
+        function aplicarLogo(emp) {
+            const img = document.getElementById('logoImg'), ic = document.getElementById('logoIcone');
+            ic.className = `fa-solid ${(NICHOS[emp.nicho] || NICHOS['Outro']).logo} text-lg` + (emp.logo ? ' hidden' : '');
+            img.classList.toggle('hidden', !emp.logo);
+            if (emp.logo && img.getAttribute('src') !== emp.logo) img.src = emp.logo;
+            const dl = document.getElementById('donoLogo');
+            if (dl) { dl.classList.toggle('hidden', !emp.logo); if (emp.logo && dl.getAttribute('src') !== emp.logo) dl.src = emp.logo; }
+        }
+
         function empresaAtual() {
             if (emEdicaoVisual && rascunho) return rascunho;
             const empresas = getEmpresas();
@@ -1460,7 +1472,7 @@
             setCampo('endereco', emp.endereco || 'Endereço do estabelecimento');
             document.getElementById('lblTipoNichoBadge').innerText = emp.nicho;
             document.getElementById('lblTipoNicho').innerText = emp.nicho;
-            document.getElementById('logoIcone').className = `fa-solid ${(NICHOS[emp.nicho] || NICHOS['Outro']).logo} text-lg`;
+            aplicarLogo(emp);
             if (document.getElementById('pubImg').getAttribute('src') !== emp.img) document.getElementById('pubImg').src = emp.img;
 
             document.getElementById('footerHorario').innerText = textoHorarios(emp.agenda);
@@ -1822,6 +1834,7 @@
                     rascunho.servicos.forEach((s, k) => { if (!n.icones.includes(s.icon)) s.icon = n.icones[k % n.icones.length]; });
                     break;
                 case 'img-padrao': rascunho.img = n.img; break;
+                case 'logo-remover': { const ant = caminhoDoStorage(rascunho.logo); if (ant) arquivosParaApagar.push(ant); rascunho.logo = ''; break; }
                 case 'copiar-link': copiarTexto(linkEmpresa(rascunho)); return;
                 case 'foto-up': { const g = rascunho.galeria; if (i > 0) [g[i - 1], g[i]] = [g[i], g[i - 1]]; break; }
                 case 'foto-down': { const g = rascunho.galeria; if (i < g.length - 1) [g[i + 1], g[i]] = [g[i], g[i + 1]]; break; }
@@ -1882,6 +1895,19 @@
 
             if (abaPainel === 'visual') {
                 c.innerHTML = `
+                    ${lbl('Logo', `
+                        <div class="flex items-center gap-3">
+                            <div class="w-16 h-16 shrink-0 rounded-full border border-gold-500 bg-dark-800 overflow-hidden flex items-center justify-center text-gold-500 text-2xl">
+                                ${d.logo ? `<img src="${esc(d.logo)}" alt="" class="w-full h-full object-contain">` : `<i class="fa-solid ${(NICHOS[d.nicho] || NICHOS['Outro']).logo}"></i>`}
+                            </div>
+                            <div class="flex-1 flex flex-col gap-2">
+                                <label class="text-center cursor-pointer bg-dark-700 hover:bg-dark-600 text-gray-200 rounded-lg py-2 text-xs font-semibold">
+                                    <i class="fa-solid fa-upload mr-1"></i> ${d.logo ? 'Trocar logo' : 'Enviar logo'}
+                                    <input type="file" accept="image/*" class="hidden" onchange="enviarLogo(this)">
+                                </label>
+                                ${d.logo ? '<button type="button" data-acao="logo-remover" class="bg-dark-700 hover:bg-dark-600 text-gray-300 rounded-lg py-2 text-xs font-semibold">Voltar pro ícone do nicho</button>' : ''}
+                            </div>
+                        </div>`, 'Aparece no topo do site, no painel e vira o ícone do app. Melhor quadrada (ex: foto de perfil do Instagram); PNG sem fundo fica ótimo.')}
                     ${lbl('Foto de capa', `
                         <img id="previewImg" src="${esc(d.img)}" class="w-full h-36 object-cover rounded-lg border border-dark-700 mb-2">
                         <input class="campo-painel mb-2" data-f="img" value="${d.img.startsWith('data:') ? '' : esc(d.img)}" placeholder="Cole o link (URL) da imagem">
@@ -2054,6 +2080,46 @@
                 renderPainel();
                 toast(`📷 Foto trocada (${Math.round(blob.size / 1024)} KB). Lembre de Salvar.`);
             } catch (err) { erroBanco(err, 'Foto não enviada'); }
+        }
+
+        // Logo: vira um quadrado 512x512 (sem cortar, fundo transparente) bem leve
+        function otimizarLogo(file) {
+            return new Promise((resolve, reject) => {
+                if (!file.type.startsWith('image/')) return reject(new Error('Esse arquivo não é uma imagem.'));
+                const url = URL.createObjectURL(file), img = new Image();
+                img.onload = () => {
+                    const L = 512, cv = document.createElement('canvas');
+                    cv.width = L; cv.height = L;
+                    const ctx = cv.getContext('2d');
+                    ctx.imageSmoothingQuality = 'high';
+                    const esc_ = Math.min(L / img.naturalWidth, L / img.naturalHeight);
+                    const w = img.naturalWidth * esc_, h = img.naturalHeight * esc_;
+                    ctx.drawImage(img, (L - w) / 2, (L - h) / 2, w, h);
+                    URL.revokeObjectURL(url);
+                    cv.toBlob(b => (b && b.type === 'image/webp') ? resolve(b) : cv.toBlob(b2 => b2 ? resolve(b2) : reject(new Error('Não deu pra preparar o logo.')), 'image/png'), 'image/webp', 0.85);
+                };
+                img.onerror = () => { URL.revokeObjectURL(url); reject(new Error('Não deu pra ler essa imagem (formato não suportado).')); };
+                img.src = url;
+            });
+        }
+
+        async function enviarLogo(input) {
+            const file = input.files[0];
+            input.value = '';
+            if (!file || !rascunho) return;
+            toast('📤 Preparando o logo...', 10000);
+            try {
+                const blob = await otimizarLogo(file);
+                const ext = blob.type === 'image/webp' ? 'webp' : 'png';
+                const url = await enviarParaStorage(blob, `empresa-${rascunho.id}/logo-${Date.now()}.${ext}`);
+                const antiga = caminhoDoStorage(rascunho.logo);
+                if (antiga) arquivosParaApagar.push(antiga);
+                rascunho.logo = url;
+                marcarSujo();
+                renderSite(rascunho);
+                renderPainel();
+                toast(`✅ Logo trocado (${Math.round(blob.size / 1024)} KB). Lembre de Salvar.`);
+            } catch (err) { erroBanco(err, 'Logo não enviado'); }
         }
 
         // ======================================================
@@ -2490,11 +2556,13 @@
                 start_url: inicio, scope: abs('./'), display: 'standalone', orientation: 'portrait',
                 background_color: '#0f0f11', theme_color: emp.cor || '#0f0f11',
                 icons: [
+                    ...(emp.logo ? [{ src: emp.logo, sizes: '512x512', type: emp.logo.endsWith('.png') ? 'image/png' : 'image/webp', purpose: 'any' }] : []),
                     { src: abs('icon-192.png'), sizes: '192x192', type: 'image/png', purpose: 'any' },
                     { src: abs('icon-512.png'), sizes: '512x512', type: 'image/png', purpose: 'any' },
                     { src: abs('icon-512.png'), sizes: '512x512', type: 'image/png', purpose: 'maskable' }
                 ]
             };
+            document.querySelector('link[rel="apple-touch-icon"]').href = emp.logo || abs('icon-192.png');
             let link = document.querySelector('link[rel="manifest"]');
             if (!link) { link = document.createElement('link'); link.rel = 'manifest'; document.head.appendChild(link); }
             if (link.href.startsWith('blob:')) URL.revokeObjectURL(link.href);
@@ -3079,7 +3147,7 @@
             aplicarTema(emp.cor, emp.fonte);
             setCampo('nome', emp.nome);
             document.getElementById('lblTipoNichoBadge').innerText = emp.nicho;
-            document.getElementById('logoIcone').className = `fa-solid ${(NICHOS[emp.nicho] || NICHOS['Outro']).logo} text-lg`;
+            aplicarLogo(emp);
             document.getElementById('donoNome').innerText = emp.nome;
             document.title = `${emp.nome} | Painel`;
             esconderCarregando();
