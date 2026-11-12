@@ -723,21 +723,26 @@
                 <!-- ABA: AGENDA DO DIA -->
                 <div id="donoAbaAgenda" class="space-y-6">
                     <div class="grid lg:grid-cols-2 gap-6 items-stretch">
-                        <div class="space-y-4">
-                            <div>
-                                <p class="text-xs text-gold-400 uppercase font-semibold tracking-wider">Agenda do dia</p>
-                                <h1 id="donoNome" class="font-vintage text-2xl md:text-4xl font-bold text-white"></h1>
+                        <!-- Banner: foto de capa da empresa com o nome -->
+                        <div id="donoBanner" class="relative rounded-2xl overflow-hidden border border-dark-700 min-h-[230px] h-full flex flex-col justify-between bg-black">
+                            <img id="donoBannerImg" alt="" class="absolute inset-0 w-full h-full object-cover" onerror="this.onerror=null;this.src=IMG_SALAO">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black/90 via-black/45 to-black/25"></div>
+                            <div class="relative z-10 p-4 md:p-5 flex justify-between items-start gap-3">
+                                <span class="text-[11px] uppercase tracking-wider font-semibold text-white/85 bg-black/45 backdrop-blur px-2.5 py-1 rounded-full"><i class="fa-solid fa-calendar-day mr-1"></i>Agenda do dia</span>
+                                <div id="donoBotaoDia"></div>
                             </div>
-                            <div class="flex items-center gap-2 bg-dark-800 border border-dark-700 rounded-xl p-2">
-                                <button type="button" data-dono="dia-ant" class="w-10 h-10 shrink-0 rounded-lg text-gray-300 hover:bg-dark-700" title="Dia anterior"><i class="fa-solid fa-chevron-left"></i></button>
-                                <div class="flex-1 text-center min-w-0">
-                                    <input type="date" id="donoData" class="bg-transparent text-white font-semibold outline-none text-center">
-                                    <p id="donoDiaSemana" class="text-xs text-gray-400"></p>
+                            <div class="relative z-10 p-4 md:p-5 pt-0 space-y-3">
+                                <h1 id="donoNome" class="font-vintage text-3xl md:text-5xl font-bold text-white drop-shadow-lg"></h1>
+                                <div class="flex items-center gap-2 bg-black/50 backdrop-blur border border-white/10 rounded-xl p-2">
+                                    <button type="button" data-dono="dia-ant" class="w-10 h-10 shrink-0 rounded-lg text-white/80 hover:bg-white/10" title="Dia anterior"><i class="fa-solid fa-chevron-left"></i></button>
+                                    <div class="flex-1 text-center min-w-0">
+                                        <input type="date" id="donoData" class="bg-transparent text-white font-semibold outline-none text-center [color-scheme:dark]">
+                                        <p id="donoDiaSemana" class="text-xs text-white/60"></p>
+                                    </div>
+                                    <button type="button" data-dono="hoje" class="px-3 h-10 shrink-0 rounded-lg text-xs font-semibold text-gold-400 hover:bg-white/10">Hoje</button>
+                                    <button type="button" data-dono="dia-prox" class="w-10 h-10 shrink-0 rounded-lg text-white/80 hover:bg-white/10" title="Próximo dia"><i class="fa-solid fa-chevron-right"></i></button>
                                 </div>
-                                <button type="button" data-dono="hoje" class="px-3 h-10 shrink-0 rounded-lg text-xs font-semibold text-gold-400 hover:bg-dark-700">Hoje</button>
-                                <button type="button" data-dono="dia-prox" class="w-10 h-10 shrink-0 rounded-lg text-gray-300 hover:bg-dark-700" title="Próximo dia"><i class="fa-solid fa-chevron-right"></i></button>
                             </div>
-                            <div id="donoBotaoDia" class="flex justify-end"></div>
                         </div>
                         <div id="donoResumo" class="grid grid-cols-2 gap-3 content-start lg:content-stretch"></div>
                     </div>
@@ -2868,6 +2873,7 @@
             atualizarRelogio();
             configurarApp(emp, true);
             document.getElementById('donoNomeLateral').innerText = emp.nome;
+            document.getElementById('donoBannerImg').src = emp.img || IMG_SALAO;
             dataPainel = dataPainel || hojeISO();
             abrirAbaDono(donoAba);
             clearInterval(timerPainel);
@@ -2924,7 +2930,7 @@
 
             // Fechar/reabrir o dia (embaixo da data)
             document.getElementById('donoBotaoDia').innerHTML = (cfg.aberto || diaTodo)
-                ? `<button type="button" data-dono="${diaTodo ? 'reabrir-dia' : 'fechar-dia'}" ${diaTodo ? `data-id="${diaTodo.id}"` : ''} class="text-xs font-semibold px-3 py-2 rounded-lg ${diaTodo ? 'bg-green-600 text-white' : 'bg-dark-800 border border-dark-700 text-gray-300 hover:text-white'}">${diaTodo ? '<i class="fa-solid fa-lock-open mr-1"></i>Reabrir este dia' : '<i class="fa-solid fa-lock mr-1"></i>Fechar o dia inteiro'}</button>`
+                ? `<button type="button" data-dono="${diaTodo ? 'reabrir-dia' : 'fechar-dia'}" ${diaTodo ? `data-id="${diaTodo.id}"` : ''} class="text-xs font-semibold px-3 py-2 rounded-lg backdrop-blur ${diaTodo ? 'bg-green-600 text-white' : 'bg-black/45 border border-white/15 text-white/85 hover:text-white'}">${diaTodo ? '<i class="fa-solid fa-lock-open mr-1"></i>Reabrir este dia' : '<i class="fa-solid fa-lock mr-1"></i>Fechar o dia inteiro'}</button>`
                 : '';
             let aviso = '';
             if (diaTodo) aviso = `<i class="fa-solid fa-lock mr-2"></i>Dia fechado por você${diaTodo.motivo ? ` (${esc(diaTodo.motivo)})` : ''}. Clientes não conseguem agendar.`;
