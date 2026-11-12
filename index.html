@@ -699,57 +699,115 @@
     </main>
 
     <!-- ================= PAINEL DO DONO DO ESTABELECIMENTO ================= -->
-    <main id="donoView" class="hidden pt-20 md:pt-24 pb-16 min-h-screen bg-dark-900">
-        <div class="w-full px-4 sm:px-6 lg:px-8 space-y-6">
+    <main id="donoView" class="hidden pt-16 md:pt-20 min-h-screen bg-dark-900">
+        <div class="flex">
+            <!-- MENU LATERAL DO DONO -->
+            <aside class="hidden md:flex flex-col w-64 shrink-0 bg-dark-800 border-r border-dark-700 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto">
+                <div class="p-4 border-b border-dark-700">
+                    <p class="text-[11px] uppercase tracking-wider text-gold-400 font-semibold">Painel do Estabelecimento</p>
+                    <p id="donoNomeLateral" class="text-white font-bold truncate"></p>
+                </div>
+                <nav id="donoSidebarItens" class="flex-1 p-3 space-y-0.5"></nav>
+                <div class="p-3 border-t border-dark-700 space-y-0.5 text-sm">
+                    <p class="px-3 pt-1 pb-2 text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Atalhos</p>
+                    <button type="button" data-dono="ver-site" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-eye w-4 text-gray-500"></i>Ver meu site</button>
+                    <button type="button" data-dono="copiar-link" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-link w-4 text-gray-500"></i>Copiar link pros clientes</button>
+                    <button type="button" onclick="sairAdmin()" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:bg-dark-700"><i class="fa-solid fa-right-from-bracket w-4"></i>Sair</button>
+                </div>
+            </aside>
 
-            <!-- Topo: comandos à esquerda, números à direita -->
-            <div class="grid lg:grid-cols-2 gap-6 items-stretch">
-                <div class="space-y-4">
-                    <div>
-                        <p class="text-xs text-gold-400 uppercase font-semibold tracking-wider">Painel do Estabelecimento</p>
-                        <h1 id="donoNome" class="font-vintage text-2xl md:text-4xl font-bold text-white"></h1>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        <button type="button" data-dono="editar" class="bg-gold-500 text-onbrand font-bold px-4 py-2.5 rounded-lg text-sm"><i class="fa-solid fa-pen mr-1"></i> <span class="sm:hidden">Editar página</span><span class="hidden sm:inline">Editar página, horários e preços</span></button>
-                        <button type="button" data-dono="fotos" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700"><i class="fa-solid fa-images mr-1"></i> Fotos dos trabalhos</button>
-                        <button type="button" data-dono="ver-site" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700"><i class="fa-solid fa-eye mr-1"></i> Ver meu site</button>
-                        <button type="button" data-dono="copiar-link" class="bg-dark-800 text-gray-300 px-3 py-2.5 rounded-lg text-sm border border-dark-700" title="Copiar link pra mandar pros clientes"><i class="fa-solid fa-link"></i></button>
-                        <button type="button" onclick="sairAdmin()" class="bg-dark-800 text-red-400 px-3 py-2.5 rounded-lg text-sm border border-dark-700" title="Sair"><i class="fa-solid fa-right-from-bracket"></i></button>
-                    </div>
-                    <div class="flex items-center gap-2 bg-dark-800 border border-dark-700 rounded-xl p-2">
-                        <button type="button" data-dono="dia-ant" class="w-10 h-10 shrink-0 rounded-lg text-gray-300 hover:bg-dark-700" title="Dia anterior"><i class="fa-solid fa-chevron-left"></i></button>
-                        <div class="flex-1 text-center min-w-0">
-                            <input type="date" id="donoData" class="bg-transparent text-white font-semibold outline-none text-center">
-                            <p id="donoDiaSemana" class="text-xs text-gray-400"></p>
+            <!-- CONTEÚDO -->
+            <section class="flex-1 min-w-0 px-4 md:px-8 py-6 space-y-6">
+                <div id="donoTabsMobile" class="md:hidden flex gap-2 overflow-x-auto pb-1 -mx-4 px-4"></div>
+
+                <!-- ABA: AGENDA DO DIA -->
+                <div id="donoAbaAgenda" class="space-y-6">
+                    <div class="grid lg:grid-cols-2 gap-6 items-stretch">
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-xs text-gold-400 uppercase font-semibold tracking-wider">Agenda do dia</p>
+                                <h1 id="donoNome" class="font-vintage text-2xl md:text-4xl font-bold text-white"></h1>
+                            </div>
+                            <div class="flex items-center gap-2 bg-dark-800 border border-dark-700 rounded-xl p-2">
+                                <button type="button" data-dono="dia-ant" class="w-10 h-10 shrink-0 rounded-lg text-gray-300 hover:bg-dark-700" title="Dia anterior"><i class="fa-solid fa-chevron-left"></i></button>
+                                <div class="flex-1 text-center min-w-0">
+                                    <input type="date" id="donoData" class="bg-transparent text-white font-semibold outline-none text-center">
+                                    <p id="donoDiaSemana" class="text-xs text-gray-400"></p>
+                                </div>
+                                <button type="button" data-dono="hoje" class="px-3 h-10 shrink-0 rounded-lg text-xs font-semibold text-gold-400 hover:bg-dark-700">Hoje</button>
+                                <button type="button" data-dono="dia-prox" class="w-10 h-10 shrink-0 rounded-lg text-gray-300 hover:bg-dark-700" title="Próximo dia"><i class="fa-solid fa-chevron-right"></i></button>
+                            </div>
+                            <div id="donoBotaoDia" class="flex justify-end"></div>
                         </div>
-                        <button type="button" data-dono="hoje" class="px-3 h-10 shrink-0 rounded-lg text-xs font-semibold text-gold-400 hover:bg-dark-700">Hoje</button>
-                        <button type="button" data-dono="dia-prox" class="w-10 h-10 shrink-0 rounded-lg text-gray-300 hover:bg-dark-700" title="Próximo dia"><i class="fa-solid fa-chevron-right"></i></button>
+                        <div id="donoResumo" class="grid grid-cols-2 gap-3 content-start lg:content-stretch"></div>
                     </div>
-                    <div id="donoBotaoDia" class="flex justify-end"></div>
-                </div>
-                <div id="donoResumo" class="grid grid-cols-2 gap-3 content-start lg:content-stretch"></div>
-            </div>
 
-            <div id="donoAviso"></div>
+                    <div id="donoAviso"></div>
 
-            <!-- Agenda: manhã | tarde -->
-            <div class="grid lg:grid-cols-2 gap-6 items-stretch">
-                <div class="bg-dark-800/60 border border-dark-700 rounded-2xl p-4">
-                    <div class="flex items-center justify-between mb-3 px-1">
-                        <h2 class="font-vintage text-xl font-bold text-white"><i class="fa-solid fa-sun text-gold-400 mr-2"></i>Manhã <span id="donoManhaFaixa" class="font-sans text-xs font-normal text-gray-500 ml-1"></span></h2>
-                        <span id="donoManhaInfo" class="text-xs text-gray-400"></span>
+                    <div class="grid lg:grid-cols-2 gap-6 items-stretch">
+                        <div class="bg-dark-800/60 border border-dark-700 rounded-2xl p-4">
+                            <div class="flex items-center justify-between mb-3 px-1">
+                                <h2 class="font-vintage text-xl font-bold text-white"><i class="fa-solid fa-sun text-gold-400 mr-2"></i>Manhã <span id="donoManhaFaixa" class="font-sans text-xs font-normal text-gray-500 ml-1"></span></h2>
+                                <span id="donoManhaInfo" class="text-xs text-gray-400"></span>
+                            </div>
+                            <div id="donoManha" class="space-y-2"></div>
+                        </div>
+                        <div class="bg-dark-800/60 border border-dark-700 rounded-2xl p-4">
+                            <div class="flex items-center justify-between mb-3 px-1">
+                                <h2 class="font-vintage text-xl font-bold text-white"><i class="fa-solid fa-cloud-sun text-gold-400 mr-2"></i>Tarde <span id="donoTardeFaixa" class="font-sans text-xs font-normal text-gray-500 ml-1"></span></h2>
+                                <span id="donoTardeInfo" class="text-xs text-gray-400"></span>
+                            </div>
+                            <div id="donoTarde" class="space-y-2"></div>
+                        </div>
                     </div>
-                    <div id="donoManha" class="space-y-2"></div>
+                    <p class="text-[11px] text-gray-500 text-center">Atualiza sozinho a cada minuto.</p>
                 </div>
-                <div class="bg-dark-800/60 border border-dark-700 rounded-2xl p-4">
-                    <div class="flex items-center justify-between mb-3 px-1">
-                        <h2 class="font-vintage text-xl font-bold text-white"><i class="fa-solid fa-cloud-sun text-gold-400 mr-2"></i>Tarde <span id="donoTardeFaixa" class="font-sans text-xs font-normal text-gray-500 ml-1"></span></h2>
-                        <span id="donoTardeInfo" class="text-xs text-gray-400"></span>
+
+                <!-- ABA: PRÓXIMOS AGENDAMENTOS -->
+                <div id="donoAbaProximos" class="hidden space-y-4">
+                    <div>
+                        <p class="text-xs text-gold-400 uppercase font-semibold tracking-wider">Atendimento</p>
+                        <h1 class="font-vintage text-2xl md:text-3xl font-bold text-white">Próximos agendamentos</h1>
+                        <p id="donoProximosSub" class="text-sm text-gray-400"></p>
                     </div>
-                    <div id="donoTarde" class="space-y-2"></div>
+                    <div id="donoProximosLista" class="space-y-5"></div>
                 </div>
-            </div>
-            <p class="text-[11px] text-gray-500 text-center">Atualiza sozinho a cada minuto.</p>
+
+                <!-- ABA: CLIENTES -->
+                <div id="donoAbaClientes" class="hidden space-y-4">
+                    <div class="flex flex-wrap items-end justify-between gap-3">
+                        <div>
+                            <p class="text-xs text-gold-400 uppercase font-semibold tracking-wider">Atendimento</p>
+                            <h1 class="font-vintage text-2xl md:text-3xl font-bold text-white">Clientes</h1>
+                            <p id="donoClientesSub" class="text-sm text-gray-400"></p>
+                        </div>
+                        <input id="donoBuscaCliente" oninput="renderClientes()" placeholder="Buscar nome ou telefone..." class="bg-dark-800 border border-dark-700 text-white rounded-lg px-3 py-2 text-sm outline-none w-full sm:w-64">
+                    </div>
+                    <div class="bg-dark-800 border border-dark-700 rounded-xl overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm text-gray-300">
+                                <thead class="bg-dark-900 text-gold-400 uppercase text-xs font-semibold">
+                                    <tr><th class="p-3">Cliente</th><th class="p-3">Visitas</th><th class="p-3">Faltas</th><th class="p-3">Gasto</th><th class="p-3">Última vez</th><th class="p-3">Próximo</th><th class="p-3"></th></tr>
+                                </thead>
+                                <tbody id="donoClientesTabela" class="divide-y divide-dark-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA: RELATÓRIOS -->
+                <div id="donoAbaRelatorio" class="hidden space-y-5">
+                    <div class="flex flex-wrap items-end justify-between gap-3">
+                        <div>
+                            <p class="text-xs text-gold-400 uppercase font-semibold tracking-wider">Atendimento</p>
+                            <h1 class="font-vintage text-2xl md:text-3xl font-bold text-white">Relatórios</h1>
+                        </div>
+                        <div id="donoPeriodo" class="flex gap-1 bg-dark-800 border border-dark-700 rounded-lg p-1 text-xs font-semibold"></div>
+                    </div>
+                    <div id="donoRelCards" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></div>
+                    <div id="donoRelGraficos" class="grid lg:grid-cols-3 gap-4"></div>
+                </div>
+            </section>
         </div>
     </main>
 
@@ -2809,14 +2867,15 @@
             aplicarAmbiente({ ...emp, fundo: 'escuro' });
             atualizarRelogio();
             configurarApp(emp, true);
+            document.getElementById('donoNomeLateral').innerText = emp.nome;
             dataPainel = dataPainel || hojeISO();
-            await renderPainelDono();
+            abrirAbaDono(donoAba);
             clearInterval(timerPainel);
             checarNotificacoes(true);
             timerPainel = setInterval(() => {
                 const aberto = !document.getElementById('donoView').classList.contains('hidden');
                 const modal = !document.getElementById('manualModal').classList.contains('hidden');
-                if (aberto && !modal) renderPainelDono(true);
+                if (aberto && !modal && donoAba === 'agenda') renderPainelDono(true);
                 if (aberto) checarNotificacoes();
             }, 60000);
         }
@@ -2922,6 +2981,158 @@
             document.getElementById('donoTardeInfo').innerText = tarde.length ? info(tarde) : '';
         }
 
+        // ---------- Abas do painel do dono ----------
+        let donoAba = localStorage.getItem('agendify_donoaba') || 'agenda';
+        let periodoRel = 30, clientesCache = [];
+
+        function itensDono() {
+            return [
+                { sec: 'Atendimento' },
+                { aba: 'agenda', icone: 'fa-calendar-day', nome: 'Agenda do dia' },
+                { aba: 'proximos', icone: 'fa-list-check', nome: 'Próximos agendamentos' },
+                { aba: 'clientes', icone: 'fa-users', nome: 'Clientes' },
+                { aba: 'relatorio', icone: 'fa-chart-column', nome: 'Relatórios' },
+                { sec: 'Minha página' },
+                { editor: 'visual', icone: 'fa-palette', nome: 'Página e visual' },
+                { editor: 'servicos', icone: 'fa-tags', nome: 'Serviços e preços' },
+                { editor: 'agenda', icone: 'fa-clock', nome: 'Horários e folgas' },
+                { editor: 'fotos', icone: 'fa-images', nome: 'Fotos dos trabalhos' }
+            ];
+        }
+
+        function renderSidebarDono() {
+            const itens = itensDono();
+            const attrs = it => it.aba ? `data-dono="aba" data-aba="${it.aba}"` : `data-dono="editor" data-aba="${it.editor}"`;
+            document.getElementById('donoSidebarItens').innerHTML = itens.map(it => it.sec
+                ? `<p class="px-3 pt-4 pb-2 text-[11px] uppercase tracking-wider text-gray-500 font-semibold">${it.sec}</p>`
+                : `<button type="button" ${attrs(it)} class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${it.aba === donoAba ? 'bg-gold-500/15 text-white font-semibold' : 'text-gray-300 hover:bg-dark-700'}">
+                    <i class="fa-solid ${it.icone} w-4 text-center text-gold-400"></i><span class="flex-1 text-left truncate">${it.nome}</span>${it.editor ? '<i class="fa-solid fa-pen text-[10px] text-gray-600"></i>' : ''}
+                </button>`).join('');
+            document.getElementById('donoTabsMobile').innerHTML = itens.filter(it => !it.sec).map(it =>
+                `<button type="button" ${attrs(it)} class="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-xs border ${it.aba === donoAba ? 'bg-gold-500 text-onbrand border-gold-500 font-bold' : 'border-dark-600 text-gray-300'}"><i class="fa-solid ${it.icone}"></i>${it.nome}</button>`).join('');
+        }
+
+        function abrirAbaDono(aba) {
+            if (!['agenda', 'proximos', 'clientes', 'relatorio'].includes(aba)) aba = 'agenda';
+            donoAba = aba;
+            localStorage.setItem('agendify_donoaba', aba);
+            const mapa = { agenda: 'donoAbaAgenda', proximos: 'donoAbaProximos', clientes: 'donoAbaClientes', relatorio: 'donoAbaRelatorio' };
+            Object.entries(mapa).forEach(([k, id]) => document.getElementById(id).classList.toggle('hidden', k !== aba));
+            renderSidebarDono();
+            if (aba === 'agenda') renderPainelDono();
+            if (aba === 'proximos') carregarProximos();
+            if (aba === 'clientes') carregarClientes();
+            if (aba === 'relatorio') carregarRelatorio();
+            window.scrollTo({ top: 0 });
+        }
+
+        const SIT_TXT = { confirmado: ['Confirmado', 'text-gold-400 bg-gold-500/10'], concluido: ['Concluído', 'text-green-400 bg-green-500/10'], faltou: ['Faltou', 'text-red-400 bg-red-500/10'] };
+        const dataBR = iso => iso.split('-').reverse().join('/');
+        const carregandoHtml = '<p class="text-center text-gray-500 py-10"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Carregando...</p>';
+
+        async function carregarProximos() {
+            const el = document.getElementById('donoProximosLista');
+            el.innerHTML = carregandoHtml;
+            const { data, error } = await sb.from('agendamentos').select('*').eq('empresa_id', empresaPainelId).gte('data', hojeISO()).order('data').order('hora').limit(400);
+            if (error) { el.innerHTML = '<p class="text-red-400 text-center py-10">Não deu pra carregar.</p>'; return; }
+            const dias = {};
+            data.forEach(a => (dias[a.data] = dias[a.data] || []).push(a));
+            const previsto = data.filter(a => a.situacao !== 'faltou').reduce((s, a) => s + Number(a.preco || 0), 0);
+            document.getElementById('donoProximosSub').innerText = `${data.length} agendamento${data.length === 1 ? '' : 's'} a partir de hoje · R$ ${fmtBR(previsto)} previsto`;
+            el.innerHTML = Object.entries(dias).map(([d, lista]) => {
+                const dt = new Date(d + 'T12:00');
+                return `<div>
+                    <button type="button" data-dono="ir-dia" data-data="${d}" class="flex items-center gap-2 mb-2 text-sm font-semibold text-white hover:text-gold-400">
+                        <i class="fa-regular fa-calendar text-gold-400"></i>${DIAS[dt.getDay()]}, ${dataBR(d)}${d === hojeISO() ? ' · Hoje' : ''}
+                        <span class="text-xs font-normal text-gray-500">${lista.length} agendamento${lista.length === 1 ? '' : 's'} · abrir dia <i class="fa-solid fa-arrow-right text-[10px]"></i></span>
+                    </button>
+                    <div class="bg-dark-800 border border-dark-700 rounded-xl divide-y divide-dark-700">
+                        ${lista.map(a => { const [t, c] = SIT_TXT[a.situacao] || SIT_TXT.confirmado; return `
+                            <div class="flex items-center gap-3 p-3">
+                                <span class="w-14 shrink-0 font-bold tabular-nums text-gold-400">${esc(a.hora)}</span>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-white font-semibold truncate">${esc(a.nome)} <span class="ml-1 text-[11px] px-2 py-0.5 rounded-full ${c}">${t}</span></p>
+                                    <p class="text-xs text-gray-400 truncate">${esc(a.servico)} · R$ ${fmtBR(a.preco || 0)}${a.origem === 'manual' ? ' · manual' : ''}</p>
+                                </div>
+                                ${a.fone ? `<a href="https://wa.me/55${esc(a.fone)}" target="_blank" class="w-9 h-9 shrink-0 rounded-lg bg-dark-700 text-green-400 flex items-center justify-center" title="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>` : ''}
+                            </div>`; }).join('')}
+                    </div>
+                </div>`;
+            }).join('') || '<p class="text-center text-gray-500 py-10">Nenhum agendamento futuro por enquanto.</p>';
+        }
+
+        async function carregarClientes() {
+            document.getElementById('donoClientesTabela').innerHTML = `<tr><td colspan="7">${carregandoHtml}</td></tr>`;
+            const { data, error } = await sb.from('agendamentos').select('nome,fone,preco,data,situacao').eq('empresa_id', empresaPainelId).order('data', { ascending: false }).limit(3000);
+            if (error) { document.getElementById('donoClientesTabela').innerHTML = '<tr><td colspan="7" class="p-6 text-center text-red-400">Não deu pra carregar.</td></tr>'; return; }
+            const hoje = hojeISO(), mapa = {};
+            data.forEach(a => {
+                const k = a.fone || a.nome.trim().toLowerCase();
+                const c = mapa[k] = mapa[k] || { nome: a.nome, fone: a.fone, visitas: 0, faltas: 0, gasto: 0, ultima: null, proximo: null };
+                if (a.data < hoje || a.situacao !== 'confirmado') {
+                    if (a.situacao === 'faltou') c.faltas++; else { c.visitas++; if (a.situacao === 'concluido') c.gasto += Number(a.preco || 0); }
+                    if (a.situacao !== 'faltou' && (!c.ultima || a.data > c.ultima)) c.ultima = a.data;
+                } else if (!c.proximo || a.data < c.proximo) c.proximo = a.data;
+            });
+            clientesCache = Object.values(mapa).sort((a, b) => b.visitas - a.visitas || (b.ultima || '').localeCompare(a.ultima || ''));
+            renderClientes();
+        }
+
+        function renderClientes() {
+            const busca = (document.getElementById('donoBuscaCliente').value || '').toLowerCase().replace(/\D/g, d => d);
+            const lista = clientesCache.filter(c => !busca || c.nome.toLowerCase().includes(busca) || (c.fone || '').includes(busca.replace(/\D/g, '') || '#'));
+            document.getElementById('donoClientesSub').innerText = `${clientesCache.length} cliente${clientesCache.length === 1 ? '' : 's'} já agendaram com você`;
+            document.getElementById('donoClientesTabela').innerHTML = lista.slice(0, 300).map(c => `
+                <tr class="hover:bg-dark-700/40">
+                    <td class="p-3"><p class="text-white font-semibold">${esc(c.nome)}</p><p class="text-xs text-gray-500">${c.fone ? esc(fmtFone(c.fone)) : 'sem telefone'}</p></td>
+                    <td class="p-3">${c.visitas}</td>
+                    <td class="p-3 ${c.faltas ? 'text-red-400' : ''}">${c.faltas}</td>
+                    <td class="p-3">R$ ${fmtBR(c.gasto)}</td>
+                    <td class="p-3 text-xs">${c.ultima ? dataBR(c.ultima) : '—'}</td>
+                    <td class="p-3 text-xs ${c.proximo ? 'text-gold-400' : ''}">${c.proximo ? dataBR(c.proximo) : '—'}</td>
+                    <td class="p-3 text-right">${c.fone ? `<a href="https://wa.me/55${esc(c.fone)}?text=${encodeURIComponent(`Olá ${c.nome.split(' ')[0]}! Tudo bem?`)}" target="_blank" class="inline-flex w-9 h-9 rounded-lg bg-dark-700 text-green-400 items-center justify-center" title="Chamar no WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>` : ''}</td>
+                </tr>`).join('') || '<tr><td colspan="7" class="p-6 text-center text-gray-500">Nenhum cliente encontrado.</td></tr>';
+        }
+
+        async function carregarRelatorio() {
+            document.getElementById('donoPeriodo').innerHTML = [7, 30, 90].map(d =>
+                `<button type="button" data-dono="periodo" data-dias="${d}" class="px-3 py-1.5 rounded-md ${d === periodoRel ? 'bg-gold-500 text-onbrand' : 'text-gray-300 hover:bg-dark-700'}">${d} dias</button>`).join('');
+            const cards = document.getElementById('donoRelCards'), graf = document.getElementById('donoRelGraficos');
+            cards.innerHTML = carregandoHtml; graf.innerHTML = '';
+            const hoje = hojeISO(), inicio = addDias(hoje, -(periodoRel - 1));
+            const [ra, rv] = await Promise.all([
+                sb.from('agendamentos').select('servico,preco,data,hora,situacao,origem').eq('empresa_id', empresaPainelId).gte('data', inicio).lte('data', hoje).limit(5000),
+                sb.from('visitas').select('qtd').eq('empresa_id', empresaPainelId).gte('dia', inicio)
+            ]);
+            if (ra.error) { cards.innerHTML = '<p class="text-red-400">Não deu pra carregar.</p>'; return; }
+            const ags = ra.data;
+            const visitas = rv.error ? null : rv.data.reduce((s, v) => s + v.qtd, 0);
+            const conc = ags.filter(a => a.situacao === 'concluido'), faltas = ags.filter(a => a.situacao === 'faltou');
+            const fat = conc.reduce((s, a) => s + Number(a.preco || 0), 0);
+            const doSite = ags.filter(a => a.origem === 'site').length;
+            const card = (t, v, i, sub = '', cor = 'text-white') => `<div class="bg-dark-800 border border-dark-700 rounded-2xl p-4 md:p-5"><p class="text-xs text-gray-400"><i class="fa-solid ${i} text-gold-400 mr-1.5"></i>${t}</p><p class="text-2xl md:text-3xl font-bold ${cor} mt-2">${v}</p>${sub ? `<p class="text-[11px] text-gray-500 mt-1">${sub}</p>` : ''}</div>`;
+            cards.innerHTML =
+                card('Agendamentos', ags.length, 'fa-calendar-check', `${doSite} pelo site · ${ags.length - doSite} manuais`) +
+                card('Faturado', 'R$ ' + fmtBR(fat), 'fa-sack-dollar', conc.length ? `ticket médio R$ ${fmtBR(fat / conc.length)}` : 'marque os atendimentos como concluídos', 'text-green-400') +
+                card('Faltas', faltas.length, 'fa-user-xmark', (conc.length + faltas.length) ? `${Math.round(faltas.length / (conc.length + faltas.length) * 100)}% dos atendimentos` : '', faltas.length ? 'text-red-400' : 'text-white') +
+                card('Visitas no site', visitas === null ? '—' : fmtNum(visitas), 'fa-globe', visitas ? `${Math.round(doSite / visitas * 100)}% viraram agendamento` : '');
+
+            const barras = (titulo, icone, pares) => {
+                const max = Math.max(1, ...pares.map(p => p[1]));
+                return `<div class="bg-dark-800 border border-dark-700 rounded-2xl p-5">
+                    <p class="text-sm text-white font-semibold mb-4"><i class="fa-solid ${icone} text-gold-400 mr-1.5"></i>${titulo}</p>
+                    <div class="space-y-2.5">${pares.map(([n, v]) => `
+                        <div><div class="flex justify-between text-xs mb-1"><span class="text-gray-300 truncate pr-2">${esc(n)}</span><span class="text-gray-400">${v}</span></div>
+                        <div class="h-2 bg-dark-900 rounded-full overflow-hidden"><div class="h-full bg-gold-500 rounded-full" style="width:${(v / max) * 100}%"></div></div></div>`).join('') || '<p class="text-xs text-gray-500">Sem dados no período.</p>'}</div>
+                </div>`;
+            };
+            const contar = f => Object.entries(ags.reduce((m, a) => { const k = f(a); m[k] = (m[k] || 0) + 1; return m; }, {}));
+            const servicos = contar(a => a.servico).sort((a, b) => b[1] - a[1]).slice(0, 6);
+            const semana = [1, 2, 3, 4, 5, 6, 0].map(d => [DIAS[d], ags.filter(a => new Date(a.data + 'T12:00').getDay() === d).length]);
+            const horas = contar(a => a.hora).sort((a, b) => b[1] - a[1]).slice(0, 6);
+            graf.innerHTML = barras('Serviços mais pedidos', 'fa-tags', servicos) + barras('Dias mais movimentados', 'fa-calendar-week', semana) + barras('Horários mais procurados', 'fa-clock', horas);
+        }
+
         // ---------- Relógio do topo ----------
         function atualizarRelogio() {
             const agora = new Date();
@@ -2994,7 +3205,7 @@
         function irParaDia(iso) {
             document.getElementById('notifDropdown').classList.add('hidden');
             dataPainel = iso;
-            renderPainelDono();
+            abrirAbaDono('agenda');
         }
         document.addEventListener('click', e => {
             const dd = document.getElementById('notifDropdown');
@@ -3031,6 +3242,10 @@
             const ag = diaPainel.ags.find(a => a.id == id);
             let r = null;
             switch (b.dataset.dono) {
+                case 'aba': abrirAbaDono(b.dataset.aba); return;
+                case 'editor': ativarEdicaoVisualParaEmpresa(emp.id, 'dono'); abrirPainel(b.dataset.aba); if (b.dataset.aba === 'fotos') document.getElementById('secaoGaleria').scrollIntoView({ behavior: 'smooth' }); return;
+                case 'ir-dia': dataPainel = b.dataset.data; abrirAbaDono('agenda'); return;
+                case 'periodo': periodoRel = Number(b.dataset.dias); carregarRelatorio(); return;
                 case 'dia-ant': dataPainel = addDias(dataPainel, -1); renderPainelDono(); return;
                 case 'dia-prox': dataPainel = addDias(dataPainel, 1); renderPainelDono(); return;
                 case 'hoje': dataPainel = hojeISO(); renderPainelDono(); return;
