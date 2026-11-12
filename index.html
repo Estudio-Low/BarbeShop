@@ -689,8 +689,8 @@
                             <div><label class="block text-xs text-gray-400 mb-1">Plano</label>
                                 <select id="cadPlano" class="campo-painel">
                                     <option value="Setup + Mensal">R$ 599,90 Setup + R$ 79,90/mês</option>
-                                    <option value="Trimestral">Trimestral (5% desc)</option>
-                                    <option value="Anual">Anual (10% desc)</option>
+                                    <option value="Trimestral">Trimestral: R$ 449,90 Setup + 5% desc</option>
+                                    <option value="Anual">Anual: R$ 299,90 Setup + 10% desc</option>
                                 </select></div>
                             <div><label class="block text-xs text-gray-400 mb-1">Status da mensalidade</label>
                                 <select id="cadStatus" class="campo-painel">
@@ -924,8 +924,8 @@
                         <label class="block text-xs text-gray-400 mb-1">Plano Comercial:</label>
                         <select id="modalPlano" class="w-full bg-dark-800 border border-dark-600 text-white rounded-lg p-2.5 text-sm outline-none">
                             <option value="Setup + Mensal">R$ 599,90 Setup + R$ 79,90/mês</option>
-                            <option value="Trimestral">Trimestral (5% desc)</option>
-                            <option value="Anual">Anual (10% desc)</option>
+                            <option value="Trimestral">Trimestral: R$ 449,90 Setup + 5% desc</option>
+                            <option value="Anual">Anual: R$ 299,90 Setup + 10% desc</option>
                         </select>
                     </div>
                     <div>
@@ -1098,6 +1098,8 @@
         // >>> PÁGINA DE VENDAS: troque pelo SEU WhatsApp de vendas (55 + DDD + número)
         const WHATS_VENDAS = '5549984031114'; // (49) 98403-1114
         const PRECO_SETUP = 599.90, PRECO_MENSAL = 79.90;
+        // Implantação com desconto: Trimestral 25% off, Anual 50% off
+        const SETUP_PLANO = { Mensal: PRECO_SETUP, Trimestral: 449.90, Anual: 299.90 };
         const CORES_RAPIDAS = ['#d4af37', '#b91c1c', '#b76e79', '#e8678a', '#a78bfa', '#7c9a82', '#38bdf8', '#34d399', '#f97316'];
         // ======================================================
         // SUPABASE: conexão
@@ -2923,22 +2925,26 @@
         }
 
         function renderPlanos() {
-            document.getElementById('planosSetup').innerText = `Implantação única de R$ ${fmtBR(PRECO_SETUP)} + o plano que preferir.`;
-            const itens = ['Site de agendamento com a sua cara', 'Painel do dono no celular', 'Agendamentos ilimitados', 'Bloqueio de horários e folgas', 'Confirmação pelo WhatsApp', 'Edição de preços, fotos e horários'];
+            document.getElementById('planosSetup').innerText = 'Implantação única + o plano que preferir. Quanto maior o plano, menor a implantação.';
             const planos = [
-                { id: 'Mensal', mes: PRECO_MENSAL, rodape: 'cobrado todo mês' },
-                { id: 'Trimestral', mes: PRECO_MENSAL * 0.95, rodape: `R$ ${fmtBR(PRECO_MENSAL * 3 * 0.95)} a cada 3 meses`, selo: 'economize 5%' },
-                { id: 'Anual', mes: PRECO_MENSAL * 0.9, rodape: `R$ ${fmtBR(PRECO_MENSAL * 12 * 0.9)} por ano`, selo: 'economize 10%', destaque: true }
+                { id: 'Mensal', mes: PRECO_MENSAL, rodape: 'cobrado todo mês', antes: '', itens: ['Site de agendamento com a sua cara', 'Painel do dono no celular', 'Agendamentos ilimitados', 'Bloqueio de horários e folgas', 'Confirmação pelo WhatsApp', 'Edição de preços, serviços e horários'] },
+                { id: 'Trimestral', mes: PRECO_MENSAL * 0.95, rodape: `R$ ${fmtBR(PRECO_MENSAL * 3 * 0.95)} a cada 3 meses`, selo: 'implantação 25% off', antes: 'Tudo do Mensal, mais:', itens: ['Galeria de fotos dos seus trabalhos', 'App instalável no celular do cliente', 'Lista de clientes e histórico', 'Relatórios de atendimentos e faltas'] },
+                { id: 'Anual', mes: PRECO_MENSAL * 0.9, rodape: `R$ ${fmtBR(PRECO_MENSAL * 12 * 0.9)} por ano`, selo: 'implantação 50% off', destaque: true, antes: 'Tudo do Trimestral, mais:', itens: ['Seu negócio em destaque no site do Agendaço', 'Suporte prioritário no WhatsApp', 'Ajustes no visual e nas fotos feitos por nós'] }
             ];
-            document.getElementById('planosGrid').innerHTML = planos.map(p => `
+            document.getElementById('planosGrid').innerHTML = planos.map(p => {
+                const setup = SETUP_PLANO[p.id];
+                return `
                 <div class="relative flex flex-col rounded-2xl p-8 ${p.destaque ? 'bg-dark-800 border-2 border-gold-500 gold-border-glow' : 'bg-dark-800 border border-dark-700'}">
-                    ${p.selo ? `<span class="absolute -top-3 left-1/2 -translate-x-1/2 text-xs font-bold px-3 py-1 rounded-full ${p.destaque ? 'bg-gold-500 text-onbrand' : 'bg-dark-600 text-gold-400'}">${p.selo}</span>` : ''}
+                    ${p.selo ? `<span class="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap text-xs font-bold px-3 py-1 rounded-full ${p.destaque ? 'bg-gold-500 text-onbrand' : 'bg-dark-600 text-gold-400'}">${p.selo}</span>` : ''}
                     <p class="text-gold-400 font-semibold uppercase tracking-wider text-sm">${p.id}</p>
                     <p class="mt-3"><span class="text-gray-400 text-lg align-top">R$</span> <span class="font-vintage text-5xl font-extrabold text-white">${fmtBR(p.mes)}</span><span class="text-gray-400">/mês</span></p>
                     <p class="text-xs text-gray-500 mt-1">${p.rodape}</p>
-                    <ul class="mt-6 space-y-2.5 text-sm text-gray-300 flex-1">${itens.map(i => `<li><i class="fa-solid fa-check text-gold-400 mr-2"></i>${i}</li>`).join('')}</ul>
+                    <p class="mt-4 text-sm bg-dark-900/60 border border-dark-700 rounded-lg px-3 py-2 text-gray-300">Implantação: ${setup < PRECO_SETUP ? `<s class="text-gray-500">R$ ${fmtBR(PRECO_SETUP)}</s> <b class="text-gold-400">R$ ${fmtBR(setup)}</b>` : `<b class="text-white">R$ ${fmtBR(setup)}</b>`}</p>
+                    ${p.antes ? `<p class="mt-6 text-xs font-semibold uppercase tracking-wider text-gray-500">${p.antes}</p>` : ''}
+                    <ul class="${p.antes ? 'mt-3' : 'mt-6'} space-y-2.5 text-sm text-gray-300 flex-1">${p.itens.map(i => `<li class="flex gap-2"><i class="fa-solid fa-check text-gold-400 mt-1"></i><span>${i}</span></li>`).join('')}</ul>
                     <button type="button" data-vendas="whats" data-plano="${p.id}" class="mt-8 w-full font-bold py-3 rounded-xl ${p.destaque ? 'bg-gradient-to-r from-gold-600 to-gold-500 text-onbrand' : 'border border-gold-500/40 text-gold-400 hover:bg-gold-500/10'}">Quero o ${p.id}</button>
-                </div>`).join('');
+                </div>`;
+            }).join('');
         }
 
         document.getElementById('vendasView').addEventListener('click', e => {
