@@ -1100,6 +1100,25 @@
         const PRECO_SETUP = 599.90, PRECO_MENSAL = 79.90;
         // Implantação com desconto: Trimestral 25% off, Anual 50% off
         const SETUP_PLANO = { Mensal: PRECO_SETUP, Trimestral: 449.90, Anual: 299.90 };
+        // Recursos por plano: 1 = Mensal, 2 = Trimestral, 3 = Anual. Empresa na vitrine (exemplo/destaque) libera tudo.
+        const RECURSO_PLANO = { galeria: 2, app: 2, clientes: 2, relatorio: 2 };
+        const NOME_NIVEL = { 2: 'Trimestral', 3: 'Anual' };
+        const nivelPlano = p => /anual/i.test(p || '') ? 3 : /trimestral/i.test(p || '') ? 2 : 1;
+        const nivelEmpresa = emp => !emp ? 1 : (emp.vitrine ? 3 : nivelPlano(emp.plano));
+        const temRecurso = (emp, r) => nivelEmpresa(emp) >= (RECURSO_PLANO[r] || 1);
+        // Admin sempre enxerga e edita tudo
+        const podeUsar = (emp, r) => souAdmin || temRecurso(emp, r);
+        function cadeadoHtml(emp, r, titulo, texto) {
+            const plano = NOME_NIVEL[RECURSO_PLANO[r]] || 'Trimestral';
+            const msg = `Olá! Sou da ${emp?.nome || 'minha empresa'} e quero mudar pro plano ${plano} do Agendaço pra liberar: ${titulo}.`;
+            return `<div class="bg-dark-800 border border-gold-500/30 rounded-2xl p-6 sm:p-8 text-center">
+                <div class="w-14 h-14 mx-auto rounded-full bg-gold-500/15 text-gold-400 flex items-center justify-center text-2xl"><i class="fa-solid fa-lock"></i></div>
+                <p class="text-white font-semibold text-lg mt-4">${titulo}</p>
+                <p class="text-gray-400 text-sm mt-1 max-w-sm mx-auto">${texto}</p>
+                <p class="text-xs text-gold-400 font-semibold uppercase tracking-wider mt-4">Disponível a partir do plano ${plano}</p>
+                <a href="https://wa.me/${WHATS_VENDAS}?text=${encodeURIComponent(msg)}" target="_blank" class="inline-flex items-center gap-2 mt-4 bg-gold-500 text-onbrand font-bold px-5 py-2.5 rounded-xl text-sm"><i class="fa-brands fa-whatsapp"></i>Fazer upgrade</a>
+            </div>`;
+        }
         const CORES_RAPIDAS = ['#d4af37', '#b91c1c', '#b76e79', '#e8678a', '#a78bfa', '#7c9a82', '#38bdf8', '#34d399', '#f97316'];
         // ======================================================
         // SUPABASE: conexão
@@ -1919,7 +1938,9 @@
                     <p class="text-[11px] text-gray-500">A duração define quais horários aparecem pro cliente (ex: serviço de 60 min não cabe às 19:30 se fecha às 20:00).</p>`;
             }
 
-            if (abaPainel === 'fotos') {
+            if (abaPainel === 'fotos' && !podeUsar(d, 'galeria')) {
+                c.innerHTML = cadeadoHtml(d, 'galeria', 'Galeria de fotos dos trabalhos', 'Mostre seus cortes, unhas e banhos com legenda. O cliente vê e já agenda o estilo que gostou.');
+            } else if (abaPainel === 'fotos') {
                 const g = d.galeria;
                 c.innerHTML = `
                     <div class="flex items-center justify-between"><p class="text-white font-semibold">Fotos dos trabalhos</p><span class="text-xs ${g.length >= MAX_FOTOS ? 'text-red-400' : 'text-gray-400'}">${g.length}/${MAX_FOTOS}</span></div>
@@ -2459,6 +2480,7 @@
         // Cada empresa vira um app com o próprio nome (site do cliente ou painel do dono)
         function configurarApp(emp, painel = false) {
             if (EMBED || !emp) return;
+            if (!painel && !temRecurso(emp, 'app')) return; // app do cliente: só Trimestral ou Anual
             const abs = p => new URL(p, location.href).href;
             const inicio = abs(painel ? `?c=${emp.slug}&painel` : `?c=${emp.slug}`);
             const curto = (painel ? 'Painel ' : '') + emp.nome;
@@ -2485,7 +2507,8 @@
         function atualizarBotaoInstalar() {
             const btn = document.getElementById('btnInstalar');
             const tela = !document.getElementById('clientView').classList.contains('hidden') || !document.getElementById('donoView').classList.contains('hidden');
-            const mostra = appPronto && tela && !EMBED && !emEdicaoVisual && !jaInstalado() && (promptInstalar || EH_IOS);
+            const noSite = !document.getElementById('clientView').classList.contains('hidden');
+            const mostra = appPronto && tela && !(noSite && !temRecurso(empresaAtual(), 'app')) && !EMBED && !emEdicaoVisual && !jaInstalado() && (promptInstalar || EH_IOS);
             btn.classList.toggle('hidden', !mostra);
             btn.classList.toggle('inline-flex', !!mostra);
         }
@@ -2612,6 +2635,7 @@
             const sec = document.getElementById('secaoGaleria');
             const fotos = emp.galeria || [];
             const ed = emEdicaoVisual;
+            if (!(emEdicaoVisual ? podeUsar(emp, 'galeria') : temRecurso(emp, 'galeria'))) { sec.classList.add('hidden'); return; }
             sec.classList.toggle('hidden', !fotos.length && !ed);
             const [tit, sub] = GALERIA[emp.tema] || GALERIA.moderno;
             document.getElementById('tituloGaleria').innerText = tit;
@@ -3199,7 +3223,11 @@
         }
 
         function renderSidebarDono() {
-            const itens = itensDono();
+            const empP = EMPRESAS.find(e => e.id == empresaPainelId);
+            const itens = itensDono().map(it => {
+                const r = it.aba || (it.editor === 'fotos' ? 'galeria' : '');
+                return (r && !it.sec && !podeUsar(empP, r)) ? { ...it, nome: it.nome + ' 🔒' } : it;
+            });
             const attrs = it => it.aba ? `data-dono="aba" data-aba="${it.aba}"` : `data-dono="editor" data-aba="${it.editor}"`;
             document.getElementById('donoSidebarItens').innerHTML = itens.map(it => it.sec
                 ? `<p class="px-3 pt-4 pb-2 text-[11px] uppercase tracking-wider text-gray-500 font-semibold">${it.sec}</p>`
@@ -3215,8 +3243,20 @@
             donoAba = aba;
             localStorage.setItem('agendaco_donoaba', aba);
             const mapa = { agenda: 'donoAbaAgenda', proximos: 'donoAbaProximos', clientes: 'donoAbaClientes', relatorio: 'donoAbaRelatorio' };
-            Object.entries(mapa).forEach(([k, id]) => document.getElementById(id).classList.toggle('hidden', k !== aba));
+            const empP = EMPRESAS.find(e => e.id == empresaPainelId);
+            const travada = !podeUsar(empP, aba);
+            let trava = document.getElementById('donoAbaTravada');
+            if (!trava) { document.getElementById('donoAbaRelatorio').insertAdjacentHTML('afterend', '<div id="donoAbaTravada" class="hidden"></div>'); trava = document.getElementById('donoAbaTravada'); }
+            Object.entries(mapa).forEach(([k, id]) => document.getElementById(id).classList.toggle('hidden', travada || k !== aba));
+            trava.classList.toggle('hidden', !travada);
             renderSidebarDono();
+            if (travada) {
+                trava.innerHTML = aba === 'clientes'
+                    ? cadeadoHtml(empP, 'clientes', 'Lista de clientes e histórico', 'Veja quem mais volta, quem falta e quanto cada cliente já gastou com você.')
+                    : cadeadoHtml(empP, 'relatorio', 'Relatórios de atendimentos e faltas', 'Faturamento, serviços mais pedidos, horários de pico e taxa de faltas do período.');
+                window.scrollTo({ top: 0 });
+                return;
+            }
             if (aba === 'agenda') renderPainelDono();
             if (aba === 'proximos') carregarProximos();
             if (aba === 'clientes') carregarClientes();
