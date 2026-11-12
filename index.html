@@ -134,7 +134,7 @@
             --amb-padrao: radial-gradient(ellipse at top right, rgb(var(--g500) / .2), transparent 50%); }
 
         /* Painel do dono: topo de ponta a ponta */
-        body.modo-painel #mainHeader > div { max-width: none; }
+        body.modo-painel #mainHeader > div, body.modo-admin #mainHeader > div { max-width: none; }
 
         /* ===================== TEMAS CLAROS (pet, salão, manicure, estética) ===================== */
         body.tl.ver-site { background: var(--t-bg); color: var(--t-text); }
@@ -592,57 +592,109 @@
     </main>
 
     <!-- ================= SUPER-ADMIN (PAINEL DO DONO DO SAAS) ================= -->
-    <main id="superAdminView" class="hidden pt-24 pb-16 min-h-screen bg-dark-900">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex flex-wrap gap-4 justify-between items-center pb-6 border-b border-dark-700 mb-8">
-                <div>
-                    <h1 class="font-vintage text-3xl font-bold text-white">Painel Super-Admin (Gestão de Clientes SaaS)</h1>
-                    <p class="text-gray-400 text-sm">Controle assinaturas, mensalidades e edite empresas visualmente na tela.</p>
+    <main id="superAdminView" class="hidden pt-16 md:pt-20 min-h-screen bg-dark-900">
+        <div class="flex">
+            <!-- MENU LATERAL -->
+            <aside class="hidden md:flex flex-col w-64 shrink-0 bg-dark-800 border-r border-dark-700 sticky top-20 h-[calc(100vh-5rem)] overflow-y-auto">
+                <div class="p-4 border-b border-dark-700">
+                    <p class="text-[11px] uppercase tracking-wider text-gold-400 font-semibold">Super-Admin</p>
+                    <p class="text-white font-bold">Gestão de clientes</p>
                 </div>
-                <div class="flex flex-wrap gap-3">
-                    <button onclick="openNovaEmpresaModal()" class="bg-gold-500 hover:bg-gold-400 text-onbrand font-bold px-4 py-2.5 rounded-lg text-sm">
-                        <i class="fa-solid fa-plus-circle mr-1"></i> Cadastrar Nova Empresa
-                    </button>
-                    <button onclick="exportarBackup()" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700" title="Baixa um .json com todas as empresas">
-                        <i class="fa-solid fa-download mr-1"></i> Backup
-                    </button>
-                    <label class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700 cursor-pointer" title="Restaura empresas de um .json">
-                        <i class="fa-solid fa-upload mr-1"></i> Importar
-                        <input type="file" accept=".json,application/json" class="hidden" onchange="importarBackup(this)">
-                    </label>
-                    <button id="btnMigrarLocal" onclick="migrarDadosLocais()" class="hidden bg-blue-600 hover:bg-blue-500 text-white px-4 py-2.5 rounded-lg text-sm" title="Envia as empresas que estavam salvas só neste navegador">
-                        <i class="fa-solid fa-cloud-arrow-up mr-1"></i> Enviar dados antigos pro Supabase
-                    </button>
-                    <button onclick="window.open(location.pathname, '_blank')" class="bg-dark-800 text-gray-300 px-4 py-2.5 rounded-lg text-sm border border-dark-700"><i class="fa-solid fa-bullhorn mr-1"></i> Página de vendas</button>
-                    <button onclick="sairAdmin()" class="bg-dark-800 text-red-400 px-4 py-2.5 rounded-lg text-sm border border-dark-700" title="Sair da conta admin"><i class="fa-solid fa-right-from-bracket"></i></button>
+                <nav id="adminSidebarItens" class="flex-1 p-3 space-y-0.5"></nav>
+                <div class="p-3 border-t border-dark-700 space-y-0.5 text-sm">
+                    <p class="px-3 pt-1 pb-2 text-[11px] uppercase tracking-wider text-gray-500 font-semibold">Ferramentas</p>
+                    <button onclick="exportarBackup()" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-dark-700" title="Baixa um .json com todas as empresas"><i class="fa-solid fa-download w-4 text-gray-500"></i>Backup</button>
+                    <label class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-dark-700 cursor-pointer" title="Restaura empresas de um .json"><i class="fa-solid fa-upload w-4 text-gray-500"></i>Importar<input type="file" accept=".json,application/json" class="hidden" onchange="importarBackup(this)"></label>
+                    <button id="btnMigrarLocal" onclick="migrarDadosLocais()" class="hidden w-full items-center gap-3 px-3 py-2 rounded-lg text-blue-300 hover:bg-dark-700"><i class="fa-solid fa-cloud-arrow-up w-4"></i>Enviar dados antigos</button>
+                    <button onclick="window.open(location.pathname, '_blank')" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-gray-300 hover:bg-dark-700"><i class="fa-solid fa-bullhorn w-4 text-gray-500"></i>Página de vendas</button>
+                    <button onclick="sairAdmin()" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-red-400 hover:bg-dark-700"><i class="fa-solid fa-right-from-bracket w-4"></i>Sair</button>
                 </div>
-            </div>
+            </aside>
 
-            <!-- Uso da plataforma (banco, fotos, tráfego) -->
-            <div id="painelUso" class="mb-8"></div>
+            <!-- CONTEÚDO -->
+            <section class="flex-1 min-w-0 px-4 md:px-8 py-6">
+                <div id="adminTabsMobile" class="md:hidden flex gap-2 overflow-x-auto pb-3 mb-4 -mx-4 px-4"></div>
+                <div class="md:hidden flex flex-wrap gap-2 mb-5 text-xs">
+                    <button onclick="exportarBackup()" class="bg-dark-800 text-gray-300 px-3 py-2 rounded-lg border border-dark-700"><i class="fa-solid fa-download mr-1"></i>Backup</button>
+                    <label class="bg-dark-800 text-gray-300 px-3 py-2 rounded-lg border border-dark-700 cursor-pointer"><i class="fa-solid fa-upload mr-1"></i>Importar<input type="file" accept=".json,application/json" class="hidden" onchange="importarBackup(this)"></label>
+                    <button onclick="window.open(location.pathname, '_blank')" class="bg-dark-800 text-gray-300 px-3 py-2 rounded-lg border border-dark-700"><i class="fa-solid fa-bullhorn mr-1"></i>Vendas</button>
+                    <button onclick="sairAdmin()" class="bg-dark-800 text-red-400 px-3 py-2 rounded-lg border border-dark-700"><i class="fa-solid fa-right-from-bracket mr-1"></i>Sair</button>
+                </div>
 
-            <!-- Tabela de Empresas Clientes do SaaS -->
-            <div class="bg-dark-800 rounded-xl border border-dark-700 overflow-hidden shadow-xl">
-                <div class="p-4 border-b border-dark-700 flex justify-between items-center">
-                    <h3 class="font-vintage font-bold text-lg text-white">Empresas Cadastradas na Plataforma</h3>
-                    <input id="buscaEmpresa" oninput="renderAdminTabela()" placeholder="Buscar empresa..." class="bg-dark-900 border border-dark-700 text-white rounded-lg px-3 py-1.5 text-sm outline-none w-48">
+                <!-- ABA: BANCO DE DADOS -->
+                <div id="admAbaUso" class="hidden">
+                    <div id="painelUso"></div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm text-gray-300">
-                        <thead class="bg-dark-900 text-gold-400 uppercase text-xs font-semibold border-b border-dark-700">
-                            <tr>
-                                <th class="p-4">Empresa</th>
-                                <th class="p-4">Nicho</th>
-                                <th class="p-4">WhatsApp</th>
-                                <th class="p-4">Plano / Valor</th>
-                                <th class="p-4">Status Mensalidade</th>
-                                <th class="p-4 text-center">Ações & Controle</th>
-                            </tr>
-                        </thead>
-                        <tbody id="adminEmpresasTable" class="divide-y divide-dark-700"></tbody>
-                    </table>
+
+                <!-- ABA: CADASTRAR EMPRESA -->
+                <div id="admAbaCadastro" class="hidden max-w-4xl">
+                    <h1 class="font-vintage text-2xl md:text-3xl font-bold text-white">Cadastrar empresa</h1>
+                    <p class="text-sm text-gray-400 mt-1 mb-6">Escolha o nicho: a empresa já nasce com layout, cores, serviços e textos dele.</p>
+                    <div id="cadNichos" class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6"></div>
+                    <div class="bg-dark-800 border border-dark-700 rounded-2xl p-5 space-y-4">
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div><label class="block text-xs text-gray-400 mb-1">Nome do estabelecimento</label><input id="cadNome" class="campo-painel" placeholder="Ex: Barbearia do Zé"></div>
+                            <div><label class="block text-xs text-gray-400 mb-1">WhatsApp que recebe os agendamentos</label><input id="cadWhats" class="campo-painel" inputmode="numeric" placeholder="5549999999999"></div>
+                        </div>
+                        <div class="grid sm:grid-cols-2 gap-4">
+                            <div><label class="block text-xs text-gray-400 mb-1">Plano</label>
+                                <select id="cadPlano" class="campo-painel">
+                                    <option value="Setup + Mensal">R$ 599,90 Setup + R$ 79,90/mês</option>
+                                    <option value="Trimestral">Trimestral (5% desc)</option>
+                                    <option value="Anual">Anual (10% desc)</option>
+                                </select></div>
+                            <div><label class="block text-xs text-gray-400 mb-1">Status da mensalidade</label>
+                                <select id="cadStatus" class="campo-painel">
+                                    <option value="Ativo">🟢 Ativo (Em dia)</option>
+                                    <option value="Atrasado">🔴 Em Atraso (Bloquear)</option>
+                                    <option value="Cancelado">⚪ Cancelado</option>
+                                </select></div>
+                        </div>
+                        <label class="flex items-center gap-2 text-xs text-gray-300 cursor-pointer"><input type="checkbox" id="cadVitrine"> Mostrar como exemplo na página de vendas</label>
+                        <div class="border-t border-dark-700 pt-4">
+                            <p class="text-sm text-white font-semibold mb-2"><i class="fa-solid fa-store text-gold-400 mr-1.5"></i>Acesso do dono <span class="text-gray-500 font-normal text-xs">(opcional, dá pra criar depois na ⚙️)</span></p>
+                            <div class="grid sm:grid-cols-2 gap-4">
+                                <input id="cadDonoEmail" type="email" class="campo-painel" placeholder="e-mail do dono">
+                                <input id="cadDonoSenha" type="text" class="campo-painel" placeholder="senha provisória (6+)">
+                            </div>
+                        </div>
+                        <button type="button" id="btnCadastrar" onclick="cadastrarEmpresaAba()" class="w-full bg-gold-500 hover:bg-gold-400 text-onbrand font-bold rounded-xl py-3"><i class="fa-solid fa-circle-plus mr-1.5"></i>Cadastrar empresa</button>
+                    </div>
+                    <div id="cadResultado" class="mt-4"></div>
                 </div>
-            </div>
+
+                <!-- ABA: LISTA (todas ou por nicho) -->
+                <div id="admAbaLista" class="hidden">
+                    <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+                        <div>
+                            <h1 id="admListaTitulo" class="font-vintage text-2xl md:text-3xl font-bold text-white"></h1>
+                            <p id="admListaSub" class="text-sm text-gray-400"></p>
+                        </div>
+                        <div class="flex gap-2">
+                            <input id="buscaEmpresa" oninput="renderAdminTabela()" placeholder="Buscar empresa..." class="bg-dark-800 border border-dark-700 text-white rounded-lg px-3 py-2 text-sm outline-none w-44 sm:w-56">
+                            <button type="button" id="admBtnNova" onclick="novaNoNicho()" class="bg-gold-500 hover:bg-gold-400 text-onbrand font-bold px-4 py-2 rounded-lg text-sm whitespace-nowrap"></button>
+                        </div>
+                    </div>
+                    <div id="admResumo" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5"></div>
+                    <div class="bg-dark-800 rounded-xl border border-dark-700 overflow-hidden shadow-xl">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left text-sm text-gray-300">
+                                <thead class="bg-dark-900 text-gold-400 uppercase text-xs font-semibold border-b border-dark-700">
+                                    <tr>
+                                        <th class="p-4">Empresa</th>
+                                        <th class="p-4">Nicho</th>
+                                        <th class="p-4">WhatsApp</th>
+                                        <th class="p-4">Plano / Valor</th>
+                                        <th class="p-4">Status Mensalidade</th>
+                                        <th class="p-4 text-center">Ações & Controle</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="adminEmpresasTable" class="divide-y divide-dark-700"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </section>
         </div>
     </main>
 
@@ -1212,6 +1264,7 @@
             document.getElementById('mainHeader').classList.toggle('hidden', id === 'vendasView');
             document.body.classList.toggle('ver-site', id === 'clientView');
             if (id === 'vendasView' || id === 'superAdminView') { document.body.classList.remove('amb', 'tl'); document.body.dataset.ambiente = ''; }
+            document.body.classList.toggle('modo-admin', id === 'superAdminView');
             const painel = id === 'donoView';
             document.body.classList.toggle('modo-painel', painel);
             const topo = document.getElementById('painelTopo');
@@ -1239,9 +1292,8 @@
                 mostrarSo('superAdminView');
                 history.replaceState(null, '', '?admin');
                 await carregarEmpresas();
-                document.getElementById('btnMigrarLocal').classList.toggle('hidden', !localStorage.getItem('agendify_empresas'));
-                renderAdminTabela();
-                carregarUso();
+                { const m = document.getElementById('btnMigrarLocal'), tem = !!localStorage.getItem('agendify_empresas'); m.classList.toggle('hidden', !tem); m.classList.toggle('flex', tem); }
+                abrirAbaAdmin(admAba);
             }
         }
 
@@ -1925,7 +1977,21 @@
 
         function renderAdminTabela() {
             const busca = (document.getElementById('buscaEmpresa').value || '').toLowerCase();
-            const empresas = getEmpresas().filter(e => !busca || `${e.nome} ${e.nicho} ${e.whatsapp}`.toLowerCase().includes(busca));
+            const nicho = admAba.startsWith('nicho:') ? admAba.slice(6) : null;
+            const doGrupo = getEmpresas().filter(e => !nicho || nichoDe(e) === nicho);
+            const empresas = doGrupo.filter(e => !busca || `${e.nome} ${e.nicho} ${e.whatsapp}`.toLowerCase().includes(busca));
+            renderSidebarAdmin();
+            document.getElementById('admListaTitulo').innerHTML = nicho
+                ? `<i class="fa-solid ${(NICHOS[nicho] || NICHOS['Outro']).logo} text-gold-400 mr-2 text-xl"></i>${esc(nicho)}`
+                : 'Todas as empresas';
+            document.getElementById('admListaSub').innerText = `${doGrupo.length} empresa${doGrupo.length === 1 ? '' : 's'}${nicho ? ' neste nicho' : ' na plataforma'}`;
+            document.getElementById('admBtnNova').innerHTML = `<i class="fa-solid fa-plus mr-1"></i>${nicho ? `Nova em ${esc(nicho)}` : 'Nova empresa'}`;
+            const card = (t, v, i, cor = 'text-white') => `<div class="bg-dark-800 border border-dark-700 rounded-xl p-4"><p class="text-xs text-gray-400"><i class="fa-solid ${i} text-gold-400 mr-1.5"></i>${t}</p><p class="text-2xl font-bold ${cor} mt-1">${v}</p></div>`;
+            document.getElementById('admResumo').innerHTML =
+                card('Empresas', doGrupo.length, 'fa-building') +
+                card('Em dia', doGrupo.filter(e => e.status === 'Ativo').length, 'fa-circle-check', 'text-green-400') +
+                card('Em atraso', doGrupo.filter(e => e.status === 'Atrasado').length, 'fa-triangle-exclamation', 'text-red-400') +
+                card('Na vitrine', doGrupo.filter(e => e.vitrine).length, 'fa-star', 'text-gold-400');
             document.getElementById('adminEmpresasTable').innerHTML = empresas.map(e => `
                 <tr class="hover:bg-dark-700/40 transition-colors">
                     <td class="p-4 font-bold text-white"><span class="inline-block w-2.5 h-2.5 rounded-full mr-2" style="background:${esc(e.cor)}"></span>${esc(e.nome)}${e.vitrine ? ' <i class="fa-solid fa-star text-gold-400 text-xs" title="Aparece na página de vendas"></i>' : ''} <span class="block text-xs font-normal text-gray-400">ID: #${esc(e.id)} · ?c=${esc(e.slug)}</span></td>
@@ -1943,13 +2009,122 @@
                         <button onclick="deletarEmpresa(${e.id})" class="bg-red-500/20 text-red-400 hover:bg-red-500 hover:text-white px-2.5 py-1.5 rounded text-xs" title="Excluir"><i class="fa-solid fa-trash"></i></button>
                     </td>
                 </tr>
-            `).join('') || `<tr><td colspan="6" class="p-6 text-center text-gray-500">Nenhuma empresa encontrada.</td></tr>`;
+            `).join('') || `<tr><td colspan="6" class="p-6 text-center text-gray-500">${nicho && !doGrupo.length ? `Nenhuma empresa de ${esc(nicho)} ainda. Clique em "Nova em ${esc(nicho)}".` : 'Nenhuma empresa encontrada.'}</td></tr>`;
+        }
+
+        // ---------- Abas do Super-Admin ----------
+        let admAba = localStorage.getItem('agendify_admaba') || 'uso';
+        let cadNicho = 'Barbearia';
+        function nichoDe(e) { return NICHOS[e.nicho] ? e.nicho : 'Outro'; }
+
+        function itensAdmin() {
+            return [
+                { sec: 'Plataforma' },
+                { id: 'uso', icone: 'fa-database', nome: 'Banco de dados' },
+                { id: 'cadastro', icone: 'fa-circle-plus', nome: 'Cadastrar empresa' },
+                { id: 'todas', icone: 'fa-building', nome: 'Todas as empresas', n: EMPRESAS.length },
+                { sec: 'Nichos' },
+                ...Object.keys(NICHOS).map(n => ({ id: 'nicho:' + n, icone: NICHOS[n].logo, nome: n, cor: NICHOS[n].cor, n: EMPRESAS.filter(e => nichoDe(e) === n).length }))
+            ];
+        }
+
+        function renderSidebarAdmin() {
+            const itens = itensAdmin();
+            document.getElementById('adminSidebarItens').innerHTML = itens.map(it => it.sec
+                ? `<p class="px-3 pt-4 pb-2 text-[11px] uppercase tracking-wider text-gray-500 font-semibold">${it.sec}</p>`
+                : `<button type="button" data-admaba="${esc(it.id)}" class="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors ${admAba === it.id ? 'bg-gold-500/15 text-white font-semibold' : 'text-gray-300 hover:bg-dark-700'}">
+                    <i class="fa-solid ${it.icone} w-4 text-center" style="color:${it.cor || 'rgb(var(--g400))'}"></i>
+                    <span class="flex-1 text-left truncate">${esc(it.nome)}</span>
+                    ${it.n !== undefined ? `<span class="text-[11px] px-2 py-0.5 rounded-full ${admAba === it.id ? 'bg-gold-500 text-onbrand' : 'bg-dark-900 text-gray-400'}">${it.n}</span>` : ''}
+                </button>`).join('');
+            document.getElementById('adminTabsMobile').innerHTML = itens.filter(it => !it.sec).map(it =>
+                `<button type="button" data-admaba="${esc(it.id)}" class="shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-full text-xs border ${admAba === it.id ? 'bg-gold-500 text-onbrand border-gold-500 font-bold' : 'border-dark-600 text-gray-300'}"><i class="fa-solid ${it.icone}"></i>${esc(it.nome)}${it.n !== undefined ? ` (${it.n})` : ''}</button>`).join('');
+        }
+
+        function abrirAbaAdmin(aba) {
+            if (!aba || (aba !== 'uso' && aba !== 'cadastro' && aba !== 'todas' && !aba.startsWith('nicho:'))) aba = 'uso';
+            admAba = aba;
+            localStorage.setItem('agendify_admaba', aba);
+            const lista = aba === 'todas' || aba.startsWith('nicho:');
+            document.getElementById('admAbaUso').classList.toggle('hidden', aba !== 'uso');
+            document.getElementById('admAbaCadastro').classList.toggle('hidden', aba !== 'cadastro');
+            document.getElementById('admAbaLista').classList.toggle('hidden', !lista);
+            renderSidebarAdmin();
+            if (aba === 'uso') carregarUso();
+            if (aba === 'cadastro') renderCadastroNichos();
+            if (lista) { document.getElementById('buscaEmpresa').value = ''; renderAdminTabela(); }
+            window.scrollTo({ top: 0 });
+        }
+
+        document.getElementById('superAdminView').addEventListener('click', e => {
+            const b = e.target.closest('[data-admaba]');
+            if (b) { abrirAbaAdmin(b.dataset.admaba); return; }
+            const n = e.target.closest('[data-cadnicho]');
+            if (n) { cadNicho = n.dataset.cadnicho; renderCadastroNichos(); }
+        });
+
+        function novaNoNicho() {
+            if (admAba.startsWith('nicho:')) cadNicho = admAba.slice(6);
+            document.getElementById('cadResultado').innerHTML = '';
+            abrirAbaAdmin('cadastro');
+            setTimeout(() => document.getElementById('cadNome').focus(), 50);
+        }
+
+        function renderCadastroNichos() {
+            document.getElementById('cadNichos').innerHTML = Object.keys(NICHOS).map(n => {
+                const N = NICHOS[n], sel = n === cadNicho;
+                return `<button type="button" data-cadnicho="${esc(n)}" class="text-left rounded-xl p-4 border transition ${sel ? 'border-gold-500 bg-gold-500/10' : 'border-dark-700 bg-dark-800 hover:border-dark-600'}">
+                    <span class="w-10 h-10 rounded-full flex items-center justify-center mb-2" style="background:${N.cor}22;color:${N.cor}"><i class="fa-solid ${N.logo}"></i></span>
+                    <span class="block text-white font-semibold text-sm">${esc(n)}</span>
+                    <span class="block text-[11px] text-gray-500">${esc((TEMAS[N.tema] || TEMAS.moderno).nome)} · ${N.servicos.length} serviços prontos</span>
+                </button>`;
+            }).join('');
+        }
+
+        async function cadastrarEmpresaAba() {
+            const v = id => document.getElementById(id);
+            const nome = v('cadNome').value.trim();
+            const whatsapp = v('cadWhats').value.replace(/\D/g, '');
+            const email = v('cadDonoEmail').value.trim().toLowerCase();
+            const senha = v('cadDonoSenha').value;
+            if (!nome || whatsapp.length < 10) { toast('Preencha o nome e o WhatsApp (55 + DDD + número).'); return; }
+            if (email && senha.length < 6) { toast('A senha do dono precisa ter 6+ caracteres.'); return; }
+            const btn = v('btnCadastrar');
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin mr-1.5"></i>Cadastrando...';
+            const emp = novaEmpresaDoNicho(cadNicho, {
+                id: null, nome, whatsapp, slug: slugUnico(slugify(nome)),
+                plano: v('cadPlano').value, status: v('cadStatus').value, vitrine: v('cadVitrine').checked
+            });
+            const salva = await salvarEmpresaBanco(emp);
+            if (!salva) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-circle-plus mr-1.5"></i>Cadastrar empresa'; return; }
+            let donoMsg = '';
+            if (email) {
+                const { error } = await sbCadastro.auth.signUp({ email, password: senha });
+                if (error && !/registered|exists/i.test(error.message)) donoMsg = `⚠️ O acesso do dono não foi criado (${error.message}). Crie depois na ⚙️.`;
+                else donoMsg = (await vincularDono(salva.id, email, senha)) ? `✅ Acesso do dono criado: ${email}` : '⚠️ O acesso do dono não foi criado. Crie depois na ⚙️.';
+            }
+            btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-circle-plus mr-1.5"></i>Cadastrar empresa';
+            ['cadNome', 'cadWhats', 'cadDonoEmail', 'cadDonoSenha'].forEach(id => v(id).value = '');
+            v('cadVitrine').checked = false;
+            v('cadResultado').innerHTML = `<div class="bg-green-500/10 border border-green-500/30 rounded-xl p-4 space-y-3">
+                <p class="text-green-300 font-semibold"><i class="fa-solid fa-circle-check mr-1.5"></i>${esc(salva.nome)} cadastrada em ${esc(salva.nicho)}!</p>
+                ${donoMsg ? `<p class="text-sm text-gray-300">${esc(donoMsg)}</p>` : ''}
+                <p class="text-xs text-gray-400 break-all">Link: ${esc(linkEmpresa(salva))}</p>
+                <div class="flex flex-wrap gap-2 text-sm">
+                    <button onclick="ativarEdicaoVisualParaEmpresa(${salva.id})" class="bg-gold-500 text-onbrand font-bold px-4 py-2 rounded-lg"><i class="fa-solid fa-pen mr-1"></i>Editar visualmente</button>
+                    <button onclick="window.open('?c=${esc(salva.slug)}', '_blank')" class="bg-dark-800 text-gray-300 px-4 py-2 rounded-lg border border-dark-700"><i class="fa-solid fa-eye mr-1"></i>Ver site</button>
+                    <button onclick="copiarLinkEmpresa(${salva.id})" class="bg-dark-800 text-gray-300 px-4 py-2 rounded-lg border border-dark-700"><i class="fa-solid fa-link mr-1"></i>Copiar link</button>
+                    <button onclick="abrirAbaAdmin('nicho:${esc(nichoDe(salva))}')" class="bg-dark-800 text-gray-300 px-4 py-2 rounded-lg border border-dark-700"><i class="fa-solid fa-list mr-1"></i>Ver em ${esc(nichoDe(salva))}</button>
+                </div>
+            </div>`;
+            renderSidebarAdmin();
         }
 
         function carregarEmpresaEVer(id) { empresaAtivaId = id; showView('client'); }
         function copiarLinkEmpresa(id) { const e = getEmpresas().find(x => x.id == id); if (e) copiarTexto(linkEmpresa(e)); }
 
         function openNovaEmpresaModal() {
+            if (!document.getElementById('superAdminView').classList.contains('hidden')) { novaNoNicho(); return; }
             document.getElementById('modalEmpresaTitulo').innerText = "Cadastrar Nova Empresa";
             document.getElementById('editEmpresaId').value = "";
             document.getElementById('modalNome').value = "";
