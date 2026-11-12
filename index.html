@@ -1118,7 +1118,7 @@
         const PARAMS = new URLSearchParams(location.search);
         const MODO = PARAMS.has('admin') ? 'admin' : PARAMS.has('painel') ? 'painel' : 'site';
         // Cliente separado só pra criar login de dono sem derrubar a sessão do admin
-        const sbCadastro = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false, autoRefreshToken: false, storageKey: 'agendify-cadastro' } });
+        const sbCadastro = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, { auth: { persistSession: false, autoRefreshToken: false, storageKey: 'agendaco-cadastro' } });
 
         function paraBanco(emp) { const o = {}; COLUNAS.forEach(k => o[k] = emp[k] ?? null); return o; }
         function getEmpresas() { return EMPRESAS; }
@@ -1159,8 +1159,8 @@
         }
 
         // "Meus agendamentos" do cliente final ficam neste aparelho (id + código pra cancelar)
-        function getMeus() { return JSON.parse(localStorage.getItem('agendify_meus') || '[]'); }
-        function saveMeus(lista) { localStorage.setItem('agendify_meus', JSON.stringify(lista)); }
+        function getMeus() { return JSON.parse(localStorage.getItem('agendaco_meus') || '[]'); }
+        function saveMeus(lista) { localStorage.setItem('agendaco_meus', JSON.stringify(lista)); }
 
         // Horários já ocupados (o banco devolve só a hora, sem nome/telefone de ninguém)
         const cacheOcupados = {};
@@ -2152,7 +2152,7 @@
                 sb.from('cobrancas').select('*').eq('empresa_id', empId).maybeSingle(),
                 sb.from('cobrancas_eventos').select('tipo,status,valor,criado_em').eq('empresa_id', empId).order('criado_em', { ascending: false }).limit(5)
             ]);
-            if (error) { st.innerHTML = 'Rode o <b>agendify-supabase-v12.sql</b> pra liberar a cobrança.'; return; }
+            if (error) { st.innerHTML = 'Rode o <b>SQL v12</b> pra liberar a cobrança.'; return; }
             document.getElementById('cobEmail').value = c?.email || '';
             const d = iso => iso ? new Date(iso).toLocaleDateString('pt-BR') : '—';
             st.innerHTML = !c ? 'Sem cobrança automática ainda. Gere o link e mande pro cliente.' : `
@@ -2194,7 +2194,7 @@
         }
 
         // ---------- Abas do Super-Admin ----------
-        let admAba = localStorage.getItem('agendify_admaba') || 'uso';
+        let admAba = localStorage.getItem('agendaco_admaba') || 'uso';
         let cadNicho = 'Barbearia';
         function nichoDe(e) { return NICHOS[e.nicho] ? e.nicho : 'Outro'; }
 
@@ -2225,7 +2225,7 @@
         function abrirAbaAdmin(aba) {
             if (!aba || (aba !== 'uso' && aba !== 'cadastro' && aba !== 'todas' && !aba.startsWith('nicho:'))) aba = 'uso';
             admAba = aba;
-            localStorage.setItem('agendify_admaba', aba);
+            localStorage.setItem('agendaco_admaba', aba);
             const lista = aba === 'todas' || aba.startsWith('nicho:');
             document.getElementById('admAbaUso').classList.toggle('hidden', aba !== 'uso');
             document.getElementById('admAbaCadastro').classList.toggle('hidden', aba !== 'cadastro');
@@ -2385,7 +2385,7 @@
             const blob = new Blob([JSON.stringify({ versao: 2, exportadoEm: new Date().toISOString(), empresas: getEmpresas() }, null, 2)], { type: 'application/json' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `agendify-backup-${hojeISO()}.json`;
+            a.download = `agendaco-backup-${hojeISO()}.json`;
             a.click();
             URL.revokeObjectURL(a.href);
         }
@@ -2727,7 +2727,7 @@
 
         function registrarVisita(empId) {
             if (EMBED || souAdmin || souDono) return;
-            const k = `agendify_visita_${empId}`;
+            const k = `agendaco_visita_${empId}`;
             if (sessionStorage.getItem(k)) return;
             sessionStorage.setItem(k, '1');
             sb.rpc('registrar_visita', { p_empresa: empId }).then(() => {}, () => {});
@@ -2746,7 +2746,7 @@
             const box = document.getElementById('painelUso');
             box.innerHTML = '<p class="text-gray-500 text-sm"><i class="fa-solid fa-circle-notch fa-spin mr-2"></i>Calculando o uso...</p>';
             const { data: u, error } = await sb.rpc('admin_uso');
-            if (error) { box.innerHTML = '<div class="text-sm bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 rounded-xl p-4">Rode o <b>agendify-supabase-v11.sql</b> no Supabase pra ver o uso aqui.</div>'; return; }
+            if (error) { box.innerHTML = '<div class="text-sm bg-yellow-500/10 border border-yellow-500/30 text-yellow-300 rounded-xl p-4">Rode o <b>SQL v11</b> no Supabase pra ver o uso aqui.</div>'; return; }
 
             // tamanho do site (o que a Vercel entrega a cada visita), comprimido ~25%
             let htmlBytes = 0;
@@ -2982,7 +2982,7 @@
             const el = document.getElementById('listaDonos');
             el.innerHTML = '<span class="text-gray-500">Carregando...</span>';
             const { data, error } = await sb.from('donos').select('user_id, email').eq('empresa_id', empId);
-            if (error) { el.innerHTML = '<span class="text-red-400">Rode o agendify-supabase-v3.sql pra liberar o painel do dono.</span>'; return; }
+            if (error) { el.innerHTML = '<span class="text-red-400">Rode o SQL v3 pra liberar o painel do dono.</span>'; return; }
             el.innerHTML = data.map(d => `<div class="flex justify-between items-center bg-dark-800 rounded px-2 py-1.5"><span><i class="fa-solid fa-user mr-1 text-gray-500"></i>${esc(d.email || d.user_id)}</span><span class="flex gap-3"><button type="button" onclick="novaSenhaDono('${esc(d.email)}', ${empId})" class="text-gold-400 hover:text-white">nova senha</button><button type="button" onclick="removerDono('${d.user_id}', ${empId})" class="text-red-400 hover:text-red-300">remover</button></span></div>`).join('') || '<span class="text-gray-500">Nenhum dono com acesso ainda.</span>';
         }
 
@@ -3189,7 +3189,7 @@
         }
 
         // ---------- Abas do painel do dono ----------
-        let donoAba = localStorage.getItem('agendify_donoaba') || 'agenda';
+        let donoAba = localStorage.getItem('agendaco_donoaba') || 'agenda';
         let periodoRel = 30, clientesCache = [];
 
         function itensDono() {
@@ -3222,7 +3222,7 @@
         function abrirAbaDono(aba) {
             if (!['agenda', 'proximos', 'clientes', 'relatorio'].includes(aba)) aba = 'agenda';
             donoAba = aba;
-            localStorage.setItem('agendify_donoaba', aba);
+            localStorage.setItem('agendaco_donoaba', aba);
             const mapa = { agenda: 'donoAbaAgenda', proximos: 'donoAbaProximos', clientes: 'donoAbaClientes', relatorio: 'donoAbaRelatorio' };
             Object.entries(mapa).forEach(([k, id]) => document.getElementById(id).classList.toggle('hidden', k !== aba));
             renderSidebarDono();
@@ -3350,7 +3350,7 @@
 
         // ---------- Notificações: agendamentos novos que chegaram pelo site ----------
         let notifConhecidos = null, notifLista = [];
-        const chaveVisto = () => `agendify_visto_${empresaPainelId}`;
+        const chaveVisto = () => `agendaco_visto_${empresaPainelId}`;
 
         async function checarNotificacoes(primeira = false) {
             if (!empresaPainelId) return;
